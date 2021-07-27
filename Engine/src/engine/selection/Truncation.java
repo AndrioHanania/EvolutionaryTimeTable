@@ -9,7 +9,7 @@ public class Truncation<T extends Solution> implements Selection<T>
 {
     //Members
     private int m_TopPercent;
-    private String m_Configuration;
+    //private String m_Configuration;
 
     //Constructors
     public Truncation(int topPercent)
