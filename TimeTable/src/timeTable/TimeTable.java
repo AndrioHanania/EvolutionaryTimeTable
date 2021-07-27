@@ -10,6 +10,7 @@ import generated.ETTTimeTable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 public class TimeTable extends Solution implements Problem<TimeTable>
 {
@@ -17,7 +18,7 @@ public class TimeTable extends Solution implements Problem<TimeTable>
     private List<TimeTableChromosome> m_Chromosomes;
     private List<Teacher> m_Teachers;
     private List<Subject> m_Subjects;
-    private  List<Class> m_classes;
+    private  List<Class> m_Classes;
     private int m_DaysForStudy;
     private int m_HourStudyForDay;
     //rules
@@ -25,10 +26,11 @@ public class TimeTable extends Solution implements Problem<TimeTable>
     //Constructors
     public TimeTable()
     {
-        List<TimeTableChromosome> m_Chromosomes = new ArrayList<>();
-        List<Teacher> m_Teachers = new ArrayList<>();
-        List<Subject> m_Subjects = new ArrayList<>();
-        List<Class> m_classes =  new ArrayList<>();
+        m_Chromosomes = new ArrayList<>();
+        m_Teachers = new ArrayList<>();
+        m_Subjects = new ArrayList<>();
+        m_Classes =  new ArrayList<>();
+
     }
 
     public TimeTable(ETTTimeTable eTTTimeTable)
@@ -53,12 +55,12 @@ public class TimeTable extends Solution implements Problem<TimeTable>
     }
 
     private void initializeclasses(ETTTimeTable eTTTimeTable){
-        m_classes = new ArrayList<>();
+        m_Classes = new ArrayList<>();
         List<ETTClass> listETTClass = eTTTimeTable.getETTClasses().getETTClass();
         for(ETTClass eTTClass : listETTClass) {
-            m_classes.add(new Class(eTTClass));
+            m_Classes.add(new Class(eTTClass));
         }
-        m_classes.sort(Comparator.comparingInt(Class::getIdNumber));
+        m_Classes.sort(Comparator.comparingInt(Class::getIdNumber));
     }
 
     private void initializeTeachers(ETTTimeTable eTTTimeTable){
@@ -92,7 +94,7 @@ public class TimeTable extends Solution implements Problem<TimeTable>
         }
         settings.append("Classes:");
         settings.append(System.lineSeparator());
-        for(Class clazz : m_classes)
+        for(Class clazz : m_Classes)
         {
             settings.append(clazz);
         }
@@ -106,8 +108,52 @@ public class TimeTable extends Solution implements Problem<TimeTable>
 
     }
 
+    public void randomizeAttributes(TimeTable timeTable)
+    {
+        Random random = new Random();
+        int numOfChromosome = random.nextInt(m_DaysForStudy * m_HourStudyForDay * Math.max(m_Teachers.size(),m_Subjects.size()) +1);
+        for(int i=0;i<numOfChromosome;i++)
+        {
+            Teacher randomTeacher = m_Teachers.get(random.nextInt(m_Teachers.size()));
+            int randomIdSubject = randomTeacher.getIdOSubjectsTeachable().get(random.nextInt(randomTeacher.getIdOSubjectsTeachable().size()));
+            Subject randomSubject = null;
+            for(Subject subject : m_Subjects)
+            {
+                if(subject.getIdNumber() == randomIdSubject)
+                {
+                    randomSubject = subject;
+                    break;
+                }
+            }
+            Class clazz= null;
+            for(Class Class : m_Classes)
+            {
+                if( Class.getMapIdSubjectToHoursInWeek().containsKey(randomIdSubject))
+                {
+                    clazz = Class;
+                    break;
+                }
+            }
+            int randomHour = random.nextInt(m_HourStudyForDay + 1) + 8;
+            int randomDay = random.nextInt(m_DaysForStudy) + 1;
+            timeTable.m_Chromosomes.add(new TimeTableChromosome(randomDay, randomHour, clazz, randomTeacher, randomSubject));
+        }
+    }
     @Override
     public TimeTable newRandomInstance() {
-        return null;
+
+        TimeTable timeTable = new TimeTable();/////////////
+        timeTable.randomizeAttributes(timeTable);
+        timeTable.m_Subjects = this.m_Subjects;
+        timeTable.m_Classes = this.m_Classes;
+        timeTable.m_Teachers = this.m_Teachers;
+        timeTable.m_DaysForStudy =this.m_DaysForStudy;
+        timeTable.m_HourStudyForDay = this.m_HourStudyForDay;
+        return timeTable;
+    }
+
+    @Override
+    public void remove() {
+        this.m_Chromosomes.remove(this.m_Chromosomes.size()-1);
     }
 }

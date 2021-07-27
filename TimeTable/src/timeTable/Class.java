@@ -63,6 +63,9 @@ public class Class
     }
 
     //Getters
+    public Map<Integer, Integer> getMapIdSubjectToHoursInWeek(){return m_MapIdSubjectToHoursInWeek;}
+
+
     public int getIdNumber()
     { return m_IdNumber; }
 

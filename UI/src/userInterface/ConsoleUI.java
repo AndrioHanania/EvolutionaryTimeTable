@@ -84,7 +84,7 @@ public class ConsoleUI extends UI
             InputStream inputStream = new FileInputStream(new File("Jaxb/src/schema/fileInfo.xml"));
             ETTDescriptor eTTEvolutionEngine = deserializeFrom(inputStream);
             timeTable = new TimeTable(eTTEvolutionEngine.getETTTimeTable());
-            engine = new Engine<>(eTTEvolutionEngine.getETTEvolutionEngine(), m_TimeTable, 100);
+            engine = new Engine<>(eTTEvolutionEngine.getETTEvolutionEngine(), timeTable, 100);
             m_IsXmlFileLoad = true;
             m_Engine = engine;
             m_TimeTable = timeTable;
@@ -117,6 +117,12 @@ public class ConsoleUI extends UI
 
     @Override
     public void runEvolutionaryAlgorithm() {
+        if(m_IsXmlFileLoad) {
+            m_Engine.run();
+        }
+        else{
+
+        }
 
     }
 

@@ -88,9 +88,9 @@ public class Engine<T extends Solution > implements Runnable
         settings.append("Engine: ");
         settings.append(System.lineSeparator());
         settings.append("size of population= " + m_SizeOfFirstPopulation);
-        settings.append(m_Selection);
-        settings.append(m_Crossover);
-        settings.append(m_Mutation);
+        settings.append(m_Selection);///
+        settings.append(m_Crossover);///
+        settings.append(m_Mutation);///
         return settings.toString();
     }
 

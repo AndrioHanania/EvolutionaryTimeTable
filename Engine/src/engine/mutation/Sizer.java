@@ -2,7 +2,7 @@ package engine.mutation;
 
 import engine.Solution;
 
-public class Sizer<T extends Solution> implements Mutation<T>
+public class Sizer<T extends Solution/* &  Problem*/> implements Mutation<T>
 {
     //Members
     private int m_TotalTupples;
@@ -17,7 +17,8 @@ public class Sizer<T extends Solution> implements Mutation<T>
     @Override
     public void execute(T item) {
         int numOfChromosomeToMutation = m_Random.nextInt(m_TotalTupples)+1;
-        if(m_TotalTupples >0)
+
+        if(m_TotalTupples > 0)
         {
 
         }
