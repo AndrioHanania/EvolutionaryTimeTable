@@ -9,6 +9,7 @@ import java.util.Random;
 
 public class Engine<T extends Solution > implements Runnable
 {
+    private int check=5;
     //Members
     private Crossover<T> m_Crossover;
     private Mutation<T> m_Mutation;
