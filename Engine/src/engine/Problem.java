@@ -1,7 +1,9 @@
 package engine;
 
 
-public interface Problem<T extends Solution>
+public interface Problem
 {
-    public T newRandomInstance();
+    public Solution newRandomInstance();
+
+    public Chromosome newRandomChromosome();
 }

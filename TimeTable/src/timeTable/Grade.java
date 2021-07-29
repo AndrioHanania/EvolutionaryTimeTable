@@ -7,7 +7,7 @@ import generated.ETTStudy;
 import java.util.*;
 
 
-public class Class
+public class Grade
 {
     //Members
     private int m_IdNumber;
@@ -15,20 +15,20 @@ public class Class
     Map<Integer, Integer> m_MapIdSubjectToHoursInWeek;
 
     //Constructors
-    public Class ()
+    public Grade()
     {
         m_Name= new String();
         m_MapIdSubjectToHoursInWeek = new HashMap();
     }
 
-    public Class (int idNumber, String name, Map<Integer, Integer> map)
+    public Grade(int idNumber, String name, Map<Integer, Integer> map)
     {
         m_IdNumber = idNumber;
         m_Name= name;
         m_MapIdSubjectToHoursInWeek = map;
     }
 
-    public Class(ETTClass eTTClass) {
+    public Grade(ETTClass eTTClass) {
         m_Name= eTTClass.getETTName();
         m_IdNumber = eTTClass.getId();
         m_MapIdSubjectToHoursInWeek = new TreeMap<>();
@@ -52,7 +52,7 @@ public class Class
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Class aClass = (Class) o;
+        Grade aClass = (Grade) o;
         return m_IdNumber == aClass.m_IdNumber && Objects.equals(m_Name, aClass.m_Name) &&
                 Objects.equals(m_MapIdSubjectToHoursInWeek, aClass.m_MapIdSubjectToHoursInWeek);
     }

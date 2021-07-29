@@ -1,5 +1,6 @@
 package timeTable;
 
+import engine.Chromosome;
 import engine.Solution;
 import engine.Problem;
 import generated.ETTClass;
@@ -12,13 +13,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-public class TimeTable extends Solution implements Problem<TimeTable>
+public class TimeTable extends Solution implements Problem
 {
     //Members
     private List<TimeTableChromosome> m_Chromosomes;
     private List<Teacher> m_Teachers;
     private List<Subject> m_Subjects;
-    private  List<Class> m_Classes;
+    private  List<Grade> m_Classes;
     private int m_DaysForStudy;
     private int m_HourStudyForDay;
     //rules
@@ -58,9 +59,9 @@ public class TimeTable extends Solution implements Problem<TimeTable>
         m_Classes = new ArrayList<>();
         List<ETTClass> listETTClass = eTTTimeTable.getETTClasses().getETTClass();
         for(ETTClass eTTClass : listETTClass) {
-            m_Classes.add(new Class(eTTClass));
+            m_Classes.add(new Grade(eTTClass));
         }
-        m_Classes.sort(Comparator.comparingInt(Class::getIdNumber));
+        m_Classes.sort(Comparator.comparingInt(Grade::getIdNumber));
     }
 
     private void initializeTeachers(ETTTimeTable eTTTimeTable){
@@ -94,7 +95,7 @@ public class TimeTable extends Solution implements Problem<TimeTable>
         }
         settings.append("Classes:");
         settings.append(System.lineSeparator());
-        for(Class clazz : m_Classes)
+        for(Grade clazz : m_Classes)
         {
             settings.append(clazz);
         }
@@ -108,35 +109,16 @@ public class TimeTable extends Solution implements Problem<TimeTable>
 
     }
 
+
+
+
     public void randomizeAttributes(TimeTable timeTable)
     {
         Random random = new Random();
         int numOfChromosome = random.nextInt(m_DaysForStudy * m_HourStudyForDay * Math.max(m_Teachers.size(),m_Subjects.size()) +1);
         for(int i=0;i<numOfChromosome;i++)
         {
-            Teacher randomTeacher = m_Teachers.get(random.nextInt(m_Teachers.size()));
-            int randomIdSubject = randomTeacher.getIdOSubjectsTeachable().get(random.nextInt(randomTeacher.getIdOSubjectsTeachable().size()));
-            Subject randomSubject = null;
-            for(Subject subject : m_Subjects)
-            {
-                if(subject.getIdNumber() == randomIdSubject)
-                {
-                    randomSubject = subject;
-                    break;
-                }
-            }
-            Class clazz= null;
-            for(Class Class : m_Classes)
-            {
-                if( Class.getMapIdSubjectToHoursInWeek().containsKey(randomIdSubject))
-                {
-                    clazz = Class;
-                    break;
-                }
-            }
-            int randomHour = random.nextInt(m_HourStudyForDay + 1) + 8;
-            int randomDay = random.nextInt(m_DaysForStudy) + 1;
-            timeTable.m_Chromosomes.add(new TimeTableChromosome(randomDay, randomHour, clazz, randomTeacher, randomSubject));
+            timeTable.m_Chromosomes.add((TimeTableChromosome) newRandomChromosome());
         }
     }
     @Override
@@ -150,5 +132,48 @@ public class TimeTable extends Solution implements Problem<TimeTable>
         timeTable.m_DaysForStudy =this.m_DaysForStudy;
         timeTable.m_HourStudyForDay = this.m_HourStudyForDay;
         return timeTable;
+    }
+
+    @Override
+    public Chromosome newRandomChromosome() {
+        Random random = new Random();
+        Teacher randomTeacher = m_Teachers.get(random.nextInt(m_Teachers.size()));
+        int randomIdSubject = randomTeacher.getIdOSubjectsTeachable().get(random.nextInt(randomTeacher.getIdOSubjectsTeachable().size()));
+        Subject randomSubject = null;
+        for(Subject subject : m_Subjects)
+        {
+            if(subject.getIdNumber() == randomIdSubject)
+            {
+                randomSubject = subject;
+                break;
+            }
+        }
+        Grade clazz= null;
+        for(Grade Class : m_Classes)
+        {
+            if( Class.getMapIdSubjectToHoursInWeek().containsKey(randomIdSubject))
+            {
+                clazz = Class;
+                break;
+            }
+        }
+        int randomHour = random.nextInt(m_HourStudyForDay + 1) + 8;
+        int randomDay = random.nextInt(m_DaysForStudy) + 1;
+        return new TimeTableChromosome(randomDay, randomHour, clazz, randomTeacher, randomSubject);
+    }
+
+
+    public List<TimeTableChromosome> getChromosomes(){return m_Chromosomes;}
+
+    public int getDay() {return m_DaysForStudy;
+    }
+
+    public List<Teacher> getTeachers() { return m_Teachers;
+    }
+
+    public List<Grade> getGrades() {return m_Classes;
+    }
+
+    public int getHour() { return m_HourStudyForDay;
     }
 }

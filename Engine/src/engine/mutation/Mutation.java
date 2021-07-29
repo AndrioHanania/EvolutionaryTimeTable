@@ -5,15 +5,15 @@ import generated.ETTMutations;
 
 import java.util.Random;
 
-public interface Mutation<T extends Solution>
+public interface Mutation
 {
     //Members
     Random m_Random = new Random();
 
-    static <T extends Solution> Mutation parse(ETTMutations ettMutations) {
+    public static Mutation parse(ETTMutations ettMutations) {
         return null;
     }
 
     //Methods
-    public abstract void execute(T item);
+    public abstract void execute(Solution item);
 }
