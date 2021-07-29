@@ -2,11 +2,11 @@ package engine.crossover;
 
 import engine.Solution;
 
-public class AspectOriented<T extends Solution> implements Crossover<T>{
+public class AspectOriented implements Crossover{
 
     int x =5;
     //Methods
-    public T execute(T parent1, T parent2) {
+    public Solution execute(Solution parent1, Solution parent2) {
         return null;}
 
 

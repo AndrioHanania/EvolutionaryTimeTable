@@ -7,21 +7,21 @@ import generated.ETTEvolutionEngine;
 
 import java.util.Random;
 
-public class Engine<T extends Solution > implements Runnable
+public class Engine implements Runnable
 {
     //Members
-    private Crossover<T> m_Crossover;
-    private Mutation<T> m_Mutation;
-    private Selection<T> m_Selection;
-    private Problem<T> m_Problem;
+    private Crossover m_Crossover;
+    private Mutation m_Mutation;
+    private Selection m_Selection;
+    private Problem m_Problem;
     private int m_NumOfGeneration = 0;
     private int m_MaxNumOfGeneration;
     private Random m_Random = new Random();
     private int m_SizeOfFirstPopulation;
 
     //Constructors
-    public Engine(Selection<T> selection, Crossover<T> crossover, Mutation<T> mutation,
-                  Problem<T> problem, int sizeOfFirstPopulation, int maxNumOfGeneration)
+    public Engine(Selection selection, Crossover crossover, Mutation mutation,
+                  Problem problem, int sizeOfFirstPopulation, int maxNumOfGeneration)
     {
         m_Selection = selection;
         m_Crossover = crossover;
@@ -31,7 +31,7 @@ public class Engine<T extends Solution > implements Runnable
         m_MaxNumOfGeneration = maxNumOfGeneration;
     }
 
-    public Engine(ETTEvolutionEngine eTTEvolutionEngine, Problem<T> problem, int maxNumOfGeneration)
+    public Engine(ETTEvolutionEngine eTTEvolutionEngine, Problem problem, int maxNumOfGeneration)
     {
         m_Selection = Selection.parse(eTTEvolutionEngine.getETTSelection());
         m_Crossover = Crossover.parse(eTTEvolutionEngine.getETTCrossover());
@@ -49,20 +49,21 @@ public class Engine<T extends Solution > implements Runnable
     //Methods
     public void run()
     {
-        T randomParent1, randomParent2;
-        T solution1, solution2;
-        Population<T> firstPopulation = new Population<>();
+        Solution randomParent1;
+        Solution randomParent2;
+        Solution solution1, solution2;
+        Population firstPopulation = new Population();
         firstPopulation.initializePopulation(m_SizeOfFirstPopulation, m_Problem);
-        firstPopulation.calculateFitness();
+        firstPopulation.calculateFitnessToAll();
 
         while(m_NumOfGeneration < m_MaxNumOfGeneration)
         {
-           Population<T> selectedParents = new Population<>(m_Selection.execute(firstPopulation));
-            Population<T> nextGeneration = new Population<>();
-           while(nextGeneration.size() < m_SizeOfFirstPopulation)
+           Population selectedParents = new Population(m_Selection.execute(firstPopulation));
+            Population nextGeneration = new Population();
+           while(nextGeneration.getPopulation().size() < m_SizeOfFirstPopulation)
             {
-                randomParent1 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
-                randomParent2 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
+                randomParent1 = selectedParents.getPopulation().get(m_Random.nextInt(m_SizeOfFirstPopulation));
+                randomParent2 = selectedParents.getPopulation().get(m_Random.nextInt(m_SizeOfFirstPopulation));
                 //נייצר 2 פתרונות
                 //Crossover
                 solution1 = m_Crossover.execute(randomParent1, randomParent2);
@@ -73,8 +74,8 @@ public class Engine<T extends Solution > implements Runnable
                 { m_Mutation.execute(solution1);}
                 if(m_Random.nextDouble() < 0.001)////
                 {  m_Mutation.execute(solution2);}
-                nextGeneration.add(solution1);
-                nextGeneration.add(solution2);
+                nextGeneration.getPopulation().add(solution1);
+                nextGeneration.getPopulation().add(solution2);
             }
             m_NumOfGeneration++;
             firstPopulation = nextGeneration;

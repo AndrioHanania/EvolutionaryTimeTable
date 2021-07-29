@@ -5,7 +5,7 @@ import engine.Population;
 
 import java.util.Random;
 
-public class Tournament<T extends Solution> implements Selection<T>
+public class Tournament implements Selection
 {
     //Members
     private double m_Pte;
@@ -20,29 +20,29 @@ public class Tournament<T extends Solution> implements Selection<T>
 
     //Methods
     @Override
-    public Population<T> execute(Population<T> currentGeneration)
+    public Population execute(Population currentGeneration)
     {
-        Population<T> newGeneration = new Population<>();
-        T parent1,parent2;
+        Population newGeneration = new Population();
+        Solution parent1,parent2;
         double randomPte;
-        int sizeOfCurrentGeneration = currentGeneration.size();
-        for (int i=0;i<currentGeneration.size();i++){
-            parent1 = currentGeneration.get(m_Random.nextInt(sizeOfCurrentGeneration));
-            parent2 = currentGeneration.get(m_Random.nextInt(sizeOfCurrentGeneration));
+        int sizeOfCurrentGeneration = currentGeneration.getPopulation().size();
+        for (int i=0;i<currentGeneration.getPopulation().size();i++){
+            parent1 = currentGeneration.getPopulation().get(m_Random.nextInt(sizeOfCurrentGeneration));
+            parent2 = currentGeneration.getPopulation().get(m_Random.nextInt(sizeOfCurrentGeneration));
             randomPte = m_Random.nextDouble();
             if(randomPte > m_Pte)
             {
                 if(parent1.getFitness() > parent2.getFitness()){
-                    newGeneration.add(parent1);
+                    newGeneration.getPopulation().add(parent1);
                 }
-                else  newGeneration.add(parent2);;
+                else  newGeneration.getPopulation().add(parent2);;
             }
             else
             {
                 if(parent1.getFitness() < parent2.getFitness()){
-                    newGeneration.add(parent1);
+                    newGeneration.getPopulation().add(parent1);
                 }
-                else  newGeneration.add(parent2);;
+                else  newGeneration.getPopulation().add(parent2);;
             }
         }
         return newGeneration;

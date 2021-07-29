@@ -5,10 +5,10 @@ import engine.Population;
 import generated.ETTSelection;
 
 
-public interface Selection<T extends Solution>
+public interface Selection
 {
     //Methods
-    public abstract Population<T> execute(Population<T> currentGeneration);
+    public abstract Population execute(Population currentGeneration);
 
     public static Selection parse(ETTSelection eTTSelection)
     {

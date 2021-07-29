@@ -15,7 +15,7 @@ import javax.xml.bind.Unmarshaller;
 public abstract class UI implements Runnable
 {
     //Members
-    protected Engine<TimeTable> m_Engine;
+    protected Engine m_Engine;
     protected boolean m_IsRunning;
     protected boolean m_IsXmlFileLoad;
     protected TimeTable m_TimeTable;

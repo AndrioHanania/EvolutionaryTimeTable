@@ -1,30 +1,39 @@
 package engine;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Population<T extends Solution> extends ArrayList<T>
+public class Population
 {
+    //Members
+    List<Solution> m_Population;
+
+    //Constructors
     public Population()
     {
-        super();
+       m_Population = new ArrayList<>();
     }
 
-    public Population(Population<T> population)
+    public Population(Population population)
     {
-        super(population);
+        m_Population = population.m_Population;
     }
 
-    public void initializePopulation(int sizeOfFirstPopulation, Problem<T> problem)
+    //Methods
+    public void initializePopulation(int sizeOfFirstPopulation, Problem problem)
     {
         for (int i = 0;i < sizeOfFirstPopulation;i++) {
-            this.add(problem.newRandomInstance());
+            m_Population.add(problem.newRandomInstance());
         }
     }
 
-    public void calculateFitness()
+    public void calculateFitnessToAll()
     {
-        for (T item: this) {
-            item.calculateFitness();
+        for (Solution solution: m_Population) {
+            solution.calculateFitness();
         }
     }
+
+    //Getters
+    public List<Solution> getPopulation(){return m_Population;}
 }

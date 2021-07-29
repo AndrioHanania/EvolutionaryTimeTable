@@ -8,7 +8,7 @@ import engine.Population;
 import java.util.Random;
 
 
-public class RouletteWheel<T extends Solution> implements Selection<T>
+public class RouletteWheel implements Selection
 {
     Random m_Random;
 
@@ -18,17 +18,17 @@ public class RouletteWheel<T extends Solution> implements Selection<T>
     }
 
     @Override
-    public Population<T> execute(Population<T> currentGeneration) {
-        Population<T> rouletteWheel = new Population<>();
-        Population<T> newGeneration = new Population<>();
-        for (T item:currentGeneration) {
-            for(int i = 0;i<item.getFitness();i++){
-                rouletteWheel.add(item);
+    public Population execute(Population currentGeneration) {
+        Population rouletteWheel = new Population();
+        Population newGeneration = new Population();
+        for (Solution solution : currentGeneration.getPopulation()) {
+            for(int i = 0;i<solution.getFitness();i++){
+                rouletteWheel.getPopulation().add(solution);
             }
         }
-        int sizeOfRouletteWheel = rouletteWheel.size();
-        for(int i = 0;i<currentGeneration.size();i++){
-            newGeneration.add(rouletteWheel.get(m_Random.nextInt(sizeOfRouletteWheel)));
+        int sizeOfRouletteWheel = rouletteWheel.getPopulation().size();
+        for(int i = 0;i<currentGeneration.getPopulation().size();i++){
+            newGeneration.getPopulation().add(rouletteWheel.getPopulation().get(m_Random.nextInt(sizeOfRouletteWheel)));
         }
         return newGeneration;
     }

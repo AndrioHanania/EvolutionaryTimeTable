@@ -3,12 +3,12 @@ package engine.crossover;
 import engine.Solution;
 import generated.ETTCrossover;
 
-public interface Crossover<T extends Solution>
+public interface Crossover
 {
     static <T extends Solution> Crossover parse(ETTCrossover ettCrossover) {
         return null;
     }
 
     //Methods
-    public abstract T execute(T parent1, T parent2);
+    public abstract Solution execute(Solution parent1, Solution parent2);
 }
