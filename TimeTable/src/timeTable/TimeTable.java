@@ -142,7 +142,7 @@ public class TimeTable extends Solution implements Problem<TimeTable>
     @Override
     public TimeTable newRandomInstance() {
 
-        TimeTable timeTable = new TimeTable();/////////////
+        TimeTable timeTable = new TimeTable();
         timeTable.randomizeAttributes(timeTable);
         timeTable.m_Subjects = this.m_Subjects;
         timeTable.m_Classes = this.m_Classes;
@@ -150,10 +150,5 @@ public class TimeTable extends Solution implements Problem<TimeTable>
         timeTable.m_DaysForStudy =this.m_DaysForStudy;
         timeTable.m_HourStudyForDay = this.m_HourStudyForDay;
         return timeTable;
-    }
-
-    @Override
-    public void remove() {
-        this.m_Chromosomes.remove(this.m_Chromosomes.size()-1);
     }
 }
