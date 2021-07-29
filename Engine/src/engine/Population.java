@@ -14,9 +14,9 @@ public class Population<T extends Solution> extends ArrayList<T>
         super(population);
     }
 
-    public void initializePopulation(int numOfFirstPopulation, Problem<T> problem)
+    public void initializePopulation(int sizeOfFirstPopulation, Problem<T> problem)
     {
-        for (int i = 0;i < numOfFirstPopulation;i++) {
+        for (int i = 0;i < sizeOfFirstPopulation;i++) {
             this.add(problem.newRandomInstance());
         }
     }
