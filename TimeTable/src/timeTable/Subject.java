@@ -31,7 +31,7 @@ public class Subject
     @Override
     public String toString()
     {
-        return "name= " + m_Name + ",ID= " + m_IdNumber;
+        return "name: " + m_Name + ", ID: " + m_IdNumber;
     }
 
     @Override

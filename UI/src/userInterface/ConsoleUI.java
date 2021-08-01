@@ -7,6 +7,7 @@ import timeTable.TimeTable;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,8 +70,12 @@ public class ConsoleUI extends UI
             case 6:
                 exit();
                 break;
+
+            case 7: //for debug
+                showRules();
+                break;
             default:
-                System.out.println("Error with ");
+                System.out.println("Error with input");
         }
     }
 
@@ -88,6 +93,8 @@ public class ConsoleUI extends UI
             m_IsXmlFileLoad = true;
             m_Engine = engine;
             m_TimeTable = timeTable;
+
+            //print to user xml file loaded succuessfully?
         } catch (JAXBException | FileNotFoundException e)
         {
             e.printStackTrace();
@@ -112,6 +119,7 @@ public class ConsoleUI extends UI
         }
         else {
             System.out.println("You need to load first info from xml file");
+            return;
         }
     }
 
@@ -121,6 +129,7 @@ public class ConsoleUI extends UI
             m_Engine.run();
         }
         else{
+            System.out.println("error loading XML file. please try again");
 
         }
 
@@ -128,14 +137,32 @@ public class ConsoleUI extends UI
 
     @Override
     public void showOptimalSolution() {
+        if(m_IsXmlFileLoad) {
+
+        }
+        else {
+            System.out.println("You need to load first info from xml file");
+            return;
+        }
 
     }
 
     @Override
     public void showInterimSolution() {
+        if(m_IsXmlFileLoad) {
+
+        }
+        else {
+            System.out.println("You need to load first info from xml file");
+            return;
+        }
 
     }
 
+    public void showRules()
+    {
+
+    }
     @Override
     public void exit() {
         m_IsRunning = false;

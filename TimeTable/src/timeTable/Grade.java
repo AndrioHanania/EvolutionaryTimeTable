@@ -12,7 +12,7 @@ public class Grade
     //Members
     private int m_IdNumber;
     private String m_Name;
-    Map<Integer, Integer> m_MapIdSubjectToHoursInWeek;
+    Map<Integer, Integer> m_MapIdSubjectToHoursInWeek; //private?
 
     //Constructors
     public Grade()
@@ -42,10 +42,9 @@ public class Grade
     //Methods
     @Override
     public String toString() {
-        return "ID= " + m_IdNumber +
-                ", Name= " + m_Name +
-                ", MapIdSubjectToHoursInWeek=" + m_MapIdSubjectToHoursInWeek +
-                '}';
+        return "ID: " + m_IdNumber +
+                ", Name: " + m_Name +
+                ", MapIdSubjectToHoursInWeek: " + m_MapIdSubjectToHoursInWeek;
     }
 
     @Override

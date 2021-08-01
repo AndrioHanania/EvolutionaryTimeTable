@@ -3,10 +3,7 @@ package timeTable;
 import engine.Chromosome;
 import engine.Solution;
 import engine.Problem;
-import generated.ETTClass;
-import generated.ETTSubject;
-import generated.ETTTeacher;
-import generated.ETTTimeTable;
+import generated.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,10 +16,11 @@ public class TimeTable extends Solution implements Problem
     private List<TimeTableChromosome> m_Chromosomes;
     private List<Teacher> m_Teachers;
     private List<Subject> m_Subjects;
-    private  List<Grade> m_Classes;
+    private  List<Grade> m_Grades;
     private int m_DaysForStudy;
     private int m_HourStudyForDay;
     //rules
+    private List<Rule> m_Rules;
 
     //Constructors
     public TimeTable()
@@ -30,7 +28,7 @@ public class TimeTable extends Solution implements Problem
         m_Chromosomes = new ArrayList<>();
         m_Teachers = new ArrayList<>();
         m_Subjects = new ArrayList<>();
-        m_Classes =  new ArrayList<>();
+        m_Grades =  new ArrayList<>();
 
     }
 
@@ -41,6 +39,7 @@ public class TimeTable extends Solution implements Problem
         initializeSubjects(eTTTimeTable);
         initializeclasses(eTTTimeTable);
         initializeTeachers(eTTTimeTable);
+        initializeRules(eTTTimeTable);
     }
 
     //Methods
@@ -56,50 +55,73 @@ public class TimeTable extends Solution implements Problem
     }
 
     private void initializeclasses(ETTTimeTable eTTTimeTable){
-        m_Classes = new ArrayList<>();
+        m_Grades = new ArrayList<>();
         List<ETTClass> listETTClass = eTTTimeTable.getETTClasses().getETTClass();
         for(ETTClass eTTClass : listETTClass) {
-            m_Classes.add(new Grade(eTTClass));
+            m_Grades.add(new Grade(eTTClass));
         }
-        m_Classes.sort(Comparator.comparingInt(Grade::getIdNumber));
+        m_Grades.sort(Comparator.comparingInt(Grade::getIdNumber));
     }
 
     private void initializeTeachers(ETTTimeTable eTTTimeTable){
         m_Teachers = new ArrayList<>();
-        List<ETTTeacher> listETTTeacher = eTTTimeTable.getETTTeachers().getETTTeacher();
+        List<ETTTeacher> listETTTeacher = eTTTimeTable.getETTTeachers().getETTTeacher(); //why get teacher at the end?
         for(ETTTeacher eTTTeacher : listETTTeacher) {
             m_Teachers.add(new Teacher(eTTTeacher));
         }
         m_Teachers.sort(Comparator.comparingInt(Teacher::getIdNumber));
     }
 
+    private  void initializeRules(ETTTimeTable ettTimeTable)
+    {
+        m_Rules = new ArrayList<>();
+        List<ETTRule> listETTRules = ettTimeTable.getETTRules().getETTRule();
+        for (ETTRule ettRule : listETTRules)
+        {
+            m_Rules.add(new Rule((ettRule)));
+        }
+       // m_Rules.sort((Comparator.comparingInt(Rule::get))); //compared by rule strickness
+    }
     public List<Subject> getSubjects(){return m_Subjects;}
 
 
 
     public String toString(){
         StringBuilder settings = new StringBuilder();
-        settings.append("Time table:");
-        settings.append(System.lineSeparator());
-        settings.append("Subjects:");
-        settings.append(System.lineSeparator());
+      ///  settings.append("Time table: ");
+      //  settings.append(System.lineSeparator());
+        //settings.append("Subjects: ");
+       // settings.append(System.lineSeparator());
+    //    settings.append("Rules: ");
+    //   settings.append(System.lineSeparator());
         for(Subject subject : m_Subjects)
         {
             settings.append(subject);
+            settings.append(System.lineSeparator());
         }
-        settings.append("Teachers:");
+        settings.append("Teachers: ");
         settings.append(System.lineSeparator());
         for(Teacher teacher : m_Teachers)
         {
             settings.append(teacher);
+            settings.append(System.lineSeparator());
         }
-        settings.append("Classes:");
+        settings.append("Classes: ");
         settings.append(System.lineSeparator());
-        for(Grade clazz : m_Classes)
+        for(Grade clazz : m_Grades)
         {
             settings.append(clazz);
+            settings.append(System.lineSeparator());
         }
         //rules
+        settings.append("Rules: ");
+        settings.append(System.lineSeparator());
+        for (Rule rule : m_Rules)
+        {
+            settings.append(rule);
+            settings.append(System.lineSeparator());
+        }
+        settings.append(System.lineSeparator());
         return settings.toString();
     }
 
@@ -127,7 +149,7 @@ public class TimeTable extends Solution implements Problem
         TimeTable timeTable = new TimeTable();
         timeTable.randomizeAttributes(timeTable);
         timeTable.m_Subjects = this.m_Subjects;
-        timeTable.m_Classes = this.m_Classes;
+        timeTable.m_Grades = this.m_Grades;
         timeTable.m_Teachers = this.m_Teachers;
         timeTable.m_DaysForStudy =this.m_DaysForStudy;
         timeTable.m_HourStudyForDay = this.m_HourStudyForDay;
@@ -149,7 +171,7 @@ public class TimeTable extends Solution implements Problem
             }
         }
         Grade clazz= null;
-        for(Grade Class : m_Classes)
+        for(Grade Class : m_Grades)
         {
             if( Class.getMapIdSubjectToHoursInWeek().containsKey(randomIdSubject))
             {
@@ -171,7 +193,7 @@ public class TimeTable extends Solution implements Problem
     public List<Teacher> getTeachers() { return m_Teachers;
     }
 
-    public List<Grade> getGrades() {return m_Classes;
+    public List<Grade> getGrades() {return m_Grades;
     }
 
     public int getHour() { return m_HourStudyForDay;

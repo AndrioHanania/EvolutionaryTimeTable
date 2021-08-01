@@ -30,6 +30,7 @@ public class Teacher
         m_IdNumber = eTTTeacher.getId();
         m_Name = eTTTeacher.getETTName();
         m_IdOfSubjectsTeachable = new ArrayList<>();
+        //ETT TEACHES?
         List<ETTTeaches> listETTTeaches = eTTTeacher.getETTTeaching().getETTTeaches();
         for(ETTTeaches eTTTeaches : listETTTeaches){
             m_IdOfSubjectsTeachable.add(eTTTeaches.getSubjectId());
@@ -42,8 +43,8 @@ public class Teacher
     @Override
     public String toString()
     {
-        return "ID= " + m_IdNumber + ", Name= " + m_Name +
-                ", Id Of Subjects Teachable= " + m_IdOfSubjectsTeachable;
+        return "ID: " + m_IdNumber + ", Name: " + m_Name +
+                ", Id Of Subjects Teachable: " + m_IdOfSubjectsTeachable;
     }
 
     @Override

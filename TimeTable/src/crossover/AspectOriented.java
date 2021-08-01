@@ -1,8 +1,9 @@
-package engine.crossover;
+package crossover;
 
 import engine.Solution;
+import engine.crossover.Crossover;
 
-public class AspectOriented implements Crossover{
+public class AspectOriented implements Crossover {
 
     int x =5;
     //Methods
