@@ -2,17 +2,16 @@ package userInterface;
 
 import engine.Engine;
 import generated.ETTDescriptor;
-import timeTable.Subject;
 import timeTable.TimeTable;
+import timeTable.TimeTableParse;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.SchemaOutputResolver;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import javax.xml.bind.Unmarshaller;
 
 public class ConsoleUI extends UI
 {
@@ -89,11 +88,10 @@ public class ConsoleUI extends UI
             InputStream inputStream = new FileInputStream(new File("Jaxb/src/schema/fileInfo.xml"));
             ETTDescriptor eTTEvolutionEngine = deserializeFrom(inputStream);
             timeTable = new TimeTable(eTTEvolutionEngine.getETTTimeTable());
-            engine = new Engine(eTTEvolutionEngine.getETTEvolutionEngine(), timeTable, 100);
+            engine = new Engine(eTTEvolutionEngine.getETTEvolutionEngine(), timeTable, 100, new TimeTableParse());
             m_IsXmlFileLoad = true;
-            m_Engine = engine;
-            m_TimeTable = timeTable;
-
+           setEngine(engine);
+           setTimeTable(timeTable);
             //print to user xml file loaded succuessfully?
         } catch (JAXBException | FileNotFoundException e)
         {
@@ -113,8 +111,8 @@ public class ConsoleUI extends UI
     public void showSettings() {
         if(m_IsXmlFileLoad) {
             StringBuilder settings = new StringBuilder();
-            settings.append(m_TimeTable);
-            settings.append(m_Engine);
+            settings.append(getTimeTable());
+            settings.append(getEngine());
             System.out.println(settings);
         }
         else {
@@ -126,11 +124,10 @@ public class ConsoleUI extends UI
     @Override
     public void runEvolutionaryAlgorithm() {
         if(m_IsXmlFileLoad) {
-            m_Engine.run();
+            runEngine();
         }
         else{
             System.out.println("error loading XML file. please try again");
-
         }
 
     }
@@ -163,6 +160,7 @@ public class ConsoleUI extends UI
     {
 
     }
+
     @Override
     public void exit() {
         m_IsRunning = false;

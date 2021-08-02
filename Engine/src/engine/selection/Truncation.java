@@ -21,12 +21,12 @@ public class Truncation implements Selection
     @Override
     public Population execute(Population currentGeneration)
     {
-        currentGeneration.getPopulation().sort(Comparator.comparingInt(Solution::getFitness));
+        currentGeneration.sort(Comparator.comparingInt(Solution::getFitness));
         Population newGeneration = new Population();
-        int numOfNewGeneration = (m_TopPercent * currentGeneration.getPopulation().size()) / 100;
+        int numOfNewGeneration = (m_TopPercent * currentGeneration.size()) / 100;
         for(int i=0;i<numOfNewGeneration;i++)
         {
-            newGeneration.getPopulation().add(currentGeneration.getPopulation().get(i));
+            newGeneration.add(currentGeneration.get(i));
         }
         return newGeneration;
     }

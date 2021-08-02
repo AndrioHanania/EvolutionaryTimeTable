@@ -12,7 +12,7 @@ public class Grade
     //Members
     private int m_IdNumber;
     private String m_Name;
-    Map<Integer, Integer> m_MapIdSubjectToHoursInWeek; //private?
+    private Map<Integer, Integer> m_MapIdSubjectToHoursInWeek;
 
     //Constructors
     public Grade()

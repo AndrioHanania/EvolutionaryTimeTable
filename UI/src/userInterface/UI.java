@@ -1,24 +1,16 @@
 package userInterface;
 
 import engine.Engine;
-import generated.ETTDescriptor;
-import timeTable.TimeTable;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import javax.xml.bind.Unmarshaller;
+import timeTable.TimeTable;
 
 public abstract class UI implements Runnable
 {
     //Members
-    protected Engine m_Engine;
+    private Engine m_Engine;
     protected boolean m_IsRunning;
     protected boolean m_IsXmlFileLoad;
-    protected TimeTable m_TimeTable;
+    private TimeTable m_TimeTable;
 
     public UI()
     {
@@ -27,6 +19,31 @@ public abstract class UI implements Runnable
     }
 
     //Methods
+    protected void runEngine()
+    {
+        if(m_IsXmlFileLoad)
+        { m_Engine.run();}
+        else
+        {
+            ////////
+        }
+    }
+
+    protected void setEngine(Engine engine)
+    {
+        m_Engine = engine;
+    }
+
+    protected void setTimeTable(TimeTable timeTable){
+        m_TimeTable = timeTable;
+    }
+
+    protected String getEngine(){return String.valueOf(m_Engine);}
+
+    protected String getTimeTable(){return String.valueOf(m_TimeTable);}
+
+
+
     @Override
     public abstract void run();
 

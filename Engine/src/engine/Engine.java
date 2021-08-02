@@ -31,11 +31,11 @@ public class Engine implements Runnable
         m_MaxNumOfGeneration = maxNumOfGeneration;
     }
 
-    public Engine(ETTEvolutionEngine eTTEvolutionEngine, Problem problem, int maxNumOfGeneration)
+    public Engine(ETTEvolutionEngine eTTEvolutionEngine, Problem problem, int maxNumOfGeneration, Parse parse)
     {
-        m_Selection = Selection.parse(eTTEvolutionEngine.getETTSelection());
-        m_Crossover = Crossover.parse(eTTEvolutionEngine.getETTCrossover());
-        m_Mutation = Mutation.parse(eTTEvolutionEngine.getETTMutations());
+        m_Selection = parse.parseSelection(eTTEvolutionEngine.getETTSelection());
+        m_Crossover =parse.parseCrossover(eTTEvolutionEngine.getETTCrossover());
+        m_Mutation = parse.parseMutation(eTTEvolutionEngine.getETTMutations());
         m_SizeOfFirstPopulation = eTTEvolutionEngine.getETTInitialPopulation().getSize();
         m_Problem = problem;
         m_MaxNumOfGeneration = maxNumOfGeneration;
@@ -60,10 +60,10 @@ public class Engine implements Runnable
         {
            Population selectedParents = new Population(m_Selection.execute(firstPopulation));
             Population nextGeneration = new Population();
-           while(nextGeneration.getPopulation().size() < m_SizeOfFirstPopulation)
+           while(nextGeneration.size() < m_SizeOfFirstPopulation)
             {
-                randomParent1 = selectedParents.getPopulation().get(m_Random.nextInt(m_SizeOfFirstPopulation));
-                randomParent2 = selectedParents.getPopulation().get(m_Random.nextInt(m_SizeOfFirstPopulation));
+                randomParent1 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
+                randomParent2 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
                 //נייצר 2 פתרונות
                 //Crossover
                 solution1 = m_Crossover.execute(randomParent1, randomParent2);
@@ -74,8 +74,8 @@ public class Engine implements Runnable
                 { m_Mutation.execute(solution1);}
                 if(m_Random.nextDouble() < 0.001)////
                 {  m_Mutation.execute(solution2);}
-                nextGeneration.getPopulation().add(solution1);
-                nextGeneration.getPopulation().add(solution2);
+                nextGeneration.add(solution1);
+                nextGeneration.add(solution2);
             }
             m_NumOfGeneration++;
             firstPopulation = nextGeneration;

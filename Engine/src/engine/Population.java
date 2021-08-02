@@ -1,6 +1,7 @@
 package engine;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Population
@@ -34,6 +35,23 @@ public class Population
         }
     }
 
-    //Getters
-    public List<Solution> getPopulation(){return m_Population;}
+    public void add(Solution solution)
+    {
+        m_Population.add(solution);
+    }
+
+    public int size()
+    {
+        return m_Population.size();
+    }
+
+    public Solution get(int index)
+    {
+        return m_Population.get(index);
+    }
+
+    public void sort(Comparator comparator)
+    {
+        m_Population.sort(comparator);
+    }
 }

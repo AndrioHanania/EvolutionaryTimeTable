@@ -43,21 +43,23 @@ public class TimeTable extends Solution implements Problem
     }
 
     //Methods
-
     private void initializeSubjects(ETTTimeTable eTTTimeTable)
     {
         m_Subjects = new ArrayList<>();
         List<ETTSubject> listETTSubject = eTTTimeTable.getETTSubjects().getETTSubject();
-        for(ETTSubject eTTSubject : listETTSubject) {
+        for(ETTSubject eTTSubject : listETTSubject)
+        {
             m_Subjects.add(new Subject(eTTSubject));
         }
         m_Subjects.sort(Comparator.comparingInt(Subject::getIdNumber));
     }
 
-    private void initializeclasses(ETTTimeTable eTTTimeTable){
+    private void initializeclasses(ETTTimeTable eTTTimeTable)
+    {
         m_Grades = new ArrayList<>();
         List<ETTClass> listETTClass = eTTTimeTable.getETTClasses().getETTClass();
-        for(ETTClass eTTClass : listETTClass) {
+        for(ETTClass eTTClass : listETTClass)
+        {
             m_Grades.add(new Grade(eTTClass));
         }
         m_Grades.sort(Comparator.comparingInt(Grade::getIdNumber));
@@ -65,7 +67,7 @@ public class TimeTable extends Solution implements Problem
 
     private void initializeTeachers(ETTTimeTable eTTTimeTable){
         m_Teachers = new ArrayList<>();
-        List<ETTTeacher> listETTTeacher = eTTTimeTable.getETTTeachers().getETTTeacher(); //why get teacher at the end?
+        List<ETTTeacher> listETTTeacher = eTTTimeTable.getETTTeachers().getETTTeacher();
         for(ETTTeacher eTTTeacher : listETTTeacher) {
             m_Teachers.add(new Teacher(eTTTeacher));
         }
@@ -83,8 +85,6 @@ public class TimeTable extends Solution implements Problem
        // m_Rules.sort((Comparator.comparingInt(Rule::get))); //compared by rule strickness
     }
     public List<Subject> getSubjects(){return m_Subjects;}
-
-
 
     public String toString(){
         StringBuilder settings = new StringBuilder();
@@ -125,14 +125,11 @@ public class TimeTable extends Solution implements Problem
         return settings.toString();
     }
 
-
     @Override
-    public void calculateFitness() {
+    public void calculateFitness()
+    {
 
     }
-
-
-
 
     public void randomizeAttributes(TimeTable timeTable)
     {
@@ -184,18 +181,13 @@ public class TimeTable extends Solution implements Problem
         return new TimeTableChromosome(randomDay, randomHour, clazz, randomTeacher, randomSubject);
     }
 
-
     public List<TimeTableChromosome> getChromosomes(){return m_Chromosomes;}
 
-    public int getDay() {return m_DaysForStudy;
-    }
+    public int getDay() {return m_DaysForStudy;}
 
-    public List<Teacher> getTeachers() { return m_Teachers;
-    }
+    public List<Teacher> getTeachers() { return m_Teachers;}
 
-    public List<Grade> getGrades() {return m_Grades;
-    }
+    public List<Grade> getGrades() {return m_Grades;}
 
-    public int getHour() { return m_HourStudyForDay;
-    }
+    public int getHour() { return m_HourStudyForDay;}
 }

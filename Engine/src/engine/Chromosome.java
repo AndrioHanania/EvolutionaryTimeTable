@@ -1,6 +1,6 @@
 package engine;
 
-public abstract class Chromosome
+public interface Chromosome
 {
 
 }

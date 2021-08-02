@@ -36,7 +36,7 @@ public class Flipping implements Mutation
                                     timeTableChromosome.setTeacher(timeTable.getTeachers().get(m_Random.nextInt(timeTable.getTeachers().size())));
                                     break;
                                 case 'S':
-                                    timeTableChromosome.setSubjet(timeTable.getSubjects().get(m_Random.nextInt(timeTable.getSubjects().size())));
+                                    timeTableChromosome.setSubject(timeTable.getSubjects().get(m_Random.nextInt(timeTable.getSubjects().size())));
                                     break;
                                 case 'C':
                                     timeTableChromosome.setGrade(timeTable.getGrades().get(m_Random.nextInt(timeTable.getGrades().size())));
@@ -45,6 +45,7 @@ public class Flipping implements Mutation
                                     timeTableChromosome.setHour(m_Random.nextInt(timeTable.getHour())+1);
                                     break;
                                 default:
+                                    //////////////////////////////////
                                     break;
                             };
             timeTable.getChromosomes().set(randomPlace, timeTableChromosome);
