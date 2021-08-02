@@ -9,6 +9,7 @@ import java.util.Random;
 
 public class Engine implements Runnable
 {
+    private int yallaHapoel = 1;
     //Members
     private Crossover m_Crossover;
     private Mutation m_Mutation;
