@@ -1,5 +1,6 @@
 package timeTable;
 
+import timeTable.Rules.Rule;
 import timeTable.chromosome.Chromosome;
 import engine.Solution;
 import engine.Problem;
@@ -20,7 +21,6 @@ public class TimeTable extends Solution implements Problem
     private  List<Grade> m_Grades;
     private int m_DaysForStudy;
     private int m_HourStudyForDay;
-    //rules
     private List<Rule> m_Rules;
 
     //Constructors
@@ -39,7 +39,7 @@ public class TimeTable extends Solution implements Problem
         initializeSubjects(eTTTimeTable);
         initializeclasses(eTTTimeTable);
         initializeTeachers(eTTTimeTable);
-        initializeRules(eTTTimeTable);
+        //initializeRules(eTTTimeTable);
     }
 
     public TimeTable(TimeTable timeTable)
@@ -84,7 +84,7 @@ public class TimeTable extends Solution implements Problem
         m_Teachers.sort(Comparator.comparingInt(Teacher::getIdNumber));
     }
 
-    private  void initializeRules(ETTTimeTable ettTimeTable)
+    /*private  void initializeRules(ETTTimeTable ettTimeTable)
     {
         m_Rules = new ArrayList<>();
         List<ETTRule> listETTRules = ettTimeTable.getETTRules().getETTRule();
@@ -94,15 +94,14 @@ public class TimeTable extends Solution implements Problem
         }
        // m_Rules.sort((Comparator.comparingInt(Rule::get))); //compared by rule strickness
     }
+*/
 
     public String toString(){
         StringBuilder settings = new StringBuilder();
-      ///  settings.append("Time table: ");
-      //  settings.append(System.lineSeparator());
-        //settings.append("Subjects: ");
-       // settings.append(System.lineSeparator());
-    //    settings.append("Rules: ");
-    //   settings.append(System.lineSeparator());
+        settings.append("Time table: ");
+        settings.append(System.lineSeparator());
+        settings.append("Subjects: ");
+        settings.append(System.lineSeparator());
         for(Subject subject : m_Subjects)
         {
             settings.append(subject);
@@ -122,6 +121,8 @@ public class TimeTable extends Solution implements Problem
             settings.append(clazz);
             settings.append(System.lineSeparator());
         }
+        //    settings.append("Rules: ");
+        //   settings.append(System.lineSeparator());
         //rules
         settings.append("Rules: ");
         settings.append(System.lineSeparator());
@@ -137,7 +138,10 @@ public class TimeTable extends Solution implements Problem
     @Override
     public void calculateFitness()
     {
-
+        for(Rule rule : m_Rules)
+        {
+           rule.Execute(this);
+        }
     }
 
     public void randomizeAttributes(TimeTable timeTable)
