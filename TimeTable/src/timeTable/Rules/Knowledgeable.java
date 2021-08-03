@@ -26,4 +26,10 @@ public class Knowledgeable extends Rule {
             timeTable.setFitness(this.m_RuleGrade);
         }
     }
+
+
+    @Override
+    public String toString() {
+        return (super.toString() + "Name: Knowledgeable");
+    }
 }

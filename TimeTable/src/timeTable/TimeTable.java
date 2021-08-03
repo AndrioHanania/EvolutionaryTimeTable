@@ -121,9 +121,6 @@ public class TimeTable extends Solution implements Problem
             settings.append(clazz);
             settings.append(System.lineSeparator());
         }
-        //    settings.append("Rules: ");
-        //   settings.append(System.lineSeparator());
-        //rules
         settings.append("Rules: ");
         settings.append(System.lineSeparator());
         for (Rule rule : m_Rules)

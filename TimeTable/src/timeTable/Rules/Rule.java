@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import static timeTable.RulesEnum.*;
 
+
 public abstract class Rule {
 
     protected String m_RuleWeight;
@@ -23,9 +24,10 @@ public abstract class Rule {
 
     public abstract void Execute(TimeTable timeTable);
 
+    @Override
+    public String toString() {return "Strictness: " + m_RuleWeight;}
+
     /*
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

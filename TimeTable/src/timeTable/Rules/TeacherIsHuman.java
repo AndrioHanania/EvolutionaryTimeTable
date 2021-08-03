@@ -31,4 +31,9 @@ public class TeacherIsHuman extends Rule {
         RuleUtils.evaluteGrade(isPassRule, this);
         timeTable.setFitness(this.m_RuleGrade);
     }
+
+    @Override
+    public String toString() {
+        return (super.toString() + "Name: TeacherIsHuman");
+    }
 }
