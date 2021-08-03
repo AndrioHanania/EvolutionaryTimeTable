@@ -1,9 +1,10 @@
 package timeTable;
 
-import engine.Chromosome;
+import timeTable.chromosome.Chromosome;
 import engine.Solution;
 import engine.Problem;
 import generated.*;
+import timeTable.chromosome.TimeTableChromosome;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,7 +30,6 @@ public class TimeTable extends Solution implements Problem
         m_Teachers = new ArrayList<>();
         m_Subjects = new ArrayList<>();
         m_Grades =  new ArrayList<>();
-
     }
 
     public TimeTable(ETTTimeTable eTTTimeTable)
@@ -40,6 +40,16 @@ public class TimeTable extends Solution implements Problem
         initializeclasses(eTTTimeTable);
         initializeTeachers(eTTTimeTable);
         initializeRules(eTTTimeTable);
+    }
+
+    public TimeTable(TimeTable timeTable)
+    {
+        m_Chromosomes = timeTable.m_Chromosomes;
+        m_Teachers = timeTable.m_Teachers;
+        m_Subjects = timeTable.m_Subjects;
+        m_Grades =  timeTable.m_Grades;
+        m_DaysForStudy = timeTable.m_DaysForStudy;
+        m_HourStudyForDay = timeTable.m_HourStudyForDay;
     }
 
     //Methods
@@ -84,7 +94,6 @@ public class TimeTable extends Solution implements Problem
         }
        // m_Rules.sort((Comparator.comparingInt(Rule::get))); //compared by rule strickness
     }
-    public List<Subject> getSubjects(){return m_Subjects;}
 
     public String toString(){
         StringBuilder settings = new StringBuilder();
@@ -140,6 +149,7 @@ public class TimeTable extends Solution implements Problem
             timeTable.m_Chromosomes.add((TimeTableChromosome) newRandomChromosome());
         }
     }
+
     @Override
     public TimeTable newRandomInstance() {
 
@@ -153,7 +163,6 @@ public class TimeTable extends Solution implements Problem
         return timeTable;
     }
 
-    @Override
     public Chromosome newRandomChromosome() {
         Random random = new Random();
         Teacher randomTeacher = m_Teachers.get(random.nextInt(m_Teachers.size()));
@@ -181,6 +190,7 @@ public class TimeTable extends Solution implements Problem
         return new TimeTableChromosome(randomDay, randomHour, clazz, randomTeacher, randomSubject);
     }
 
+    //Getters
     public List<TimeTableChromosome> getChromosomes(){return m_Chromosomes;}
 
     public int getDay() {return m_DaysForStudy;}
@@ -190,4 +200,20 @@ public class TimeTable extends Solution implements Problem
     public List<Grade> getGrades() {return m_Grades;}
 
     public int getHour() { return m_HourStudyForDay;}
+
+    public List<Subject> getSubjects(){return m_Subjects;}
+
+    //Setters
+    public void setHour(int hour){m_HourStudyForDay = hour;}
+
+    public void setDay(int day){m_DaysForStudy = day;}
+
+    public void setChromosomes(List<TimeTableChromosome> chromosomes){m_Chromosomes = chromosomes;}
+
+    public void setTeachers(List<Teacher> teachers){m_Teachers = teachers;}
+
+    public void setSubjects(List<Subject> subjects){ m_Subjects = subjects;}
+
+    public void setGrades(List<Grade> grades){ m_Grades = grades;}
+
 }

@@ -1,4 +1,4 @@
-package engine;
+package timeTable.chromosome;
 
 public interface Chromosome
 {

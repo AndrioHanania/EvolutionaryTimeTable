@@ -5,13 +5,14 @@ import engine.mutation.Mutation;
 import engine.selection.Selection;
 import generated.ETTEvolutionEngine;
 
+import java.util.List;
 import java.util.Random;
 
 public class Engine implements Runnable
 {
     //Members
     private Crossover m_Crossover;
-    private Mutation m_Mutation;
+    private List<Mutation> m_Mutations;
     private Selection m_Selection;
     private Problem m_Problem;
     private int m_NumOfGeneration = 0;
@@ -20,12 +21,12 @@ public class Engine implements Runnable
     private int m_SizeOfFirstPopulation;
 
     //Constructors
-    public Engine(Selection selection, Crossover crossover, Mutation mutation,
+    public Engine(Selection selection, Crossover crossover, List<Mutation> mutations,
                   Problem problem, int sizeOfFirstPopulation, int maxNumOfGeneration)
     {
         m_Selection = selection;
         m_Crossover = crossover;
-        m_Mutation = mutation;
+        m_Mutations = mutations;
          m_Problem = problem;
         m_SizeOfFirstPopulation = sizeOfFirstPopulation;
         m_MaxNumOfGeneration = maxNumOfGeneration;
@@ -35,7 +36,7 @@ public class Engine implements Runnable
     {
         m_Selection = parse.parseSelection(eTTEvolutionEngine.getETTSelection());
         m_Crossover =parse.parseCrossover(eTTEvolutionEngine.getETTCrossover());
-        m_Mutation = parse.parseMutation(eTTEvolutionEngine.getETTMutations());
+        m_Mutations = parse.parseMutation(eTTEvolutionEngine.getETTMutations());
         m_SizeOfFirstPopulation = eTTEvolutionEngine.getETTInitialPopulation().getSize();
         m_Problem = problem;
         m_MaxNumOfGeneration = maxNumOfGeneration;
@@ -64,18 +65,13 @@ public class Engine implements Runnable
             {
                 randomParent1 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
                 randomParent2 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
-                //נייצר 2 פתרונות
-                //Crossover
                 solution1 = m_Crossover.execute(randomParent1, randomParent2);
                 solution2 =m_Crossover.execute(randomParent1, randomParent2);
-                //Mutation
-                //בהסתברות מסויימת
-                if(m_Random.nextDouble() < 0.001)////stam
-                { m_Mutation.execute(solution1);}
-                if(m_Random.nextDouble() < 0.001)////
-                {  m_Mutation.execute(solution2);}
-                nextGeneration.add(solution1);
-                nextGeneration.add(solution2);
+                for(Mutation mutation : m_Mutations)
+                {
+                    mutation.execute(solution1);
+                    mutation.execute(solution2);
+                }
             }
             m_NumOfGeneration++;
             firstPopulation = nextGeneration;
@@ -91,7 +87,8 @@ public class Engine implements Runnable
         settings.append("size of population= " + m_SizeOfFirstPopulation);
         settings.append(m_Selection);///
         settings.append(m_Crossover);///
-        settings.append(m_Mutation);///
+        for(Mutation mutation : m_Mutations)
+        { settings.append(mutation);}///
         return settings.toString();
     }
 

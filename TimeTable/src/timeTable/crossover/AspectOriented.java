@@ -3,7 +3,7 @@ package timeTable.crossover;
 import engine.Solution;
 import engine.crossover.Crossover;
 import timeTable.TimeTable;
-import timeTable.TimeTableChromosome;
+import timeTable.chromosome.TimeTableChromosome;
 
 public class AspectOriented implements Crossover {
 

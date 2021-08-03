@@ -1,16 +1,23 @@
 package timeTable;
 
 import engine.Parse;
+import engine.Solution;
 import engine.crossover.Crossover;
 import engine.mutation.Mutation;
 import engine.selection.RouletteWheel;
 import engine.selection.Selection;
 import engine.selection.Truncation;
 import generated.ETTCrossover;
+import generated.ETTMutation;
 import generated.ETTMutations;
 import generated.ETTSelection;
+import timeTable.Mutation.Flipping;
+import timeTable.Mutation.Sizer;
 import timeTable.crossover.AspectOriented;
 import timeTable.crossover.DayTimeOriented;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TimeTableParse extends Parse
 {
@@ -27,6 +34,10 @@ public class TimeTableParse extends Parse
             case "RouletteWheel":
                 selection = new RouletteWheel();
                 break;
+
+            //case "Tournament":
+
+              //  break;
 
             default:
 /////////////////////
@@ -57,8 +68,35 @@ public class TimeTableParse extends Parse
     }
 
     @Override
-    public Mutation parseMutation(ETTMutations eTTMutations)
+    public List<Mutation> parseMutation(ETTMutations eTTMutations)
     {
-        return null;
+        List<Mutation> mutations = new ArrayList<>(eTTMutations.getETTMutation().size());
+        double probability;
+        for(ETTMutation eTTMutation : eTTMutations.getETTMutation())
+        {
+            probability = eTTMutation.getProbability();
+            String configuration = eTTMutation.getConfiguration();
+
+            switch (eTTMutation.getName())
+            {
+
+                case "Flipping":
+                    Flipping flipping = new Flipping(Integer.parseInt(configuration.substring(11)), configuration.charAt(23), probability);
+                    mutations.add(flipping);
+                    flipping.setConfiguration(configuration);
+                    break;
+
+                case "Sizer":
+                    Sizer sizer = new Sizer(Integer.parseInt(configuration.substring(13)), probability);
+                    mutations.add(sizer);
+                    sizer.setConfiguration(configuration);
+                    break;
+
+                default:
+/////////////////////////////
+                    break;
+            }
+        }
+        return mutations;
     }
 }

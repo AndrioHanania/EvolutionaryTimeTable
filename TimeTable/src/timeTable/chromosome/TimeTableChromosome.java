@@ -1,8 +1,8 @@
-package timeTable;
+package timeTable.chromosome;
 
-import engine.Chromosome;
-
-import java.util.Comparator;
+import timeTable.Grade;
+import timeTable.Subject;
+import timeTable.Teacher;
 
 public class TimeTableChromosome implements Chromosome {
     //Members

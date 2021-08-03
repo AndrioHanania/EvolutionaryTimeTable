@@ -7,11 +7,13 @@ import generated.ETTCrossover;
 import generated.ETTMutations;
 import generated.ETTSelection;
 
+import java.util.List;
+
 public abstract class Parse
 {
     public abstract Selection parseSelection(ETTSelection eTTSelection);
 
     public abstract Crossover parseCrossover(ETTCrossover eTTCrossover);
 
-    public abstract Mutation parseMutation(ETTMutations eTTMutations);
+    public abstract List<Mutation> parseMutation(ETTMutations eTTMutations);
 }

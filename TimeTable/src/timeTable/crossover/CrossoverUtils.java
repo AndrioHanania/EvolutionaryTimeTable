@@ -21,7 +21,12 @@ public class CrossoverUtils {
         CrossoverUtils.randomizeCrossingPoints(tTableParent1,tTableParent2, numOfCuttingPoints);
 
         TimeTable childTimeTable = new TimeTable();
-        childTimeTable.newRandomInstance();
+        //unlimited generality for tTableParent1
+        childTimeTable.setHour(tTableParent1.getHour());
+        childTimeTable.setTeachers(tTableParent1.getTeachers());
+        childTimeTable.setDay(tTableParent1.getDay());
+        childTimeTable.setGrades(tTableParent1.getGrades());
+        childTimeTable.setSubjects(tTableParent1.getSubjects());
 
         int previousCuttingPoint=0;
         for (int i =0; i<numOfCuttingPoints;i++)
@@ -48,14 +53,11 @@ public class CrossoverUtils {
 
     private static void randomizeCrossingPoints(TimeTable tTableParent1, TimeTable tTableParent2, int numOfCuttingPoints) {
         Random random = new Random();
-        int randomCuttingPoint;
         m_CuttingPointsLocations = new ArrayList<>(numOfCuttingPoints);
         for(int i=0; i < numOfCuttingPoints ; i++)
         {
             m_CuttingPointsLocations.add(random.nextInt(tTableParent1.getChromosomes().size()));
             //כרגע עושים לפי הראשון אבל אפשר מקס\מין בין שני ההורים
         }
-
-
     }
 }

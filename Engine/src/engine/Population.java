@@ -35,9 +35,9 @@ public class Population
         }
     }
 
-    public void add(Solution solution)
+    public boolean add(Solution solution)
     {
-        m_Population.add(solution);
+       return m_Population.add(solution);
     }
 
     public int size()
