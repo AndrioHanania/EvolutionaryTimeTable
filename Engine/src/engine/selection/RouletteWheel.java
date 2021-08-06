@@ -8,11 +8,17 @@ import engine.Population;
 
 
 
-public class RouletteWheel implements Selection
+public class RouletteWheel extends Selection
 {
     public RouletteWheel()
     {
 
+    }
+
+
+    @Override
+    public String toString() {
+        return "Name: RouletteWheel" + super.toString();
     }
 
     @Override

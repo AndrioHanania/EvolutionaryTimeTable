@@ -1,5 +1,6 @@
 package userInterface;
 
+import Listeners.UpdateGenerationListener;
 import engine.Engine;
 
 import timeTable.TimeTable;
@@ -10,6 +11,7 @@ public abstract class UI implements Runnable
     private Engine m_Engine;
     protected boolean m_IsRunning;
     protected boolean m_IsXmlFileLoad;
+    protected boolean m_IsEngineHasBeenRunning;
     private TimeTable m_TimeTable;
 
     public UI()
@@ -19,9 +21,26 @@ public abstract class UI implements Runnable
     }
 
     //Methods
+
+    protected int getNumberOfGenerationInEngine(){
+        return m_Engine.getNumOfGeneration();
+    }
+
+
+    protected void addListenerToUpdateGenerationAbstract(UpdateGenerationListener listener)
+    {
+        m_Engine.addListenerToUpdateGeneration(listener);
+    }
+
+
+    protected TimeTable getOptimalSolutionFromEngine() {
+        return (TimeTable)m_Engine.getOptimalSolution();
+    }
+
+
     protected void runEngine()
     {
-        if(m_IsXmlFileLoad)
+        if(m_IsXmlFileLoad)///
         { m_Engine.run();}
         else
         {
@@ -42,6 +61,9 @@ public abstract class UI implements Runnable
 
     protected String getTimeTable(){return String.valueOf(m_TimeTable);}
 
+    protected void setMaxNumOfGenerationInEngine(int num){m_Engine.setMaxNumOfGeneration(num);}
+
+    protected void setNumberOfGenerationForUpdateInEngine(int num){m_Engine.setNumberOfGenerationForUpdate(num);}
 
 
     @Override
@@ -55,7 +77,9 @@ public abstract class UI implements Runnable
 
     public abstract void showOptimalSolution();
 
-    public abstract void showInterimSolution();
+    public abstract void viewAlgorithmProcess();
+
+    public abstract void runSmallFile();
 
     public abstract void exit();
 }

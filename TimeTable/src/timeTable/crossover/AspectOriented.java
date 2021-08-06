@@ -5,9 +5,9 @@ import engine.crossover.Crossover;
 import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
 
-public class AspectOriented implements Crossover {
+public class AspectOriented extends Crossover {
 
-    private int m_NumOfCuttingPoints;
+
 
 
     public AspectOriented(int cuttingPoints)
@@ -16,6 +16,13 @@ public class AspectOriented implements Crossover {
     }
 
     //Methods
+
+
+    @Override
+    public String toString() {
+        return  "Name: AspectOriented" +  super.toString();
+    }
+
     public Solution execute(Solution parent1, Solution parent2)
     {
         TimeTable TTableParent1 = (TimeTable) parent1;

@@ -6,15 +6,5 @@ public class Main
     {
         UI ui = new ConsoleUI();
         ui.run();
-
-
-
-
     }
-
-
-
-
-
-
 }

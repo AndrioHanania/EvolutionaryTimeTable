@@ -5,7 +5,7 @@ import engine.Population;
 import java.util.*;
 
 
-public class Truncation implements Selection
+public class Truncation extends Selection
 {
     //Members
     private int m_TopPercent;
@@ -18,6 +18,12 @@ public class Truncation implements Selection
     }
 
     //Methods
+    @Override
+    public String toString() {
+        return "Name: Truncation" + "Top percent: " + m_TopPercent + super.toString();
+    }
+
+
     @Override
     public Population execute(Population currentGeneration)
     {

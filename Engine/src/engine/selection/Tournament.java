@@ -5,7 +5,7 @@ import engine.Population;
 
 import java.util.Random;
 
-public class Tournament implements Selection
+public class Tournament extends Selection
 {
     //Members
     private double m_Pte;
@@ -19,6 +19,12 @@ public class Tournament implements Selection
     }
 
     //Methods
+
+    @Override
+    public String toString() {
+        return "Name: Tournament" + "PTE: " + m_Pte + super.toString();
+    }
+
     @Override
     public Population execute(Population currentGeneration)
     {

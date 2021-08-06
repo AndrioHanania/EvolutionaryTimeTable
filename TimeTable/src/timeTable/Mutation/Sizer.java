@@ -20,6 +20,12 @@ public class Sizer extends Mutation
 
     //Methods
     @Override
+    public String toString() {
+        return "Name: Sizer" + super.toString();
+    }
+
+
+    @Override
     public void execute(Solution solution)
     {
         if (m_Random.nextDouble() < m_Probability) {

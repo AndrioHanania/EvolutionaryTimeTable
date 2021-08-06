@@ -20,6 +20,13 @@ public class Flipping extends Mutation
     }
 
     //Methods
+
+
+    @Override
+    public String toString() {
+        return "Name: Flipping" + super.toString();
+    }
+
     @Override
     public void execute(Solution solution) {
         if (m_Random.nextDouble() < m_Probability) {

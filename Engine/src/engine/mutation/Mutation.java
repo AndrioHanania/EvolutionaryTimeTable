@@ -15,4 +15,12 @@ public abstract class Mutation
     public abstract void execute(Solution item);
 
     public void setConfiguration(String configuration){m_Configuration = configuration;}
+
+    public String getConfiguration(){return  m_Configuration;}
+
+    @Override
+    public String toString() {
+        return "Probability: " + m_Probability +
+                ", Configuration: " + m_Configuration ;
+    }
 }

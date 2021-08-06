@@ -204,6 +204,8 @@ public class TimeTable extends Solution implements Problem
 
     public List<Subject> getSubjects(){return m_Subjects;}
 
+    public List<Rule> getRules(){return m_Rules;}
+
     //Setters
     public void setHour(int hour){m_HourStudyForDay = hour;}
 

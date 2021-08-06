@@ -9,10 +9,10 @@ import timeTable.chromosome.TimeTableChromosome;
 import java.util.Comparator;
 
 
-public class DayTimeOriented implements Crossover
+public class DayTimeOriented extends Crossover
 {
 
-        private int m_NumOfCuttingPoints;
+
 
 
     public DayTimeOriented(int cuttingPoints)
@@ -22,6 +22,12 @@ public class DayTimeOriented implements Crossover
 
     public DayTimeOriented(ETTCrossover ettCrossover){
         m_NumOfCuttingPoints = ettCrossover.getCuttingPoints();
+    }
+
+
+    @Override
+    public String toString() {
+        return  "Name: DayTimeOriented" +  super.toString();
     }
 
 

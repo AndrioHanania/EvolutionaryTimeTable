@@ -15,6 +15,14 @@ public class TimeTableChromosome implements Chromosome {
     public TimeTableChromosome() {
     }
 
+    @Override
+    public String toString() {
+        return "Day: " + m_Day +
+                ", Hour: " + m_Hour +
+                ", Grade: " + m_Class +
+                ", Teacher: " + m_Teacher +
+                ", Subject: " + m_Subject;
+    }
 
     public TimeTableChromosome(int day, int hour, Grade clazz, Teacher teacher, Subject subject) {
         m_Day = day;
@@ -66,5 +74,9 @@ public class TimeTableChromosome implements Chromosome {
 
     public static int compareWithTeacher(TimeTableChromosome timeTableChromosome1, TimeTableChromosome timeTableChromosome2) {
         return Integer.compare(timeTableChromosome1.getTeacher().getIdNumber(), timeTableChromosome2.getTeacher().getIdNumber());
+    }
+
+    public static int compareWithGrade(TimeTableChromosome timeTableChromosome1, TimeTableChromosome timeTableChromosome2) {
+        return Integer.compare(timeTableChromosome1.getGrade().getIdNumber(), timeTableChromosome2.getGrade().getIdNumber());
     }
 }

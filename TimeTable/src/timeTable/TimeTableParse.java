@@ -29,10 +29,12 @@ public class TimeTableParse extends Parse
             case "Truncation":
                 int topPercent = Integer.parseInt(eTTSelection.getConfiguration().substring(11));
                 selection = new Truncation(topPercent);
+                selection.setConfiguration(eTTSelection.getConfiguration());
                 break;
 
             case "RouletteWheel":
                 selection = new RouletteWheel();
+                selection.setConfiguration(eTTSelection.getConfiguration());
                 break;
 
             //case "Tournament":
@@ -55,9 +57,11 @@ public class TimeTableParse extends Parse
         {
             case "AspectOriented":
                 crossover = new AspectOriented(cuttingPoint);
+                crossover.setConfiguration(eTTCrossover.getConfiguration());
                 break;
             case "DayTimeOriented":
                 crossover = new DayTimeOriented(cuttingPoint);
+                crossover.setConfiguration(eTTCrossover.getConfiguration());
                 break;
 
             default:
@@ -79,11 +83,14 @@ public class TimeTableParse extends Parse
 
             switch (eTTMutation.getName())
             {
-
                 case "Flipping":
-                    Flipping flipping = new Flipping(Integer.parseInt(configuration.substring(11)), configuration.charAt(23), probability);
+                    String tempStr = configuration.substring(11);
+                    String tempStrArr[] = tempStr.split(",");
+
+                    Flipping flipping = new Flipping(Integer.parseInt(tempStrArr[0]), configuration.charAt(23), probability);
                     mutations.add(flipping);
                     flipping.setConfiguration(configuration);
+                    System.out.println(configuration.substring(11));
                     break;
 
                 case "Sizer":

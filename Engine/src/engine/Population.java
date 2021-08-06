@@ -7,7 +7,7 @@ import java.util.List;
 public class Population
 {
     //Members
-    List<Solution> m_Population;
+    private List<Solution> m_Population;
 
     //Constructors
     public Population()

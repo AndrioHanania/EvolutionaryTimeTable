@@ -25,7 +25,7 @@ public abstract class Rule {
     public abstract void Execute(TimeTable timeTable);
 
     @Override
-    public String toString() {return "Strictness: " + m_RuleWeight;}
+    public String toString() {return "Strictness: " + m_RuleWeight + " Rule Grade:----";}
 
     /*
     @Override
