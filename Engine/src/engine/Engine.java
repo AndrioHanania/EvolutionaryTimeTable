@@ -64,7 +64,7 @@ public class Engine implements Runnable
            int sizeOfElitism = m_Selection.getSizeOfElitism();
            Population selectedParents = new Population(m_Selection.execute(firstPopulation));
            Population nextGeneration = new Population(firstPopulation.getElita(sizeOfElitism));
-           //note
+
 
            while(nextGeneration.size() < m_SizeOfFirstPopulation)
             {
