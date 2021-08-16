@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Engine/Engine.iml" filepath="$PROJECT_DIR$/Engine/Engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JAVAFX/JAVAFX.iml" filepath="$PROJECT_DIR$/JAVAFX/JAVAFX.iml" />
       <module fileurl="file://$PROJECT_DIR$/Jaxb/Jaxb.iml" filepath="$PROJECT_DIR$/Jaxb/Jaxb.iml" />
       <module fileurl="file://$PROJECT_DIR$/TimeTable/TimeTable.iml" filepath="$PROJECT_DIR$/TimeTable/TimeTable.iml" />
       <module fileurl="file://$PROJECT_DIR$/UI/UI.iml" filepath="$PROJECT_DIR$/UI/UI.iml" />

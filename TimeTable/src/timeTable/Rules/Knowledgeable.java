@@ -1,35 +1,57 @@
 package timeTable.Rules;
 
+import generated.ETTRule;
+import timeTable.Teacher;
 import timeTable.TimeTable;
-import timeTable.chromosome.TimeTableChromosome;
 
 import java.util.List;
 
 public class Knowledgeable extends Rule {
 
+
+    public Knowledgeable(ETTRule ettRule)
+    {super(ettRule);}
+
+    public Knowledgeable(Rule rule) {
+        super(rule);
+    }
+
     public void Execute(TimeTable timeTable) {
-        boolean isPassRule = false;
-        List<TimeTableChromosome> timeTableChromosomeList = timeTable.getChromosomes();
-        for (TimeTableChromosome timeTableChromosome : timeTableChromosomeList) {
-            isPassRule = false;
-            List<Integer> idSubjects = timeTableChromosome.getTeacher().getIdOSubjectsTeachable();
-            for (int idSubject : idSubjects) {
-                if (idSubject == timeTableChromosome.getSubject().getIdNumber()) {
-                    isPassRule = true;
-                    break;
-                }
-                if (isPassRule) {
-                    break;
+
+        for (Teacher teacher1 : timeTable.getTeachers())
+        {
+            int numOfTeacher = timeTable.getTeachers().size();
+            int rulePerTeacherScore = 100 / numOfTeacher;
+            List<Integer> subjectsIDTeaching1 = teacher1.getIdOfSubjectsTeachable();
+
+            for (int i = 0; i < timeTable.getChromosomes().size(); i++)
+            {
+                Teacher teacher2 = timeTable.getChromosomes().get(i).getTeacher();
+                if (teacher1.equals(teacher2))
+                {
+                    if(!subjectsIDTeaching1.contains(timeTable.getChromosomes().get(i).getSubject().getIdNumber()))
+                    {
+                        m_RuleGrade -= rulePerTeacherScore;
+                        break;
+                    }
                 }
             }
-            RuleUtils.evaluteGrade(isPassRule, this);
-            timeTable.setFitness(this.m_RuleGrade);
         }
     }
 
 
     @Override
     public String toString() {
-        return (super.toString() + "Name: Knowledgeable");
+        return ( "Name: Knowledgeable, " + super.toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

@@ -20,15 +20,13 @@ public class Flipping extends Mutation
     }
 
     //Methods
-
-
     @Override
     public String toString() {
-        return "Name: Flipping" + super.toString();
+        return "Name: Flipping " + " " + super.toString();
     }
 
     @Override
-    public void execute(Solution solution) {
+    public void execute(Solution solution){
         if (m_Random.nextDouble() < m_Probability) {
             TimeTable timeTable = (TimeTable) solution;
             int numOfChromosomeToChange = m_Random.nextInt(m_MaxTupples) + 1;
@@ -51,9 +49,8 @@ public class Flipping extends Mutation
                     case 'H':
                         timeTableChromosome.setHour(m_Random.nextInt(timeTable.getHour()) + 1);
                         break;
-                    default:
-                        //////////////////////////////////
-                        break;
+                    //default:
+                        //throw new Exception("The component to Flipping-Mutation does not exist");
                 }
                 ;
                 timeTable.getChromosomes().set(randomPlace, timeTableChromosome);

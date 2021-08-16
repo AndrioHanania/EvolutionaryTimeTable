@@ -30,7 +30,6 @@ public class Teacher
         m_IdNumber = eTTTeacher.getId();
         m_Name = eTTTeacher.getETTName();
         m_IdOfSubjectsTeachable = new ArrayList<>();
-        //ETT TEACHES?
         List<ETTTeaches> listETTTeaches = eTTTeacher.getETTTeaching().getETTTeaches();
         for(ETTTeaches eTTTeaches : listETTTeaches){
             m_IdOfSubjectsTeachable.add(eTTTeaches.getSubjectId());
@@ -70,7 +69,7 @@ public class Teacher
     public String getName()
     { return m_Name; }
 
-    public List<Integer> getIdOSubjectsTeachable()
+    public List<Integer> getIdOfSubjectsTeachable()
     { return m_IdOfSubjectsTeachable; }
 
     //Setters

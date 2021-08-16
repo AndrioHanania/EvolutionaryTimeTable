@@ -1,49 +1,71 @@
 package timeTable.Rules;
 
+import generated.ETTRule;
 import timeTable.Grade;
 import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 public class Satisfactory extends Rule {
 
+    //Contractors
+    public Satisfactory(ETTRule ettRule) {
+        super(ettRule);
+    }
+
+    public Satisfactory(Rule rule) {
+        super(rule);
+    }
+
+    //Methods
     public void Execute(TimeTable timeTable)
     {
-        boolean isPassRule = true;
         List<Grade> grades = timeTable.getGrades();
         List<TimeTableChromosome> timeTableChromosomeList = timeTable.getChromosomes();
+        int rulePerGradeScore = 100 / grades.size();
+        //assuming the number of subjects equals the largest id of them
+        int sizeOfHourInWeekForSubjects = timeTable.getSubjects().size();
+        Integer[] data = new Integer[sizeOfHourInWeekForSubjects];
+        List<Integer> HourInWeekForSubjects = Arrays.asList(data);
         for(Grade grade : grades)
         {
-            List<Integer> HourInWeekForSubjects = new ArrayList<>(grade.getMapIdSubjectToHoursInWeek().size());
-            for(Integer value : HourInWeekForSubjects){
-                value = 0;
-            }
+            Arrays.fill(data,new Integer(0));
             for (TimeTableChromosome timeTableChromosome : timeTableChromosomeList)
             {
                 if(timeTableChromosome.getGrade().equals(grade))
                 {
-                    HourInWeekForSubjects.set(timeTableChromosome.getSubject().getIdNumber(), HourInWeekForSubjects.get(timeTableChromosome.getSubject().getIdNumber())+1);
+                    int index=timeTableChromosome.getSubject().getIdNumber()-1;
+                    int value=HourInWeekForSubjects.get(timeTableChromosome.getSubject().getIdNumber()-1)+1;
+                    HourInWeekForSubjects.set(index, value);
                 }
-
             }
-            for(int id=0;id<HourInWeekForSubjects.size();id++){
-                if(HourInWeekForSubjects.get(id) != grade.getMapIdSubjectToHoursInWeek().get(id)){
-                    isPassRule = false;
+            Map<Integer,Integer> map = grade.getMapIdSubjectToHoursInWeek();
+            for(Map.Entry<Integer,Integer> entry : map.entrySet())
+            {
+                if(!HourInWeekForSubjects.get(entry.getKey()-1).equals(entry.getValue())){
+                    m_RuleGrade -= rulePerGradeScore;
                     break;
                 }
             }
-            if(!isPassRule){break;}
         }
-        RuleUtils.evaluteGrade(isPassRule, this);
-        timeTable.setFitness(this.m_RuleGrade);
     }
-
 
     @Override
     public String toString() {
-        return (super.toString() + "Name: Satisfactory");
+        return ( "Name: Satisfactory, " + super.toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

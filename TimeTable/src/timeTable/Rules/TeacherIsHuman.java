@@ -1,39 +1,69 @@
 package timeTable.Rules;
 
+import generated.ETTRule;
 import timeTable.Teacher;
 import timeTable.TimeTable;
 
 public class TeacherIsHuman extends Rule {
-    boolean isPassRule =true;
+
+    //Contractors
+    public TeacherIsHuman(ETTRule ettRule) {
+        super(ettRule);
+    }
+
+    public TeacherIsHuman(Rule rule) {
+        super(rule);
+    }
+
+    //Methods
     @Override
     public void Execute(TimeTable timeTable) {
-        for(int i=0; i<timeTable.getChromosomes().size()-1;i++)
+        int numOfTeacher = timeTable.getTeachers().size();
+        int rulePerTeacherScore = 100 / numOfTeacher;
+        boolean isRulePassed = true;
+        for(Teacher teacher : timeTable.getTeachers())
         {
-            Teacher T1 =  timeTable.getChromosomes().get(i).getTeacher();
-            int day1 = timeTable.getChromosomes().get(i).getDay();
-            int hour1 = timeTable.getChromosomes().get(i).getHour();
-
-            for (int j=i+1;j<timeTable.getChromosomes().size();j++)
+            isRulePassed = true;
+            for (int i=0; i<timeTable.getChromosomes().size()-1;i++)
             {
-                Teacher T2 = timeTable.getChromosomes().get(j).getTeacher();
-                int day2 = timeTable.getChromosomes().get(i).getDay();
-                int hour2 = timeTable.getChromosomes().get(i).getHour();
-
-                if(day1==day2 && hour1 == hour2)
+                Teacher T1 = timeTable.getChromosomes().get(i).getTeacher();
+                int day1 = timeTable.getChromosomes().get(i).getDay();
+                int hour1 = timeTable.getChromosomes().get(i).getHour();
+                if (T1.equals(teacher))
                 {
-                    if (T1.equals(T2))
+                    for (int j=i+1;j<timeTable.getChromosomes().size(); j++)
                     {
-                        isPassRule = false;
+                        Teacher T2 = timeTable.getChromosomes().get(j).getTeacher();
+                        int day2 = timeTable.getChromosomes().get(j).getDay();
+                        int hour2 = timeTable.getChromosomes().get(j).getHour();
+                        if(T2.equals(teacher))
+                        {
+                            if(day1==day2 && hour1 == hour2)
+                            {
+                                m_RuleGrade -= rulePerTeacherScore;
+                                isRulePassed = false;
+                                break;
+                            }
+                        }
                     }
+                    if(!isRulePassed){break;}
                 }
             }
         }
-        RuleUtils.evaluteGrade(isPassRule, this);
-        timeTable.setFitness(this.m_RuleGrade);
     }
 
     @Override
     public String toString() {
-        return (super.toString() + "Name: TeacherIsHuman");
+        return ( "Name: TeacherIsHuman, " + super.toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

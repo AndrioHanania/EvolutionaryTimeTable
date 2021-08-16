@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TimeTable:jar">
+    <output-path>$PROJECT_DIR$/../Evolutionary Time Table/out/artifacts/TimeTable_jar</output-path>
+    <root id="archive" name="TimeTable.jar">
+      <element id="module-output" name="TimeTable" />
+      <element id="module-output" name="Engine" />
+      <element id="module-output" name="Jaxb" />
+    </root>
+  </artifact>
+</component>

@@ -3,26 +3,21 @@ package engine.selection;
 import engine.Solution;
 import engine.Population;
 
-import java.util.Random;
-
 public class Tournament extends Selection
 {
     //Members
     private double m_Pte;
 
-
     //Constructors
     public Tournament(double pte)
     {
         m_Pte = pte;
-
     }
 
     //Methods
-
     @Override
     public String toString() {
-        return "Name: Tournament" + "PTE: " + m_Pte + super.toString();
+        return "Name: Tournament " + "PTE: " + m_Pte + " " + super.toString();
     }
 
     @Override

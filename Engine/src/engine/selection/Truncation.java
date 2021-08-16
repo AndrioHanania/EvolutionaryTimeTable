@@ -4,12 +4,10 @@ import engine.Solution;
 import engine.Population;
 import java.util.*;
 
-
 public class Truncation extends Selection
 {
     //Members
     private int m_TopPercent;
-    //private String m_Configuration;
 
     //Constructors
     public Truncation(int topPercent)
@@ -20,19 +18,18 @@ public class Truncation extends Selection
     //Methods
     @Override
     public String toString() {
-        return "Name: Truncation" + "Top percent: " + m_TopPercent + super.toString();
+        return "Name: Truncation " + "Top percent: " + m_TopPercent + " "+ super.toString();
     }
-
 
     @Override
     public Population execute(Population currentGeneration)
     {
-        currentGeneration.sort(Comparator.comparingInt(Solution::getFitness));
+        currentGeneration.sort(Comparator.comparingDouble(Solution::getFitness));
         Population newGeneration = new Population();
         int numOfNewGeneration = (m_TopPercent * currentGeneration.size()) / 100;
-        for(int i=0;i<numOfNewGeneration;i++)
+        for(int i=0,j=currentGeneration.size()-1;i<numOfNewGeneration;i++,j--)
         {
-            newGeneration.add(currentGeneration.get(i));
+            newGeneration.add(currentGeneration.get(j));
         }
         return newGeneration;
     }

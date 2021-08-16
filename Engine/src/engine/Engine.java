@@ -1,10 +1,10 @@
 package engine;
 
-import Listeners.UpdateGenerationListener;
+import engine.Listeners.UpdateGenerationListener;
 import engine.crossover.Crossover;
 import engine.mutation.Mutation;
 import engine.selection.Selection;
-import generated.ETTEvolutionEngine;
+import engine.stopCondition.StopCondition;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,13 +19,15 @@ public class Engine implements Runnable
     private Selection m_Selection;
     private Problem m_Problem;
     private int m_NumOfGeneration = 0;
-    private int m_MaxNumOfGeneration;
     private Random m_Random = new Random();
     private int m_SizeOfFirstPopulation;
     private int m_NumberOfGenerationForUpdate;
     private Solution m_OptimalSolution;
     private boolean m_IsFinishToRun = false;
     private List<UpdateGenerationListener> listenersToUpdateGeneration = new ArrayList<>();
+    private double m_BestFitnessInCurrentGeneration=0;
+    private List<StopCondition> m_StopConditions = new ArrayList<>();
+    DataEngine m_DataEngine = new DataEngine();
 
     //Constructors
     public Engine(Selection selection, Crossover crossover, List<Mutation> mutations,
@@ -38,21 +40,13 @@ public class Engine implements Runnable
         m_SizeOfFirstPopulation = sizeOfFirstPopulation;
     }
 
-    public Engine(ETTEvolutionEngine eTTEvolutionEngine, Problem problem, Parse parse)
-    {
-        m_Selection = parse.parseSelection(eTTEvolutionEngine.getETTSelection());
-        m_Crossover =parse.parseCrossover(eTTEvolutionEngine.getETTCrossover());
-        m_Mutations = parse.parseMutation(eTTEvolutionEngine.getETTMutations());
-        m_SizeOfFirstPopulation = eTTEvolutionEngine.getETTInitialPopulation().getSize();
-        m_Problem = problem;
-    }
-
     public Engine()
     {
 
     }
 
     //Methods
+    @Override
     public void run()
     {
         Solution randomParent1;
@@ -63,58 +57,76 @@ public class Engine implements Runnable
         m_IsFinishToRun = false;
         firstPopulation.initializePopulation(m_SizeOfFirstPopulation, m_Problem);
         firstPopulation.calculateFitnessToAll();
-
-        while(m_NumOfGeneration < m_MaxNumOfGeneration)
+        firstPopulation.sort(Comparator.comparingDouble(Solution::getFitness));
+        m_BestFitnessInCurrentGeneration = firstPopulation.get(firstPopulation.size()-1).m_Fitness;
+        while (!checkStopConditions())
         {
+           int sizeOfElitism = m_Selection.getSizeOfElitism();
            Population selectedParents = new Population(m_Selection.execute(firstPopulation));
-           Population nextGeneration = new Population();
+           Population nextGeneration = new Population(firstPopulation.getElita(sizeOfElitism));
+           //note
+
            while(nextGeneration.size() < m_SizeOfFirstPopulation)
             {
-                randomParent1 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
-                randomParent2 = selectedParents.get(m_Random.nextInt(m_SizeOfFirstPopulation));
-                solution1 = m_Crossover.execute(randomParent1, randomParent2);
-                solution2 =m_Crossover.execute(randomParent1, randomParent2);
+                randomParent1 = selectedParents.get(m_Random.nextInt(selectedParents.size()));
+                randomParent2 = selectedParents.get(m_Random.nextInt(selectedParents.size()));
+
+                List<Solution> solutions = m_Crossover.execute(randomParent1, randomParent2);
+                solution1 = solutions.get(0);
+                solution2 = solutions.get(1);
+
                 for(Mutation mutation : m_Mutations)
                 {
                     mutation.execute(solution1);
                     mutation.execute(solution2);
                 }
+
+                nextGeneration.add(solution1);
+                nextGeneration.add(solution2);
             }
+
             m_NumOfGeneration++;
             forUpdate++;
+            nextGeneration.calculateFitnessToAll();
+            nextGeneration.sort(Comparator.comparingDouble(Solution::getFitness));
+            m_BestFitnessInCurrentGeneration = nextGeneration.get(nextGeneration.size()-1).m_Fitness;
             if(forUpdate == m_NumberOfGenerationForUpdate)
             {
                 for (UpdateGenerationListener listener : listenersToUpdateGeneration)
-                {listener.OnUpdateGeneration(m_OptimalSolution.getFitness(), m_NumOfGeneration);}
+                {listener.OnUpdateGeneration(m_BestFitnessInCurrentGeneration, m_NumOfGeneration);}
                 forUpdate = 0;
             }
+
             firstPopulation = nextGeneration;
         }
+
         m_IsFinishToRun = true;
         updateOptimalSolution(firstPopulation);
     }
-
 
     public String toString()
     {
         StringBuilder settings = new StringBuilder();
         settings.append("Engine: ");
         settings.append(System.lineSeparator());
-        settings.append("size of population= ").append(m_SizeOfFirstPopulation);
+        settings.append("size of population: ").append(m_SizeOfFirstPopulation);
+        settings.append(System.lineSeparator());
         settings.append(m_Selection);
+        settings.append(System.lineSeparator());
         settings.append(m_Crossover);
+        settings.append(System.lineSeparator());
         for(Mutation mutation : m_Mutations)
-        { settings.append(mutation);}
+        {
+            settings.append(mutation);
+            settings.append(System.lineSeparator());
+        }
         return settings.toString();
     }
-
 
     public int getNumOfGeneration()
     {
         return m_NumOfGeneration;
     }
-
-    public void setMaxNumOfGeneration(int num){m_MaxNumOfGeneration = num;}
 
     public void  setNumberOfGenerationForUpdate(int num){m_NumberOfGenerationForUpdate = num;}
 
@@ -126,8 +138,8 @@ public class Engine implements Runnable
 
 
     private void updateOptimalSolution(Population population){
-        population.sort(Comparator.comparingInt(Solution::getFitness));
-        m_OptimalSolution = population.get(0);
+        population.sort(Comparator.comparingDouble(Solution::getFitness));
+        m_OptimalSolution = population.get(population.size()-1);
     }
 
     public void addListenerToUpdateGeneration(UpdateGenerationListener listenerToAdd)
@@ -138,5 +150,77 @@ public class Engine implements Runnable
     public void removeListenerToUpdateGeneration(UpdateGenerationListener listenerToAdd)
     {
         listenersToUpdateGeneration.remove(listenerToAdd);
+    }
+
+    public void clear()
+    {
+        m_NumOfGeneration = 0;
+        m_OptimalSolution = null;
+    }
+
+    public void setSelection(Selection selection) {
+        m_Selection = selection;
+    }
+
+    public void setCrossover(Crossover crossover) {
+        m_Crossover=crossover;
+    }
+
+    public void setMutations(List<Mutation> mutations) {
+       m_Mutations=mutations;
+    }
+
+    public void setSizeOfFirstPopulation(int size) {
+        m_SizeOfFirstPopulation = size;
+    }
+
+    public void setProblem(Problem problem){
+        m_Problem = problem;
+    }
+
+    public void addStopCondition(StopCondition stopCondition)
+    {
+        m_StopConditions.add(stopCondition);
+    }
+
+    public void removeStopCondition(StopCondition stopCondition)
+    {
+        m_StopConditions.remove(stopCondition);
+    }
+
+    private boolean checkStopConditions()
+    {
+        if(m_StopConditions.isEmpty())
+        {
+            return true;
+        }
+
+       boolean condition = false;
+
+        for (StopCondition stopCondition : m_StopConditions)
+        {
+            condition = stopCondition.execute(m_DataEngine);
+            if(condition) {
+                break;
+            }
+        }
+
+        return condition;
+    }
+
+    public int getSizeOfFirstPopulation(){return  m_SizeOfFirstPopulation;}
+
+    public class DataEngine
+    {
+
+        public int getNumberOfCurrentGeneration()
+        {
+            return m_NumOfGeneration;
+        }
+
+        public double getBestFitness()
+        {
+            return m_BestFitnessInCurrentGeneration;
+        }
     }
 }

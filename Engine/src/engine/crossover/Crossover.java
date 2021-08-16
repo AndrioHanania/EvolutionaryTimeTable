@@ -1,19 +1,17 @@
 package engine.crossover;
 
 import engine.Solution;
-import generated.ETTCrossover;
 
-import java.util.Random;
-
+import java.util.List;
 
 public abstract class Crossover
 {
+    //Members
     protected int m_NumOfCuttingPoints;
     protected String m_Configuration;
 
     //Methods
-    public abstract Solution execute(Solution parent1, Solution parent2);
-
+    public abstract List<Solution> execute(Solution parent1, Solution parent2);
 
    public void setConfiguration(String configuration){m_Configuration= configuration; }
 

@@ -3,21 +3,27 @@ package timeTable.Rules;
 public class RuleUtils
 {
 
-    public static void evaluteGrade(boolean isPassRule, Rule rule)
-    {
-        if(isPassRule)
+
+    public static Rule CreateRule(Rule rule){
+        Rule newRule=null;
+        switch (rule.getClass().getSimpleName())
         {
-            if(rule.m_RuleWeight == "Hard")
-            { rule.m_RuleGrade += 5;}
-            else if(rule.m_RuleWeight == "Soft")
-            { rule.m_RuleGrade +=3;}
+            case "Knowledgeable":
+                newRule = new Knowledgeable(rule);
+                break;
+            case "Satisfactory":
+                newRule = new Satisfactory(rule);
+                break;
+            case "Singularity":
+                newRule = new Singularity(rule);
+                break;
+            case "TeacherIsHuman":
+                newRule = new TeacherIsHuman(rule);
+                break;
+           // default:
+                //throw new Exception("Type of rule does not exsist");
         }
-        else
-        {
-            if(rule.m_RuleWeight == "Hard")
-            {  rule.m_RuleGrade += 0;}
-            else if(rule.m_RuleWeight == "Soft")
-            {rule.m_RuleGrade +=1;}
-        }
+        newRule.setGrade(100);
+        return newRule;
     }
 }

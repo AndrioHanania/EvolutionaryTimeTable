@@ -1,8 +1,9 @@
 package userInterface;
 
-import Listeners.UpdateGenerationListener;
+import engine.Listeners.UpdateGenerationListener;
 import engine.Engine;
 
+import engine.stopCondition.StopCondition;
 import timeTable.TimeTable;
 
 public abstract class UI implements Runnable
@@ -11,8 +12,9 @@ public abstract class UI implements Runnable
     private Engine m_Engine;
     protected boolean m_IsRunning;
     protected boolean m_IsXmlFileLoad;
-    protected boolean m_IsEngineHasBeenRunning;
+    protected boolean m_IsEngineHasBeenRunning=false;
     private TimeTable m_TimeTable;
+    protected Thread m_ThreadEngine = new Thread(m_Engine);
 
     public UI()
     {
@@ -21,11 +23,6 @@ public abstract class UI implements Runnable
     }
 
     //Methods
-
-    protected int getNumberOfGenerationInEngine(){
-        return m_Engine.getNumOfGeneration();
-    }
-
 
     protected void addListenerToUpdateGenerationAbstract(UpdateGenerationListener listener)
     {
@@ -38,14 +35,16 @@ public abstract class UI implements Runnable
     }
 
 
-    protected void runEngine()
-    {
-        if(m_IsXmlFileLoad)///
-        { m_Engine.run();}
-        else
+    protected void runEngine() {
+        if(m_IsXmlFileLoad)
         {
-            ////////
+            m_Engine.run();
+            m_IsEngineHasBeenRunning=true;
         }
+    }
+
+    protected void clearEngine() {
+        m_Engine.clear();
     }
 
     protected void setEngine(Engine engine)
@@ -61,10 +60,13 @@ public abstract class UI implements Runnable
 
     protected String getTimeTable(){return String.valueOf(m_TimeTable);}
 
-    protected void setMaxNumOfGenerationInEngine(int num){m_Engine.setMaxNumOfGeneration(num);}
-
     protected void setNumberOfGenerationForUpdateInEngine(int num){m_Engine.setNumberOfGenerationForUpdate(num);}
 
+
+    protected void addStopConditionToEngine(StopCondition stopCondition)
+    {
+        m_Engine.addStopCondition(stopCondition);
+    }
 
     @Override
     public abstract void run();
@@ -78,8 +80,6 @@ public abstract class UI implements Runnable
     public abstract void showOptimalSolution();
 
     public abstract void viewAlgorithmProcess();
-
-    public abstract void runSmallFile();
 
     public abstract void exit();
 }

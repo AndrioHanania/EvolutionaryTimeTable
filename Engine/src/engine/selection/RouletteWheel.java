@@ -1,24 +1,14 @@
 package engine.selection;
 
-
-
 import engine.Solution;
 import engine.Population;
 
-
-
-
 public class RouletteWheel extends Selection
 {
-    public RouletteWheel()
-    {
-
-    }
-
-
+    //Methods
     @Override
     public String toString() {
-        return "Name: RouletteWheel" + super.toString();
+        return "Name: RouletteWheel, " + super.toString();
     }
 
     @Override

@@ -1,7 +1,11 @@
 package userInterface;
 
-import Listeners.UpdateGenerationListener;
+import engine.Listeners.UpdateGenerationListener;
 import engine.Engine;
+import engine.Parse;
+import engine.stopCondition.BestFitnessCondition;
+import engine.stopCondition.MaxNumOfGenerationCondition;
+import engine.stopCondition.TimeCondition;
 import generated.ETTDescriptor;
 import timeTable.TimeTable;
 import timeTable.TimeTableParse;
@@ -13,14 +17,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
-public class ConsoleUI extends UI  implements UpdateGenerationListener
+public class ConsoleUI extends UI
 {
     //Constructors
-    Map<Integer,Integer> m_NumOfGeneration2BestFitness= new TreeMap<>();
+    Map<Integer,Double> m_NumOfGeneration2BestFitness= new TreeMap<>();
 
     public ConsoleUI()
     {
-        addListenerToUpdateGenerationAbstract(this);
+
     }
 
     //Methods
@@ -59,56 +63,49 @@ public class ConsoleUI extends UI  implements UpdateGenerationListener
             case 6:
                 exit();
                 break;
-            case 7:
-                runSmallFile();
-                break;
             default:
                 System.out.println("Error with input");
         }
     }
 
-    private  void runMyEngine()
-    {
-        getAndSetMaxNumOfGenerationInEngine();
+    private  void runMyEngine(){
+        getAndSetStopCondition();
         getAndSetNumberOfGenerationForUpdateInEngine();
         m_NumOfGeneration2BestFitness.clear();
+        clearEngine();
         runEngine();
     }
 
-    private void getAndSetMaxNumOfGenerationInEngine()
+    private void getMaxNumOfGenerationCondition()
     {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("For stop condition please enter number of generation To produce (integer bigger than 100):");
         while(true)
         {
             int maxNumOfGenerationInEngine = 0;
-            boolean hasBeenCatch = false;
             try
             {
-                maxNumOfGenerationInEngine = scanner.nextInt();
-            }
-            catch (InputMismatchException e)
-            {
-                System.out.println("Error with input. The input is not integer");
-                hasBeenCatch = true;
+                System.out.print("Please enter integer (bigger or equal to 100) of generation for stop condition: ");
+                maxNumOfGenerationInEngine  = Integer.parseInt(scanner.nextLine());
+                if (maxNumOfGenerationInEngine < 100)
+                {
+                    System.out.println("Error with input. The input is not bigger or equal to 100");
+                } else
+                {
+                    addStopConditionToEngine(new MaxNumOfGenerationCondition(maxNumOfGenerationInEngine));
+                    break;
+                }
             }
             catch (IllegalStateException e)
             {
                 System.out.println("Scanner was closed");
-                hasBeenCatch = true;
             }
             catch (NoSuchElementException e)
             {
                 System.out.println("Error with input. The input is exhausted");
-                hasBeenCatch = true;
             }
-            if(!hasBeenCatch) {
-                if (maxNumOfGenerationInEngine < 100) {
-                    System.out.println("Error with input. The input is not bigger than 100");
-                } else {
-                    setMaxNumOfGenerationInEngine(maxNumOfGenerationInEngine);
-                    break;
-                }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Error with input. The input is not integer");
             }
         }
     }
@@ -116,66 +113,173 @@ public class ConsoleUI extends UI  implements UpdateGenerationListener
     private void getAndSetNumberOfGenerationForUpdateInEngine()
     {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("For Updates please enter number of generation to support for details(integer bigger than 0):");
         while(true)
         {
             int numberOfGenerationForUpdateInEngine = 0;
-            boolean hasBeenCatch = false;
             try
             {
-                numberOfGenerationForUpdateInEngine = scanner.nextInt();
-            }
-            catch (InputMismatchException e)
-            {
-                System.out.println("Error with input. The input is not integer");
-                hasBeenCatch = true;
-            }
-            catch (IllegalStateException e)
-            {
-                System.out.println("Scanner was closed");
-                hasBeenCatch = true;
-            }
-            catch (NoSuchElementException e)
-            {
-                System.out.println("Error with input. The input is exhausted");
-                hasBeenCatch = true;
-            }
-            if(!hasBeenCatch) {
-                if (numberOfGenerationForUpdateInEngine < 0) {
+                System.out.println("For Updates please enter number of generation to support for details(integer bigger than 0):");
+                numberOfGenerationForUpdateInEngine  = Integer.parseInt(scanner.nextLine());
+                if (numberOfGenerationForUpdateInEngine < 0)
+                {
                     System.out.println("Error with input. The input is not bigger than 0");
-                } else {
+                }
+                else
+                {
                     setNumberOfGenerationForUpdateInEngine(numberOfGenerationForUpdateInEngine);
                     break;
                 }
             }
+            catch (IllegalStateException e)
+            {
+                System.out.println("Scanner was closed");
+            }
+            catch (NoSuchElementException e)
+            {
+                System.out.println("Error with input. The input is exhausted");
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Error with input. The input is not integer");
+            }
+        }
+    }
+    // לנסות לעשות שיהיה אפשר להוסיף יותר מתנאי עצירה 1
+    private void getAndSetStopCondition()
+    {
+        Menu stopConditionsMenu = new Menu("Stop condition for the engine",
+                new String[]{
+                        "To stop the algorithm by fitness threshold",
+                        "To stop the algorithm by number of generation",
+                        "To stop the algorithm by timer"
+                });
+        stopConditionsMenu.Draw();
+        int input = stopConditionsMenu.getInputFromMenu();
+        switch (input)
+        {
+            case 1:
+                getFitnessThresholdCondition();
+                break;
+            case 2:
+                getMaxNumOfGenerationCondition();
+                break;
+            case 3:
+                getTimeCondition();
+                break;
         }
     }
 
-    @Override
-    public void OnUpdateGeneration(int bestFitnessInCurrentGeneration, int numberOfGeneration)
+    private void getTimeCondition()
     {
-        m_NumOfGeneration2BestFitness.put( numberOfGeneration, bestFitnessInCurrentGeneration);
-        System.out.println("Best fitness in Generation number "+ numberOfGeneration + ": " + bestFitnessInCurrentGeneration);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter number of second for stop condition(integer): ");
+        int second;
+        while (true)
+        {
+            try
+            {
+                second = Integer.parseInt(scanner.nextLine());
+                if (second < 0) {
+                    System.out.println("Error with input. Please enter number of second for stop condition(integer): ");
+                } else {
+                    addStopConditionToEngine(new TimeCondition(second));
+                    break;
+                }
+            }
+            catch (IllegalStateException e)
+            {
+                System.out.println("Scanner was closed");
+            }
+            catch (NoSuchElementException e)
+            {
+                System.out.println("Error with input. The input is exhausted");
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Error with input. The input is not integer");
+            }
+        }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private  void getFitnessThresholdCondition()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter a double between 0 - 100 to be the fitness threshold for stop condition: ");
+        double maxFitness;
+         while (true)
+         {
+             try
+             {
+                 maxFitness = Double.parseDouble(scanner.nextLine());
+                  if (maxFitness < 0 || maxFitness > 100) {
+                         System.out.println("Error with input. please enter a double between 0 - 100 as fitness threshold: ");
+                  } else {
+                         addStopConditionToEngine(new BestFitnessCondition(maxFitness));
+                          break;
+                  }
+             }
+            catch (IllegalStateException e)
+             {
+                  System.out.println("Scanner was closed");
+             }
+             catch (NoSuchElementException e)
+            {
+                  System.out.println("Error with input. The input is exhausted");
+            }
+            catch (NumberFormatException e)
+            {
+                  System.out.println("Error with input. The input is not double");
+            }
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void loadInfoFromXmlFile() {
         Engine engine;
         TimeTable timeTable;
+        Scanner scanner = new Scanner(System.in);
+        Parse parse= new TimeTableParse();
         try
         {
-            InputStream inputStream = new FileInputStream(new File("Jaxb/src/schema/fileInfo.xml"));
+            System.out.println("Please enter full name of file to load: ");
+            String nameFileToLoad = scanner.nextLine();
+            InputStream inputStream = new FileInputStream(new File(nameFileToLoad));
+            if(!nameFileToLoad.substring(nameFileToLoad.length()-3).equals("xml"))
+            {
+                throw new Exception("The file is not a xml");
+            }
             ETTDescriptor eTTEvolutionEngine = ConsoleUIUtils.deserializeFrom(inputStream);
-            timeTable = new TimeTable(eTTEvolutionEngine.getETTTimeTable());
-            engine = new Engine(eTTEvolutionEngine.getETTEvolutionEngine(), timeTable, new TimeTableParse());
+            timeTable = (TimeTable) parse.parseSolution(eTTEvolutionEngine.getETTTimeTable());
+            engine = parse.parseEngine(eTTEvolutionEngine.getETTEvolutionEngine());
+            engine.setProblem(timeTable);
+            if(m_IsXmlFileLoad)
+            {
+                m_IsEngineHasBeenRunning=false;
+            }
             m_IsXmlFileLoad = true;
            setEngine(engine);
+           addListenerToUpdateGenerationAbstract(new UpdateGenerationListener() {
+               @Override
+               public void OnUpdateGeneration(double bestFitnessInCurrentGeneration, int numberOfGeneration) {
+                   m_NumOfGeneration2BestFitness.put( numberOfGeneration, bestFitnessInCurrentGeneration);
+                   System.out.println("Best fitness in Generation number "+ numberOfGeneration + ": " + String.format("%.2f", bestFitnessInCurrentGeneration));
+               }
+           });
            setTimeTable(timeTable);
             System.out.println("The xml file was loaded");
-        } catch (JAXBException | FileNotFoundException e)
+        }
+        catch (JAXBException  e)
         {
-            e.printStackTrace();
+            System.out.println("Error with generating data from xml file");
+        }
+        catch (FileNotFoundException e)
+        {
+            System.out.println("File not found");
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -206,7 +310,6 @@ public class ConsoleUI extends UI  implements UpdateGenerationListener
                 switch (input)
                 {
                     case 1:
-                        //בהפעלה מחודשת כל המידעים הקודמים נמחקים
                         runMyEngine();
                         System.out.println("Done run algorithm");
                         break;
@@ -219,7 +322,6 @@ public class ConsoleUI extends UI  implements UpdateGenerationListener
             }
             else
             {
-                //בהפעלה מחודשת כל המידעים הקודמים נמחקים
                 runMyEngine();
                 System.out.println("Done run algorithm");
             }
@@ -279,8 +381,8 @@ public class ConsoleUI extends UI  implements UpdateGenerationListener
     public void viewAlgorithmProcess() {
         if(m_IsXmlFileLoad) {
             if (m_IsEngineHasBeenRunning) {
-                Map<Integer, Integer> m_numOfGeneration2BestFitness = m_NumOfGeneration2BestFitness;
-                for (Map.Entry<Integer, Integer> entry   : m_NumOfGeneration2BestFitness.entrySet())
+                Map<Integer, Double> m_numOfGeneration2BestFitness = m_NumOfGeneration2BestFitness;
+                for (Map.Entry<Integer, Double> entry   : m_NumOfGeneration2BestFitness.entrySet())
                 {
                     System.out.println("Best fitness in Generation number "+ entry.getKey() + ": " + entry.getValue());
                 }
@@ -297,16 +399,14 @@ public class ConsoleUI extends UI  implements UpdateGenerationListener
     }
 
     @Override
-    public void runSmallFile()
-    {
-        ////
-        ////
-        System.out.println("Done run small file");
-    }
-
-    @Override
     public void exit() {
         m_IsRunning = false;
-        System.out.println("Exit");
+        System.out.println("Exit...");
+
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            System.out.println("Error exiting program (Thread.sleep)");
+        }
     }
 }

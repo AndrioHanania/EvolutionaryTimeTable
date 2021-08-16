@@ -6,7 +6,6 @@ import generated.ETTStudy;
 
 import java.util.*;
 
-
 public class Grade
 {
     //Members
@@ -18,7 +17,7 @@ public class Grade
     public Grade()
     {
         m_Name= new String();
-        m_MapIdSubjectToHoursInWeek = new HashMap();
+        m_MapIdSubjectToHoursInWeek = new TreeMap<>();
     }
 
     public Grade(int idNumber, String name, Map<Integer, Integer> map)

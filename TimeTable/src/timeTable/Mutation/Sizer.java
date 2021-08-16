@@ -21,7 +21,7 @@ public class Sizer extends Mutation
     //Methods
     @Override
     public String toString() {
-        return "Name: Sizer" + super.toString();
+        return "Name: Sizer, " + super.toString();
     }
 
 

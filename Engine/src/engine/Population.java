@@ -1,5 +1,6 @@
 package engine;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -21,8 +22,7 @@ public class Population
     }
 
     //Methods
-    public void initializePopulation(int sizeOfFirstPopulation, Problem problem)
-    {
+    public void initializePopulation(int sizeOfFirstPopulation, Problem problem){
         for (int i = 0;i < sizeOfFirstPopulation;i++) {
             m_Population.add(problem.newRandomInstance());
         }
@@ -53,5 +53,18 @@ public class Population
     public void sort(Comparator comparator)
     {
         m_Population.sort(comparator);
+    }
+
+    public Population getElita(int sizeOfElitism) 
+    {
+        Population elita = new Population();
+        m_Population.sort(Comparator.comparingDouble(Solution::getFitness));
+        int sizePopulation = m_Population.size();
+        for(int i = sizePopulation - sizeOfElitism;i<sizePopulation;i++)
+        {
+            elita.add(m_Population.get(i));
+        }
+
+       return elita;
     }
 }
