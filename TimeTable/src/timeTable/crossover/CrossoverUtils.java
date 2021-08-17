@@ -84,7 +84,7 @@ public class CrossoverUtils
         List<Solution> solutions=new ArrayList<>();
         m_CopyFromFirstParent = true;
         m_CuttingPointsLocations = new ArrayList<>(numOfCuttingPoints);
-        randomizeCrossingPoints(tTableParent1,tTableParent2, numOfCuttingPoints);
+
         //unlimited generality for tTableParent1
         TimeTable firstChild = createChild(tTableParent1);
         TimeTable secondChild = createChild(tTableParent1);
@@ -92,13 +92,15 @@ public class CrossoverUtils
         int indexCuttingPoints=0;
         int index=0;
 
-        for (int l=1;l<=tTableParent1.getTeachers().size();l++)
+        for (int i=1;i<=tTableParent1.getTeachers().size();i++)
         {
+            randomizeCrossingPoints(tTableParent1,tTableParent2, numOfCuttingPoints);
+
             for (int j=1;j<=tTableParent1.getHour();j++)
             {
                 for (int k=1;k<=tTableParent1.getGrades().size();k++)
                 {
-                    for (int i=1;i<=tTableParent1.getDay();i++)
+                    for (int l=1;l<=tTableParent1.getDay();l++)
                     {
                         for (int m=1;m<=tTableParent1.getSubjects().size();m++)
                         {

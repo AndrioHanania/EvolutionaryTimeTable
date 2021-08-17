@@ -42,6 +42,20 @@ public class Engine implements Runnable
 
     public Engine()
     {
+        m_Selection = new Selection() {
+            @Override
+            public Population execute(Population currentGeneration) {
+                return null;
+            }
+        };
+
+        m_Crossover = new Crossover() {
+            @Override
+            public List<Solution> execute(Solution parent1, Solution parent2) {
+                return null;
+            }
+        };
+        m_Mutations = new ArrayList<Mutation>();
 
     }
 

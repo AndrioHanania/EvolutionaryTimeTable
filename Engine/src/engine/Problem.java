@@ -4,5 +4,6 @@ package engine;
 public interface Problem
 {
     //Methods
+
     public Solution newRandomInstance();
 }

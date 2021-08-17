@@ -236,7 +236,7 @@ public class ConsoleUI extends UI
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void loadInfoFromXmlFile() {
-        Engine engine;
+        Engine engine = new Engine();
         TimeTable timeTable;
         Scanner scanner = new Scanner(System.in);
         Parse parse= new TimeTableParse();

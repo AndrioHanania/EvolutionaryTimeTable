@@ -62,7 +62,11 @@ public class TimeTableParse extends Parse
                     throw new Exception("Error with type of selection");
         }
         selection.setConfiguration(eTTSelection.getConfiguration());
-        if(eTTSelection.getETTElitism() > sizeOfFirstPopulation)
+        if(eTTSelection.getETTElitism() == null)
+        {
+            selection.setSizeOfElitism(0);
+        }
+        else if(eTTSelection.getETTElitism() > sizeOfFirstPopulation)
         {
             throw new Exception("Error with size of elitism, is bigger than size of first population");
         }
@@ -86,6 +90,8 @@ public class TimeTableParse extends Parse
         switch(eTTCrossover.getName())
         {
             case "AspectOriented":
+                String[] str = eTTCrossover.getConfiguration().split("=");
+                String Orientation = str[1];
                 crossover = new AspectOriented(cuttingPoint);
                 break;
             case "DayTimeOriented":
@@ -175,6 +181,9 @@ public class TimeTableParse extends Parse
                 break;
             case "DayOffTeacher":
                 rule = new DayOffTeacher(ettRule);
+                break;
+            case "Sequentiality":
+                rule = new Sequentiality(ettRule);
                 break;
             default:
                 throw new Exception("Error with type of rule");

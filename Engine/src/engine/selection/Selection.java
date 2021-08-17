@@ -11,6 +11,10 @@ public abstract class Selection
     protected int m_SizeOfElitism = 0;
 
     //Methods
+    public Selection()
+    {
+
+    }
     public abstract Population execute(Population currentGeneration);
 
     public void setConfiguration(String configuration){m_Configuration = configuration;}

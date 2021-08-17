@@ -11,6 +11,10 @@ public abstract class Crossover
     protected String m_Configuration;
 
     //Methods
+    public  Crossover()
+    {
+
+    }
     public abstract List<Solution> execute(Solution parent1, Solution parent2);
 
    public void setConfiguration(String configuration){m_Configuration= configuration; }
