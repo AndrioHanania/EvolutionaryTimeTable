@@ -1,6 +1,7 @@
 package JAVAFXUI;
 
 import engine.Engine;
+import engine.Listeners.UpdateGenerationListener;
 import engine.Parse;
 import generated.ETTDescriptor;
 import timeTable.TimeTable;
@@ -11,20 +12,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class JavaFxUI
 {
 
+    private boolean m_IsRunning;
+    private boolean m_IsXmlFileLoad;
+    private boolean m_IsEngineHasBeenRunning=false;
+    private Engine m_Engine;
+    private TimeTable m_TimeTable;
+    Map<Integer,Double> m_NumOfGeneration2BestFitness= new TreeMap<>();
 
-    public void loadInfoFromXmlFile(File selectedFile)
+    public void loadInfoFromXmlFile(File selectedFile) throws Exception
     {
 
         Engine engine;
         TimeTable timeTable;
         Parse parse= new TimeTableParse();
-        try
-        {
+        //try
+        //{
             InputStream inputStream = new FileInputStream(selectedFile);
             String nameFileToLoad = selectedFile.getName();
             if(!nameFileToLoad.substring(nameFileToLoad.length()-3).equals("xml"))
@@ -40,18 +49,18 @@ public class JavaFxUI
                 m_IsEngineHasBeenRunning=false;
             }
             m_IsXmlFileLoad = true;
-            setEngine(engine);
-            addListenerToUpdateGenerationAbstract(new UpdateGenerationListener() {
+            m_Engine = engine;
+            m_Engine.addListenerToUpdateGeneration(new UpdateGenerationListener() {
                 @Override
                 public void OnUpdateGeneration(double bestFitnessInCurrentGeneration, int numberOfGeneration) {
                     m_NumOfGeneration2BestFitness.put( numberOfGeneration, bestFitnessInCurrentGeneration);
                     System.out.println("Best fitness in Generation number "+ numberOfGeneration + ": " + String.format("%.2f", bestFitnessInCurrentGeneration));
+
                 }
             });
-            setTimeTable(timeTable);
-            System.out.println("The xml file was loaded");
-        }
-        catch (JAXBException e)
+            m_TimeTable = timeTable;
+       // }
+        /*catch (JAXBException e)
         {
             System.out.println("Error with generating data from xml file");
         }
@@ -62,7 +71,7 @@ public class JavaFxUI
         catch (Exception e)
         {
             System.out.println(e.getMessage());
-        }
+        }*/
     }
 
 
