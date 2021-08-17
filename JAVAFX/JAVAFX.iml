@@ -7,5 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="TimeTable" />
+    <orderEntry type="module" module-name="Engine" />
+    <orderEntry type="module" module-name="Jaxb" />
   </component>
 </module>
