@@ -117,28 +117,26 @@
                                  <children>
                                     <TableView fx:id="rowsTableView" layoutX="7.0" layoutY="80.0" prefHeight="502.0" prefWidth="924.0">
                                       <columns>
-                                        <TableColumn prefWidth="114.0" text="Day" />
-                                        <TableColumn prefWidth="146.0" text="Hour" />
-                                          <TableColumn prefWidth="193.0" text="Teacher" />
-                                          <TableColumn prefWidth="229.0" text="Grade" />
-                                          <TableColumn prefWidth="241.0" text="Subject" />
+                                        <TableColumn fx:id="dayRowTableColumn" prefWidth="114.0" text="Day" />
+                                        <TableColumn fx:id="hourRowTableColumn" prefWidth="146.0" text="Hour" />
+                                          <TableColumn fx:id="teacherRowTableColumn" prefWidth="193.0" text="Teacher" />
+                                          <TableColumn fx:id="gradeRowTableColumn" prefWidth="229.0" text="Grade" />
+                                          <TableColumn fx:id="subjectRowTableColumn" prefWidth="241.0" text="Subject" />
                                       </columns>
                                     </TableView>
                                  </children></AnchorPane>
                           </content>
                         </Tab>
-                        <Tab text="Rules &amp; Fitness">
+                        <Tab text="Rules">
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <HBox layoutX="1.0" prefHeight="79.0" prefWidth="929.0" spacing="60.0" AnchorPane.bottomAnchor="503.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <HBox layoutX="1.0" prefHeight="79.0" prefWidth="929.0" spacing="70.0" AnchorPane.bottomAnchor="503.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
                                           <Label prefHeight="21.0" prefWidth="129.0" text="Hard rules avg: " />
                                           <Label fx:id="hardRulesAvgLabel" text="0.0" />
                                           <Label text="Soft Rules avg: " />
                                           <Label fx:id="softRulesAvgLabel" text="0.0" />
-                                          <Label text="Fitness: " />
-                                          <Label fx:id="OptimalFitnessLabel" text="0.0" />
                                        </children>
                                        <padding>
                                           <Insets left="20.0" right="20.0" top="25.0" />
@@ -146,10 +144,10 @@
                                     </HBox>
                                     <TableView fx:id="rulesTableView" layoutX="1.0" layoutY="78.0" prefHeight="504.0" prefWidth="931.0">
                                       <columns>
-                                        <TableColumn prefWidth="208.0" text="Name" />
-                                        <TableColumn prefWidth="227.0" text="Weight" />
-                                          <TableColumn prefWidth="222.0" text="Score" />
-                                          <TableColumn prefWidth="273.0" text="Configoration" />
+                                        <TableColumn fx:id="nameRulTableColumn" prefWidth="208.0" text="Name" />
+                                        <TableColumn fx:id="weightRuleTableColumn" prefWidth="227.0" text="Weight" />
+                                          <TableColumn fx:id="scoreRuleTableColumn" prefWidth="222.0" text="Score" />
+                                          <TableColumn fx:id="configRuleTableColumn" prefWidth="273.0" text="Configoration" />
                                       </columns>
                                     </TableView>
                                  </children>
@@ -162,8 +160,8 @@
                                  <children>
                                     <TableView fx:id="updatesTableView" layoutY="79.0" prefHeight="503.0" prefWidth="931.0">
                                       <columns>
-                                        <TableColumn prefWidth="461.0" text="Generation" />
-                                        <TableColumn prefWidth="469.0" text="Fitness" />
+                                        <TableColumn fx:id="updateGenerationTableColumn" prefWidth="461.0" text="Generation" />
+                                        <TableColumn fx:id="updateFitnessTableColumn" prefWidth="469.0" text="Fitness" />
                                       </columns>
                                     </TableView>
                                  </children>

@@ -22,7 +22,7 @@ public class JavaFxUI
     private Engine m_Engine;
     private TimeTable m_TimeTable;
     private Map<Integer,Double> m_NumOfGeneration2BestFitness= new TreeMap<>();
-    private Thread m_ThreadEngine = new Thread(m_Engine);
+    private Thread m_ThreadEngine;// = new Thread(m_Engine);
 
     public void loadInfoFromXmlFile(File selectedFile) throws Exception
     {
@@ -56,6 +56,8 @@ public class JavaFxUI
     public Map<Integer,Double> getNumOfGeneration2BestFitness(){return m_NumOfGeneration2BestFitness;}
 
     public Thread getThreadEngine(){return m_ThreadEngine;}
+
+    public void setThreadEngine(Thread thread){m_ThreadEngine=thread;}
 
     public TimeTable getTimeTable() {
         return m_TimeTable;

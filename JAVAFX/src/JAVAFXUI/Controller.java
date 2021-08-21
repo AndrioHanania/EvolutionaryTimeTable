@@ -12,11 +12,16 @@ import engine.stopCondition.TimeCondition;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.animation.ScaleTransition;
+import javafx.application.Platform;
 import javafx.beans.property.*;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import timeTable.Grade;
@@ -27,7 +32,6 @@ import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
 
 import javax.xml.bind.JAXBException;
-
 
 public class Controller {
 
@@ -46,8 +50,6 @@ public class Controller {
     private URL location;
 
     // Values injected by FXMLLoader
-
-
     @FXML private Button fileChooserButton;
     @FXML private TextField loadFileTextBox;
     @FXML private Label messageToUserTextBox;
@@ -71,13 +73,20 @@ public class Controller {
     @FXML private TextArea rulesTextArea;
     @FXML private Label hardRulesAvgLabel;
     @FXML private Label softRulesAvgLabel;
-    @FXML private Label OptimalFitnessLabel;
     @FXML private TableView<ProductRule> rulesTableView;
     @FXML private TableView<ProductUpdate> updatesTableView;
     @FXML private TableView<ProductRow> rowsTableView;
-
-
-
+    @FXML private TableColumn<ProductRule, String> nameRulTableColumn;
+    @FXML private TableColumn<ProductRule, String> weightRuleTableColumn;
+    @FXML private TableColumn<ProductRule, String> scoreRuleTableColumn;
+    @FXML private TableColumn<ProductRule, String> configRuleTableColumn;
+    @FXML private TableColumn<ProductUpdate, String> updateGenerationTableColumn;
+    @FXML private TableColumn<ProductUpdate, String> updateFitnessTableColumn;
+    @FXML private TableColumn<ProductRow, String> dayRowTableColumn;
+    @FXML private TableColumn<ProductRow, String> hourRowTableColumn;
+    @FXML private TableColumn<ProductRow, String> teacherRowTableColumn;
+    @FXML private TableColumn<ProductRow, String> gradeRowTableColumn;
+    @FXML private TableColumn<ProductRow, String> subjectRowTableColumn;
 
     IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
     DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
@@ -88,17 +97,26 @@ public class Controller {
     StringProperty  m_SPSubjectsInfo = new SimpleStringProperty();
     StringProperty  m_SPGradesInfo = new SimpleStringProperty();
     StringProperty  m_SPRulesInfo = new SimpleStringProperty();
+    DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
 
     //Casual reboot
     MaxNumOfGenerationCondition maxNumOfGenerationCondition =new MaxNumOfGenerationCondition(0);
     BestFitnessCondition bestFitnessCondition = new BestFitnessCondition(0);
     TimeCondition timeCondition = new TimeCondition(0);
 
+    ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
+    ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
+
 
     //reminder that some codes need to be in synchronized!!!!!
 
 
 
+
+
+
+    private void addToObservableListOfRules(ProductRule productRule){observableListOfRules.add(productRule);}
+    private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
 
     private void provideInfoFromOptimalSolution(TimeTable timeTable)
     {
@@ -109,6 +127,7 @@ public class Controller {
     private void provideInfoAboutRowsFromOptimalSolution(TimeTable timeTable)
     {
         rowsTableView.getItems().clear();
+        observableListOfRows.clear();
         List<TimeTableChromosome> chromosomes = timeTable.getChromosomes();
         chromosomes.sort(Comparator.comparingInt(TimeTableChromosome::getDay)
                 .thenComparing(Comparator.comparingInt(TimeTableChromosome::getHour)
@@ -116,25 +135,27 @@ public class Controller {
                         .thenComparing(TimeTableChromosome::compareWithTeacher)));
         for(TimeTableChromosome chromosome : chromosomes)
         {
-            rowsTableView.getItems().add(new ProductRow(chromosome.getDay(),
-                    chromosome.getHour(), chromosome.getTeacher().getName(),
+            addToObservableListOfRows(new ProductRow(((Integer)chromosome.getDay()).toString(),
+                    ((Integer)chromosome.getHour()).toString(), chromosome.getTeacher().getName(),
                     chromosome.getGrade().getName(), chromosome.getSubject().getName()));
         }
+        rowsTableView.setItems(observableListOfRows);
     }
 
     private void provideInfoAboutRulesAndFitnessFromOptimalSolution(TimeTable timeTable)
     {
         rulesTableView.getItems().clear();
+        observableListOfRules.clear();
         List<Rule> rules = timeTable.getRules();
         for(Rule rule : rules)
         {
-            rulesTableView.getItems().add(new ProductRule(rule.getClass().getSimpleName(),
-                    rule.getRuleWeight() , rule.getGrade(), rule.getConfig()));
+            addToObservableListOfRules(new ProductRule(rule.getClass().getSimpleName(),
+                    rule.getRuleWeight() , ((Integer)rule.getGrade()).toString(), rule.getConfig()));
         }
 
-        hardRulesAvgLabel.setText(((Double)timeTable.getHardRulesAvg()).toString());
-        softRulesAvgLabel.setText(((Double)timeTable.getSoftRulesAvg()).toString());
-        OptimalFitnessLabel.setText(((Double)timeTable.getFitness()).toString());
+        rulesTableView.setItems(observableListOfRules);
+        hardRulesAvgLabel.setText(String.format("%.2f", timeTable.getHardRulesAvg()));
+        softRulesAvgLabel.setText(String.format("%.2f", timeTable.getSoftRulesAvg()));
     }
 
     private void provideInfoFromFile()
@@ -244,6 +265,7 @@ public class Controller {
         timerCheckBox.setDisable(toDisable);
         timerTextField.setDisable(toDisable);
         numOfGeneration4Update.setDisable(toDisable);
+        runAlgorithmButton.setDisable(toDisable);
     }
 
     private boolean handleParametersBeforeRunning()
@@ -290,23 +312,44 @@ public class Controller {
         return true;
     }
 
+
+
+
     private void handleStopConditionBeforeRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition, BestFitnessCondition bestFitnessCondition ,TimeCondition timeCondition)
     {
         if(numOfGenerationCheckBox.isSelected())
         {
+            maxNumOfGenerationCondition.setMaxNumOfGeneration(Integer.parseInt(numberOfGenerationTextField.getText()));
             ui.getEngine().addStopCondition(maxNumOfGenerationCondition);
         }
         if(bestFitnessCheckBox.isSelected())
         {
+            bestFitnessCondition.setBestFitness(Double.parseDouble(m_SPBestFitness.toString()));///????
             ui.getEngine().addStopCondition(bestFitnessCondition);
         }
         if(timerCheckBox.isSelected())
         {
+            timeCondition.setMinutes(Integer.parseInt(timerTextField.getText()));
             ui.getEngine().addStopCondition(timeCondition);
         }
     }
 
-    private void handleProgressBarBeforeRunning()
+    private void handleStopConditionAfterRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition, BestFitnessCondition bestFitnessCondition, TimeCondition timeCondition) {
+        if(numOfGenerationCheckBox.isSelected())
+        {
+            ui.getEngine().removeStopCondition(maxNumOfGenerationCondition);
+        }
+        if(bestFitnessCheckBox.isSelected())
+        {
+            ui.getEngine().removeStopCondition(bestFitnessCondition);
+        }
+        if(timerCheckBox.isSelected())
+        {
+            ui.getEngine().removeStopCondition(timeCondition);
+        }
+    }
+
+    private void handleProgressBarBeforeRunning()///!!!!!!
     {
         Task<Void> task = new Task<Void>()
         {
@@ -335,7 +378,15 @@ public class Controller {
                     progress4Timer= Integer.parseInt(timerTextField.toString())-timeCondition.getTimeLeft();
                 }
 
-                runProgressBar.setProgress(Math.max(Math.max(progress4Generation, progress4Fitness),progress4Timer));
+
+
+
+                double progress = Math.max(Math.max(progress4Generation, progress4Fitness),progress4Timer);
+                //runProgressBar.progressProperty().unbind();
+                //runProgressBar.setProgress(progress);
+                //updateProgress(progress,1);
+                //updateProgress(progress,1);
+                m_DPProgress.set(progress);
                 return null;
             }
         };
@@ -346,11 +397,13 @@ public class Controller {
         // If the task completed successfully, perform other updates here
         task.setOnSucceeded(wse -> {
             handleControls2DisableBeforeRunning(true);
+            handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
             m_SPMessageToUser.set("The algorithm has run successfully");
         });
 
         // Before starting our task, we need to bind our values to the properties on the task
-        runProgressBar.progressProperty().bind(task.progressProperty());
+        //runProgressBar.progressProperty().bind(task.progressProperty());
+        //m_DPProgress.bind(task.progressProperty());
         // Now, start the task on a background thread
         new Thread(task).start();
     }
@@ -367,17 +420,20 @@ public class Controller {
             {
                  ui.loadInfoFromXmlFile(selectedFile);
                  ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
-                     m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
-                     m_IPCurrentGeneration.set(numberOfGeneration);
-                     ui.getNumOfGeneration2BestFitness().put( numberOfGeneration, bestFitnessInCurrentGeneration);
-                     provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
-                     updatesTableView.getItems().add(new ProductUpdate(numberOfGeneration, bestFitnessInCurrentGeneration));
-                 });
+
+                     Platform.runLater(() -> {
+                         m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
+                         m_IPCurrentGeneration.set(numberOfGeneration);
+                         ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
+                         provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
+                         updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
+                     });});
 
                 provideInfoFromFile();
                 animationForLoadFileTextBox();
-                runProgressBar.progressProperty().unbind();
-                runProgressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+
+                m_DPProgress.unbind();
+                m_DPProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
                 m_SPMessageToUser.set("The xml file was loaded");
             }
             catch (JAXBException e)
@@ -405,7 +461,7 @@ public class Controller {
         {
             if(handleParametersBeforeRunning())
             {
-                handleProgressBarBeforeRunning();
+                //handleProgressBarBeforeRunning();
 
                 handleStopConditionBeforeRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
 
@@ -415,13 +471,12 @@ public class Controller {
                 ui.getEngine().clear();
                 animationForRunAlgorithmButton();
                 handleControls2DisableBeforeRunning(false);
+                m_DPCurrentFitness.set(0);
+                m_IPCurrentGeneration.set(0);
                 updatesTableView.getItems().clear();
-                //need to close before start if we run during another running
-                ui.getThreadEngine().start();
 
-                ui.getEngine().removeStopCondition(maxNumOfGenerationCondition);
-                ui.getEngine().removeStopCondition(bestFitnessCondition);
-                ui.getEngine().removeStopCondition(timeCondition);
+                ui.setThreadEngine(new Thread(ui.getEngine()));
+                ui.getThreadEngine().start();
             }
         }
     }
@@ -446,13 +501,14 @@ public class Controller {
     void OnPauseResumeClick(ActionEvent event)
     {
         //////////////////////handle timer need to Pause-Resume////////////////////////////////
-        if(runProgressBar.getProgress() == 1)
+        //if(m_DPProgress.get() == 1)
+        if(ui.getThreadEngine().isAlive())
         {
             if(pauseResumeButton.getText().equals("Pause"))
             {
                 try {
                     ui.getThreadEngine().wait();
-                } catch (InterruptedException ignored) {
+                } catch (InterruptedException | IllegalMonitorStateException ignored) {
 
                 }
                 pauseResumeButton.setText("Resume");
@@ -469,14 +525,15 @@ public class Controller {
         }
     }
 
-    @FXML
+    @FXML//חקא קוד
     void OnStopRunClick(ActionEvent event) {
-        double progress=runProgressBar.getProgress();
-        if(progress == 1)
+        double progress=m_DPProgress.get();
+        //if(progress == 1)
+        if(!ui.getThreadEngine().isAlive())
         {
            m_SPMessageToUser.set("The algorithm already over");
         }
-        else if(progress == 0 ||progress==-1)
+        else if(progress <=0)///////////////
         {
             m_SPMessageToUser.set("The algorithm hasn't started yet");
         }
@@ -487,7 +544,7 @@ public class Controller {
                 ui.getThreadEngine().notify();
             }
             ui.getThreadEngine().interrupt();
-            runProgressBar.setProgress(0);
+            m_DPProgress.set(0);
         }
     }
 
@@ -510,6 +567,8 @@ public class Controller {
         subjectsTextArea.textProperty().bind(m_SPSubjectsInfo);
         gradesTexArea.textProperty().bind(m_SPGradesInfo);
         rulesTextArea.textProperty().bind(m_SPRulesInfo);
+
+        runProgressBar.progressProperty().bind(m_DPProgress);
 
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
@@ -549,49 +608,95 @@ public class Controller {
 
         numOfGeneration4Update.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                timerTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                numOfGeneration4Update.setText(newValue.replaceAll("[^\\d]", ""));
             }});
+
+
+        nameRulTableColumn.setCellValueFactory(new PropertyValueFactory("Name"));
+        weightRuleTableColumn.setCellValueFactory(new PropertyValueFactory("Weight"));
+        scoreRuleTableColumn.setCellValueFactory(new PropertyValueFactory("Score"));
+        configRuleTableColumn.setCellValueFactory(new PropertyValueFactory("Configoration"));
+
+        updateGenerationTableColumn.setCellValueFactory(new PropertyValueFactory("Generation"));
+        updateFitnessTableColumn.setCellValueFactory(new PropertyValueFactory("Fitness"));
+
+        dayRowTableColumn.setCellValueFactory(new PropertyValueFactory("Day"));
+        hourRowTableColumn.setCellValueFactory(new PropertyValueFactory("Hour"));
+       teacherRowTableColumn.setCellValueFactory(new PropertyValueFactory("Teacher"));
+       gradeRowTableColumn.setCellValueFactory(new PropertyValueFactory("Grade"));
+        subjectRowTableColumn.setCellValueFactory(new PropertyValueFactory("Subject"));
     }
 
-    private class ProductRule {
-        String m_Name;
-        String m_Weight;
-        double m_Score;
-        String m_Config;
-        public ProductRule(String name, String weight, double score, String config) {
-            m_Name=name;
-            m_Weight=weight;
-            m_Score=score;
-            m_Config=config;
+    public class ProductRule {
+        StringProperty m_Name;
+        StringProperty m_Weight;
+        StringProperty m_Score;
+        StringProperty m_Config;
+
+        public ProductRule(String name, String weight, String score, String config) {
+            m_Name = new SimpleStringProperty(name);
+            m_Weight= new SimpleStringProperty(weight);
+            m_Score= new SimpleStringProperty(score);
+            m_Config= new SimpleStringProperty(config);
         }
+
+        public String getName(){return m_Name.get();}
+        public String getWeight(){return m_Weight.get();}
+        public String getScore(){return m_Score.get();}
+        public String getConfigoration(){return m_Config.get();}
+
+        public void setName(String name){m_Name.set(name);}
+        public void setWeight(String name){m_Weight.set(name);}
+        public void setScore(String name){m_Score.set(name);}
+        public void setConfigoration(String name){m_Config.set(name);}
     }
 
-    private class ProductUpdate
+    public class ProductUpdate
     {
-        double m_Fitness;
-        int m_Generation;
-        public ProductUpdate(int generation, double fitness)
+        StringProperty m_Fitness;
+        StringProperty m_Generation;
+
+        public ProductUpdate(String generation, String fitness)
         {
-            m_Generation= generation;
-            m_Fitness= fitness;
+            m_Generation= new SimpleStringProperty(generation);
+            m_Fitness= new SimpleStringProperty(fitness);
         }
+
+        public String getFitness(){return m_Fitness.get();}
+        public String getGeneration(){return m_Generation.get();}
+
+        public void setFitness(String fitness){m_Fitness.set(fitness);}
+        public void setGeneration(String generation){m_Generation.set(generation);}
     }
 
-    private class ProductRow
+    public class ProductRow
     {
-        int m_Day;
-        int m_Hour;
-        String m_Teacher;
-        String m_Grade;
-        String m_Subject;
+        StringProperty m_Day;
+        StringProperty m_Hour;
+        StringProperty m_Teacher;
+        StringProperty m_Grade;
+        StringProperty m_Subject;
 
-        public ProductRow(int day, int hour, String teacher, String grade, String subject)
+        public ProductRow( String day,  String hour, String teacher, String grade, String subject)
         {
-            m_Day=day;
-            m_Hour=hour;
-            m_Teacher=teacher;
-            m_Grade=grade;
-            m_Subject=subject;
+            m_Day= new SimpleStringProperty(day);
+            m_Hour= new SimpleStringProperty(hour);
+            m_Teacher= new SimpleStringProperty(teacher);
+            m_Grade= new SimpleStringProperty(grade);
+            m_Subject= new SimpleStringProperty(subject);
         }
+
+        public String getDay(){return m_Day.get();}
+        public String getHour(){return m_Hour.get();}
+        public String getTeacher(){return m_Teacher.get();}
+        public String getGrade(){return m_Grade.get();}
+        public String getSubject(){return m_Subject.get();}
+
+
+        public void setDay(String day){m_Day.set(day);}
+        public void setHour(String hour){m_Hour.set(hour);}
+        public void setTeacher(String teacher){m_Teacher.set(teacher);}
+        public void setGrade(String grade){m_Grade.set(grade);}
+        public void setSubject(String subject){m_Subject.set(subject);}
     }
 }

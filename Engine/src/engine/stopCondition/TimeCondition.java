@@ -32,7 +32,7 @@ public class TimeCondition implements StopCondition{
 
     public int getSecond(){return m_minutes;}
 
-    public void setSecond(int second){m_minutes=second;}
+    public void setMinutes(int minutes){m_minutes=minutes;}
 
     @Override
     public boolean execute(Engine.DataEngine dataEngine) {
