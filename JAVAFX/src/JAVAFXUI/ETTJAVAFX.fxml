@@ -1,105 +1,227 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.paint.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1303.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
-   <top>
-      <Label prefHeight="66.0" prefWidth="702.0" text="Evolutionary Time Table" textAlignment="CENTER" BorderPane.alignment="CENTER">
-         <font>
-            <Font name="System Bold Italic" size="55.0" />
-         </font>
-      </Label>
-   </top>
-   <center>
-      <GridPane BorderPane.alignment="CENTER">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="268.0" minWidth="10.0" prefWidth="89.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="431.0" minWidth="10.0" prefWidth="431.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints maxHeight="107.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="341.0" minHeight="10.0" prefHeight="341.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <HBox prefHeight="0.0" prefWidth="1303.0" spacing="30.0" GridPane.columnSpan="2147483647">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+   <content>
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
+         <top>
+            <Label prefHeight="66.0" prefWidth="702.0" text="Evolutionary Time Table" textAlignment="CENTER" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="System Bold Italic" size="55.0" />
+               </font>
+            </Label>
+         </top>
+         <center>
+            <GridPane maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="268.0" minWidth="10.0" prefWidth="89.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="431.0" minWidth="10.0" prefWidth="431.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints maxHeight="107.0" minHeight="0.0" prefHeight="36.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="341.0" minHeight="0.0" prefHeight="52.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="572.0" minHeight="0.0" prefHeight="143.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="590.0" minHeight="0.0" prefHeight="211.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="300.0" minHeight="0.0" prefHeight="162.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="54.0" minHeight="9.0" prefHeight="36.0" vgrow="SOMETIMES" />
+              </rowConstraints>
                <children>
-                  <Button fx:id="fileChooserButton" mnemonicParsing="false" onAction="#OnFileChooser" text="Open file &amp; Load">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </Button>
-                  <TextField fx:id="loadFileTextBox" text="File: " />
-                  <Button mnemonicParsing="false" text="Run algorithm" />
-                  <ProgressBar prefWidth="200.0" progress="0.0" />
-                  <Button mnemonicParsing="false" text="Continue / Pause" />
-                  <Button mnemonicParsing="false" text="Stop" />
+                  <HBox prefHeight="0.0" prefWidth="1303.0" spacing="25.0" GridPane.columnSpan="2147483647">
+                     <children>
+                        <Button fx:id="fileChooserButton" mnemonicParsing="false" onAction="#OnFileChooser" text="Open file &amp; Load">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                        <TextField fx:id="loadFileTextBox" text="File: " />
+                        <Button fx:id="runAlgorithmButton" mnemonicParsing="false" onAction="#OnRunAlgo" text="Run algorithm" />
+                        <ProgressBar fx:id="runProgressBar" prefWidth="200.0" />
+                        <Button fx:id="pauseResumeButton" mnemonicParsing="false" onAction="#OnPauseResumeClick" text="Pause" />
+                        <Button fx:id="stopRunButton" mnemonicParsing="false" onAction="#OnStopRunClick" text="Stop" />
+                        <Label fx:id="messageToUserTextBox" />
+                     </children>
+                  </HBox>
+                  <Accordion GridPane.columnIndex="5" GridPane.rowIndex="2" GridPane.rowSpan="3">
+                    <panes>
+                      <TitledPane animated="false" text="Teachers">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea fx:id="teacherTextArea" layoutX="2.0" prefHeight="538.0" prefWidth="366.0" AnchorPane.bottomAnchor="-23.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="-11.0" />
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="false" text="Subjects">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea fx:id="subjectsTextArea" layoutX="2.0" layoutY="2.0" prefHeight="524.0" prefWidth="365.0" AnchorPane.bottomAnchor="-23.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="-11.0" />
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="false" text="Grades">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea fx:id="gradesTexArea" layoutX="1.0" layoutY="1.0" prefHeight="525.0" prefWidth="368.0" AnchorPane.bottomAnchor="-14.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="-11.0" />
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </TitledPane>
+                        <TitledPane animated="false" text="Rules(without score)">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea fx:id="rulesTextArea" layoutX="84.0" layoutY="96.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="-23.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="-11.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </TitledPane>
+                    </panes>
+                  </Accordion>
+                  <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.rowIndex="2" GridPane.rowSpan="3">
+                    <tabs>
+                      <Tab text="Optimal solution by teacher">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <ChoiceBox layoutX="217.0" layoutY="27.0" prefWidth="150.0" />
+                                    <Label layoutX="79.0" layoutY="32.0" text="Choose teacher: " />
+                                 </children></AnchorPane>
+                        </content>
+                      </Tab>
+                      <Tab text="Optimal solution by grade">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <ChoiceBox layoutX="212.0" layoutY="24.0" prefWidth="150.0" />
+                                    <Label layoutX="82.0" layoutY="29.0" text="Chosse grade: " />
+                                 </children></AnchorPane>
+                        </content>
+                      </Tab>
+                        <Tab text="Optimal solution by raw">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="rowsTableView" layoutX="7.0" layoutY="80.0" prefHeight="502.0" prefWidth="924.0">
+                                      <columns>
+                                        <TableColumn prefWidth="114.0" text="Day" />
+                                        <TableColumn prefWidth="146.0" text="Hour" />
+                                          <TableColumn prefWidth="193.0" text="Teacher" />
+                                          <TableColumn prefWidth="229.0" text="Grade" />
+                                          <TableColumn prefWidth="241.0" text="Subject" />
+                                      </columns>
+                                    </TableView>
+                                 </children></AnchorPane>
+                          </content>
+                        </Tab>
+                        <Tab text="Rules &amp; Fitness">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <HBox layoutX="1.0" prefHeight="79.0" prefWidth="929.0" spacing="60.0" AnchorPane.bottomAnchor="503.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <Label prefHeight="21.0" prefWidth="129.0" text="Hard rules avg: " />
+                                          <Label fx:id="hardRulesAvgLabel" text="0.0" />
+                                          <Label text="Soft Rules avg: " />
+                                          <Label fx:id="softRulesAvgLabel" text="0.0" />
+                                          <Label text="Fitness: " />
+                                          <Label fx:id="OptimalFitnessLabel" text="0.0" />
+                                       </children>
+                                       <padding>
+                                          <Insets left="20.0" right="20.0" top="25.0" />
+                                       </padding>
+                                    </HBox>
+                                    <TableView fx:id="rulesTableView" layoutX="1.0" layoutY="78.0" prefHeight="504.0" prefWidth="931.0">
+                                      <columns>
+                                        <TableColumn prefWidth="208.0" text="Name" />
+                                        <TableColumn prefWidth="227.0" text="Weight" />
+                                          <TableColumn prefWidth="222.0" text="Score" />
+                                          <TableColumn prefWidth="273.0" text="Configoration" />
+                                      </columns>
+                                    </TableView>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                        <Tab text="All updates">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="updatesTableView" layoutY="79.0" prefHeight="503.0" prefWidth="931.0">
+                                      <columns>
+                                        <TableColumn prefWidth="461.0" text="Generation" />
+                                        <TableColumn prefWidth="469.0" text="Fitness" />
+                                      </columns>
+                                    </TableView>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
+                  <HBox prefHeight="100.0" prefWidth="200.0" spacing="25.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Stop conditions: ">
+                           <padding>
+                              <Insets left="5.0" />
+                           </padding>
+                        </Label>
+                        <CheckBox fx:id="numOfGenerationCheckBox" mnemonicParsing="false" onAction="#OnNumOfGenerationCheck" text="Number of generation" />
+                        <TextField fx:id="numberOfGenerationTextField" prefHeight="31.0" prefWidth="68.0" />
+                        <CheckBox fx:id="bestFitnessCheckBox" mnemonicParsing="false" onAction="#OnBestFitnessCheck" prefHeight="21.0" prefWidth="112.0" text="Best fitness" />
+                        <TextField fx:id="bestFitnessTextField" prefHeight="31.0" prefWidth="46.0" />
+                        <CheckBox fx:id="timerCheckBox" mnemonicParsing="false" onAction="#OnTimerCheck" prefHeight="24.0" prefWidth="142.0" text="Timer(minutes): " />
+                        <TextField fx:id="timerTextField" prefHeight="31.0" prefWidth="75.0" />
+                        <Label prefHeight="21.0" prefWidth="233.0" text="Number of generation for update: " />
+                        <TextField fx:id="numOfGeneration4Update" prefHeight="31.0" prefWidth="143.0" />
+                     </children>
+                     <padding>
+                        <Insets top="15.0" />
+                     </padding>
+                  </HBox>
+                  <ToolBar prefHeight="73.0" prefWidth="1277.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="5">
+                     <items>
+                        <Label text="Generation: " />
+                        <Label fx:id="generation4Update" text="0" />
+                        <Label text="Best fitness: " />
+                        <Label fx:id="fitness4Update" text="0" />
+                     </items>
+                  </ToolBar>
+                  <Accordion GridPane.rowIndex="2" GridPane.rowSpan="3">
+                    <panes>
+                      <TitledPane animated="false" text="untitled 1">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="false" text="untitled 2">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="false" text="untitled 3">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </TitledPane>
+                    </panes>
+                  </Accordion>
                </children>
-            </HBox>
-            <Accordion GridPane.columnIndex="5" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
-              <panes>
-                <TitledPane animated="false" text="untitled 1">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="untitled 2">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="untitled 3">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
-            <Accordion GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
-              <panes>
-                <TitledPane animated="false" text="untitled 1">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="untitled 2">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="untitled 3">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
-            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.rowSpan="5">
-              <tabs>
-                <Tab text="Untitled Tab 1">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </Tab>
-                <Tab text="Untitled Tab 2">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </Tab>
-              </tabs>
-            </TabPane>
-         </children>
-      </GridPane>
-   </center>
-</BorderPane>
+            </GridPane>
+         </center>
+      </BorderPane>
+   </content>
+</ScrollPane>

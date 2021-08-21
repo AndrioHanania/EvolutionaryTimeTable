@@ -7,13 +7,10 @@ import generated.ETTDescriptor;
 import timeTable.TimeTable;
 import timeTable.TimeTableParse;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 public class JavaFxUI
@@ -24,7 +21,8 @@ public class JavaFxUI
     private boolean m_IsEngineHasBeenRunning=false;
     private Engine m_Engine;
     private TimeTable m_TimeTable;
-    Map<Integer,Double> m_NumOfGeneration2BestFitness= new TreeMap<>();
+    private Map<Integer,Double> m_NumOfGeneration2BestFitness= new TreeMap<>();
+    private Thread m_ThreadEngine = new Thread(m_Engine);
 
     public void loadInfoFromXmlFile(File selectedFile) throws Exception
     {
@@ -32,47 +30,34 @@ public class JavaFxUI
         Engine engine;
         TimeTable timeTable;
         Parse parse= new TimeTableParse();
-        //try
-        //{
-            InputStream inputStream = new FileInputStream(selectedFile);
-            String nameFileToLoad = selectedFile.getName();
-            if(!nameFileToLoad.substring(nameFileToLoad.length()-3).equals("xml"))
-            {
-                throw new Exception("The file is not a xml");
-            }
-            ETTDescriptor eTTEvolutionEngine = JavaFxUIUtils.deserializeFrom(inputStream);
-            timeTable = (TimeTable) parse.parseSolution(eTTEvolutionEngine.getETTTimeTable());
-            engine = parse.parseEngine(eTTEvolutionEngine.getETTEvolutionEngine());
-            engine.setProblem(timeTable);
-            if(m_IsXmlFileLoad)
-            {
-                m_IsEngineHasBeenRunning=false;
-            }
-            m_IsXmlFileLoad = true;
-            m_Engine = engine;
-            m_Engine.addListenerToUpdateGeneration(new UpdateGenerationListener() {
-                @Override
-                public void OnUpdateGeneration(double bestFitnessInCurrentGeneration, int numberOfGeneration) {
-                    m_NumOfGeneration2BestFitness.put( numberOfGeneration, bestFitnessInCurrentGeneration);
-                    System.out.println("Best fitness in Generation number "+ numberOfGeneration + ": " + String.format("%.2f", bestFitnessInCurrentGeneration));
-
-                }
-            });
-            m_TimeTable = timeTable;
-       // }
-        /*catch (JAXBException e)
+        InputStream inputStream = new FileInputStream(selectedFile);
+        String nameFileToLoad = selectedFile.getName();
+        if(!nameFileToLoad.endsWith("xml"))
         {
-            System.out.println("Error with generating data from xml file");
+            throw new Exception("The file is not a xml");
         }
-        catch (FileNotFoundException e)
+        ETTDescriptor eTTEvolutionEngine = JavaFxUIUtils.deserializeFrom(inputStream);
+        timeTable = (TimeTable) parse.parseSolution(eTTEvolutionEngine.getETTTimeTable());
+        engine = parse.parseEngine(eTTEvolutionEngine.getETTEvolutionEngine());
+        engine.setProblem(timeTable);
+        if(m_IsXmlFileLoad)
         {
-            System.out.println("File not found");
+            m_IsEngineHasBeenRunning=false;
         }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }*/
+        m_IsXmlFileLoad = true;
+        m_Engine = engine;
+        m_TimeTable = timeTable;
     }
 
+    public boolean getIsXmlFileLoaded(){return  m_IsXmlFileLoad;}
 
+    public Engine getEngine(){return  m_Engine;}
+
+    public Map<Integer,Double> getNumOfGeneration2BestFitness(){return m_NumOfGeneration2BestFitness;}
+
+    public Thread getThreadEngine(){return m_ThreadEngine;}
+
+    public TimeTable getTimeTable() {
+        return m_TimeTable;
+    }
 }

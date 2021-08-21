@@ -11,6 +11,10 @@ public class BestFitnessCondition implements StopCondition{
         m_BestFitness= bestFitness;
     }
 
+    public double getBestFitness(){return m_BestFitness;}
+
+    public void setBestFitness(double bestFitness){m_BestFitness = bestFitness;}
+
     @Override
     public boolean execute(Engine.DataEngine dataEngine) {
         return dataEngine.getBestFitness() >= m_BestFitness;

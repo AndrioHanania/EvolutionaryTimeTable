@@ -11,6 +11,10 @@ public class MaxNumOfGenerationCondition implements StopCondition{
         m_MaxNumOfGeneration = maxNumOfGeneration;
     }
 
+    public int getMaxNumOfGeneration(){return m_MaxNumOfGeneration;}
+
+    public void setMaxNumOfGeneration(int maxNumOfGeneration){m_MaxNumOfGeneration = maxNumOfGeneration;}
+
     @Override
     public boolean execute(Engine.DataEngine dataEngine)
     {

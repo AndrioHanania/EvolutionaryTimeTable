@@ -104,6 +104,7 @@ public class Engine implements Runnable
             nextGeneration.calculateFitnessToAll();
             nextGeneration.sort(Comparator.comparingDouble(Solution::getFitness));
             m_BestFitnessInCurrentGeneration = nextGeneration.get(nextGeneration.size()-1).m_Fitness;
+            updateOptimalSolution(nextGeneration);
             if(forUpdate == m_NumberOfGenerationForUpdate)
             {
                 for (UpdateGenerationListener listener : listenersToUpdateGeneration)
@@ -145,9 +146,11 @@ public class Engine implements Runnable
     public void  setNumberOfGenerationForUpdate(int num){m_NumberOfGenerationForUpdate = num;}
 
     public Solution getOptimalSolution() {
-        if(m_IsFinishToRun)
-        { return m_OptimalSolution;}
-        else{ return null;}
+        //if(m_IsFinishToRun)
+       // {
+            return m_OptimalSolution;
+       // }
+        //else{ return null;}
     }
 
 

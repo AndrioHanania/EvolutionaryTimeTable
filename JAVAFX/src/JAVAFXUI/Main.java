@@ -1,10 +1,13 @@
 package JAVAFXUI;
 
 import javafx.application.Application;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+
 
 public class Main extends Application {
 
@@ -18,7 +21,8 @@ public class Main extends Application {
 
         primaryStage.setTitle("Evolutionary Time Table");
         Parent load = FXMLLoader.load(getClass().getResource("ettjavafx.fxml"));
-        Scene scene = new Scene(load, 1800, 1000);
+        Scene scene = new Scene(load);
+        primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

@@ -172,17 +172,17 @@ public class ConsoleUI extends UI
     private void getTimeCondition()
     {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter number of second for stop condition(integer): ");
-        int second;
+        System.out.println("Please enter number of minutes for stop condition(integer): ");
+        int minutes;
         while (true)
         {
             try
             {
-                second = Integer.parseInt(scanner.nextLine());
-                if (second < 0) {
-                    System.out.println("Error with input. Please enter number of second for stop condition(integer): ");
+                minutes = Integer.parseInt(scanner.nextLine());
+                if (minutes < 0) {
+                    System.out.println("Error with input. Please enter number of minutes for stop condition(integer): ");
                 } else {
-                    addStopConditionToEngine(new TimeCondition(second));
+                    addStopConditionToEngine(new TimeCondition(minutes));
                     break;
                 }
             }
