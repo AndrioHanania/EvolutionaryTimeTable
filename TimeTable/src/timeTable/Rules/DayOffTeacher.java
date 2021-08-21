@@ -25,12 +25,12 @@ public class DayOffTeacher extends Rule{
         int rulePerTeacherScore = 100 / numOfTeacher;
         List<Teacher> teachers = timeTable.getTeachers();
         List<TimeTableChromosome> timeTableChromosomes = timeTable.getChromosomes();
-        int daysSize=timeTable.getDay();
-        boolean[] days = new boolean[daysSize];
+        int daysToStudyInAWeek=timeTable.getDay();
+        boolean[] days = new boolean[daysToStudyInAWeek];
 
         for(Teacher teacher : teachers)
         {
-            for (int i=0;i<daysSize;i++)
+            for (int i=0;i<daysToStudyInAWeek;i++)
             {
                 days[i]=false;
             }
@@ -40,19 +40,27 @@ public class DayOffTeacher extends Rule{
                 if(timeTableChromosome.getTeacher().getIdNumber() == teacher.getIdNumber())
                 {
                     days[timeTableChromosome.getDay() - 1] = true;
+                    //speed things up
+/*                    boolean flag = true;
+                    for (Boolean val: days)
+                    {
+                        flag = val;
+                        if(!flag)
+                    }
+ */
                 }
             }
 
-            boolean isDayOff=true;
-            for (int i=0;i<daysSize;i++)
+            boolean HasNoDayOff=true;
+            for (int i=0;i<daysToStudyInAWeek;i++)
             {
-                isDayOff = isDayOff && days[i];
-                if(!isDayOff){
+                HasNoDayOff = HasNoDayOff && days[i];
+                if(!HasNoDayOff){
                     break;
                 }
             }
 
-            if (isDayOff){
+            if (HasNoDayOff){
                 m_RuleGrade -= rulePerTeacherScore;
             }
         }

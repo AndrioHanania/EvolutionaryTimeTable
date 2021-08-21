@@ -19,7 +19,7 @@ public class TeacherIsHuman extends Rule {
     @Override
     public void Execute(TimeTable timeTable) {
         int numOfTeacher = timeTable.getTeachers().size();
-        int rulePerTeacherScore = 100 / numOfTeacher;
+        double rulePerTeacherScore = 100 / numOfTeacher;
         boolean isRulePassed = true;
         for(Teacher teacher : timeTable.getTeachers())
         {

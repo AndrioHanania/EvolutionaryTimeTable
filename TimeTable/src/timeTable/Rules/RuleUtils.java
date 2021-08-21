@@ -3,7 +3,6 @@ package timeTable.Rules;
 public class RuleUtils
 {
 
-
     public static Rule CreateRule(Rule rule){
         Rule newRule=null;
         switch (rule.getClass().getSimpleName())
@@ -20,8 +19,13 @@ public class RuleUtils
             case "TeacherIsHuman":
                 newRule = new TeacherIsHuman(rule);
                 break;
-           // default:
-                //throw new Exception("Type of rule does not exsist");
+            case "DayOffTeacher":
+                newRule = new DayOffTeacher(rule);
+                break;
+            case "Sequentiality":
+                newRule = new Sequentiality(rule);
+            default:
+                //throw new Exception("Type of rule does not exist");
         }
         newRule.setGrade(100);
         return newRule;

@@ -310,6 +310,7 @@ public class ConsoleUI extends UI
                 switch (input)
                 {
                     case 1:
+                        //initSettings
                         runMyEngine();
                         System.out.println("Done run algorithm");
                         break;
