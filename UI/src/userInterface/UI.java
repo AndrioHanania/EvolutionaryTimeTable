@@ -67,6 +67,10 @@ public abstract class UI implements Runnable
     {
         m_Engine.addStopCondition(stopCondition);
     }
+    protected void removeStopCondotionsFromEngine()
+    {
+        m_Engine.removeAllStopCondition();
+    }
 
     @Override
     public abstract void run();

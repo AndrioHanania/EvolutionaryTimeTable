@@ -205,6 +205,11 @@ public class Engine implements Runnable
         m_StopConditions.remove(stopCondition);
     }
 
+    public void removeAllStopCondition()
+    {
+        m_StopConditions.clear();
+    }
+
     private boolean checkStopConditions()
     {
         if(m_StopConditions.isEmpty())
@@ -226,6 +231,7 @@ public class Engine implements Runnable
     }
 
     public int getSizeOfFirstPopulation(){return  m_SizeOfFirstPopulation;}
+
 
     public class DataEngine
     {

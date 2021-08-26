@@ -91,6 +91,10 @@ public class ConsoleUI extends UI
                     System.out.println("Error with input. The input is not bigger or equal to 100");
                 } else
                 {
+                    if(m_IsEngineHasBeenRunning)
+                    {
+                        removeStopCondotionsFromEngine();
+                    }
                     addStopConditionToEngine(new MaxNumOfGenerationCondition(maxNumOfGenerationInEngine));
                     break;
                 }
@@ -181,7 +185,12 @@ public class ConsoleUI extends UI
                 minutes = Integer.parseInt(scanner.nextLine());
                 if (minutes < 0) {
                     System.out.println("Error with input. Please enter number of minutes for stop condition(integer): ");
-                } else {
+                } else
+                {
+                    if(m_IsEngineHasBeenRunning)
+                    {
+                        removeStopCondotionsFromEngine();
+                    }
                     addStopConditionToEngine(new TimeCondition(minutes));
                     break;
                 }
@@ -214,6 +223,10 @@ public class ConsoleUI extends UI
                   if (maxFitness < 0 || maxFitness > 100) {
                          System.out.println("Error with input. please enter a double between 0 - 100 as fitness threshold: ");
                   } else {
+                      if(m_IsEngineHasBeenRunning)
+                      {
+                          removeStopCondotionsFromEngine();
+                      }
                          addStopConditionToEngine(new BestFitnessCondition(maxFitness));
                           break;
                   }

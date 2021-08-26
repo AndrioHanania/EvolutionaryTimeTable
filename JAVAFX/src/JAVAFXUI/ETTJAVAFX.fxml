@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.paint.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
          <top>
@@ -49,6 +67,7 @@
                         <Button fx:id="pauseResumeButton" mnemonicParsing="false" onAction="#OnPauseResumeClick" text="Pause" />
                         <Button fx:id="stopRunButton" mnemonicParsing="false" onAction="#OnStopRunClick" text="Stop" />
                         <Label fx:id="messageToUserTextBox" />
+                        <ProgressBar prefWidth="200.0" progress="0.0" />
                      </children>
                   </HBox>
                   <Accordion GridPane.columnIndex="5" GridPane.rowIndex="2" GridPane.rowSpan="3">
@@ -97,8 +116,19 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <ChoiceBox layoutX="217.0" layoutY="27.0" prefWidth="150.0" />
+                                    <ChoiceBox fx:id="teacherChoiceBox" layoutX="217.0" layoutY="27.0" prefWidth="150.0" />
                                     <Label layoutX="79.0" layoutY="32.0" text="Choose teacher: " />
+                                    <ComboBox fx:id="teacherComboBox" layoutX="419.0" layoutY="27.0" prefWidth="150.0" />
+                                    <TableView fx:id="teachersTableView" layoutX="93.0" layoutY="88.0" prefHeight="371.0" prefWidth="724.0">
+                                      <columns>
+                                        <TableColumn fx:id="teacherDayTableColumn" prefWidth="134.0" text="C2" />
+                                        <TableColumn fx:id="teacherSundayTableColumn" prefWidth="138.0" text="C1" />
+                                          <TableColumn fx:id="teacherMondayTableColumn" prefWidth="109.0" text="Column X" />
+                                          <TableColumn fx:id="teacherTuesdayTableColumn" prefWidth="124.0" text="Column X" />
+                                          <TableColumn fx:id="teacherWednesdayTableColumn" prefWidth="60.0" text="Column X" />
+                                          <TableColumn fx:id="teacherThursdayTableColumn" minWidth="0.0" prefWidth="158.0" text="Column X" />
+                                      </columns>
+                                    </TableView>
                                  </children></AnchorPane>
                         </content>
                       </Tab>
@@ -106,7 +136,7 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <ChoiceBox layoutX="212.0" layoutY="24.0" prefWidth="150.0" />
+                                    <ChoiceBox id="gradeChoiceBox" fx:id="gradeChoiceBox" layoutX="212.0" layoutY="24.0" prefWidth="150.0" />
                                     <Label layoutX="82.0" layoutY="29.0" text="Chosse grade: " />
                                  </children></AnchorPane>
                         </content>

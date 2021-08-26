@@ -20,10 +20,13 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import timeTable.Grade;
 import timeTable.Rules.Rule;
 import timeTable.Subject;
@@ -33,12 +36,12 @@ import timeTable.chromosome.TimeTableChromosome;
 
 import javax.xml.bind.JAXBException;
 
-public class Controller {
+public class Controller implements Initializable { //implements Initializable
 
 
     public Controller()/////////////////
     {
-
+        m_Timetable = ui.getTimeTable();
     }
 
     JavaFxUI ui = new JavaFxUI();
@@ -73,9 +76,24 @@ public class Controller {
     @FXML private TextArea rulesTextArea;
     @FXML private Label hardRulesAvgLabel;
     @FXML private Label softRulesAvgLabel;
+    @FXML private ChoiceBox<Teacher> teacherChoiceBox;
+    @FXML private ChoiceBox<Grade> gradeChoiceBox;
+    @FXML private ComboBox<Teacher> teacherComboBox;
+ //   @FXML private ChoiceBox<String> myChoiceBox;
+
+
     @FXML private TableView<ProductRule> rulesTableView;
     @FXML private TableView<ProductUpdate> updatesTableView;
     @FXML private TableView<ProductRow> rowsTableView;
+    @FXML private TableView<ProductTeacher> teachersTableView;
+    @FXML private TableView<ProductGrade> gradesTableView;
+    @FXML private TableColumn<ProductTeacher,String> teacherDayTableColumn;
+    @FXML private TableColumn<ProductTeacher,String> teacherSundayTableColumn;
+    @FXML private TableColumn<ProductTeacher,String> teacherMondayTableColumn;
+    @FXML private TableColumn<ProductTeacher,String> teacherTuesdayTableColumn;
+    @FXML private TableColumn<ProductTeacher,String> teacherWednesdayTableColumn;
+    @FXML private TableColumn<ProductTeacher,String> teacherThursdayTableColumn;
+
     @FXML private TableColumn<ProductRule, String> nameRulTableColumn;
     @FXML private TableColumn<ProductRule, String> weightRuleTableColumn;
     @FXML private TableColumn<ProductRule, String> scoreRuleTableColumn;
@@ -87,6 +105,7 @@ public class Controller {
     @FXML private TableColumn<ProductRow, String> teacherRowTableColumn;
     @FXML private TableColumn<ProductRow, String> gradeRowTableColumn;
     @FXML private TableColumn<ProductRow, String> subjectRowTableColumn;
+
 
     IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
     DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
@@ -106,6 +125,9 @@ public class Controller {
 
     ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
     ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
+    ObservableList<ProductTeacher> observableListOfTeachers = FXCollections.observableArrayList();
+
+    TimeTable m_Timetable;
 
 
     //reminder that some codes need to be in synchronized!!!!!
@@ -117,13 +139,45 @@ public class Controller {
 
     private void addToObservableListOfRules(ProductRule productRule){observableListOfRules.add(productRule);}
     private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
+    private void addToObservableListOfTeachers(ProductTeacher productTeacher) { observableListOfTeachers.add(productTeacher);}
 
     private void provideInfoFromOptimalSolution(TimeTable timeTable)
     {
         provideInfoAboutRulesAndFitnessFromOptimalSolution(timeTable);
-        provideInfoAboutRowsFromOptimalSolution(timeTable);
+        provideInfoAboutRowsFromOptimalSolution(timeTable); //row גולמי
+        //provideInfoAboutTeachersFromOptimalSolution(timeTable);
     }
 
+
+    private void provideInfoAboutGradesFromOptimalSolution(TimeTable timeTable, Grade gradeChosen)
+    {
+        gradesTableView.getItems().clear();
+    }
+
+    private void provideInfoAboutTeachersFromOptimalSolution(TimeTable timeTable, Teacher teacher)
+    {
+        //TimeTable timeTable = ui.getTimeTable();
+        teachersTableView.getItems().clear();
+        observableListOfTeachers.clear();
+        List<TimeTableChromosome> chromosomes = timeTable.getChromosomes();
+        chromosomes.sort(Comparator.comparingInt(TimeTableChromosome::getDay)
+            .thenComparing(Comparator.comparingInt(TimeTableChromosome::getHour)));
+
+        for(TimeTableChromosome chromosome : chromosomes)
+        {
+            if(chromosome.getTeacher().equals(teacher))
+            {
+                addToObservableListOfTeachers(new ProductTeacher(((Integer)chromosome.getDay()).toString(),
+                        ((Integer)chromosome.getHour()).toString(), chromosome.getGrade().getName(),
+                        ((Integer)chromosome.getGrade().getIdNumber()).toString(), chromosome.getSubject().getName(),
+                        ((Integer)chromosome.getSubject().getIdNumber()).toString()));
+            }
+        }
+        teachersTableView.setItems(observableListOfTeachers);
+    }
+
+
+    //private void provideInfoAboutTeacher
     private void provideInfoAboutRowsFromOptimalSolution(TimeTable timeTable)
     {
         rowsTableView.getItems().clear();
@@ -143,7 +197,7 @@ public class Controller {
     }
 
     private void provideInfoAboutRulesAndFitnessFromOptimalSolution(TimeTable timeTable)
-    {
+        {
         rulesTableView.getItems().clear();
         observableListOfRules.clear();
         List<Rule> rules = timeTable.getRules();
@@ -243,6 +297,7 @@ public class Controller {
         scale.setAutoReverse(true);
         //loadFileTextBox.toFront();
         scale.play();
+
     }
 
     private void animationForRunAlgorithmButton()
@@ -254,6 +309,7 @@ public class Controller {
         rotate.setByAngle(360);
         rotate.setInterpolator(Interpolator.LINEAR);
         rotate.play();
+
     }
 
     private void handleControls2DisableBeforeRunning(boolean toDisable)
@@ -274,26 +330,28 @@ public class Controller {
         {
             if(Integer.parseInt(numberOfGenerationTextField.getText()) < 100 && numOfGenerationCheckBox.isSelected())
             {
-                m_SPMessageToUser.set("Number of generation is need to be bigger than 99");
+                m_SPMessageToUser.set("Number of generation needs to be at least a 100");
                 return false;
             }
         }
         catch (NumberFormatException e)
         {
-            m_SPMessageToUser.set("Number of generation is need to be bigger than 99");
+            m_SPMessageToUser.set("Please set number of generations");
             return false;
         }
         try
         {
-            if(Integer.parseInt(numOfGeneration4Update.getText()) <1)
+            String txt = numOfGeneration4Update.getText();
+            int gensToUpdate = Integer.parseInt(txt);
+            if(gensToUpdate <1)
             {
-                m_SPMessageToUser.set("Number of generation for update is need to be positive");
+                m_SPMessageToUser.set("Number of generations to update needs to be a positive integer");
                 return false;
             }
         }
         catch (NumberFormatException e)
         {
-            m_SPMessageToUser.set("Number of generation for update is need to be positive");
+            m_SPMessageToUser.set("Please set number of generations to update");
             return false;
         }
         try
@@ -317,21 +375,32 @@ public class Controller {
 
     private void handleStopConditionBeforeRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition, BestFitnessCondition bestFitnessCondition ,TimeCondition timeCondition)
     {
-        if(numOfGenerationCheckBox.isSelected())
+        try
         {
-            maxNumOfGenerationCondition.setMaxNumOfGeneration(Integer.parseInt(numberOfGenerationTextField.getText()));
-            ui.getEngine().addStopCondition(maxNumOfGenerationCondition);
+            if(numOfGenerationCheckBox.isSelected())
+            {
+                maxNumOfGenerationCondition.setMaxNumOfGeneration(Integer.parseInt(numberOfGenerationTextField.getText()));
+                ui.getEngine().addStopCondition(maxNumOfGenerationCondition);
+            }
+            if(bestFitnessCheckBox.isSelected())
+            {
+                String bestFitnessStr = m_SPBestFitness.getValue();
+                double bestFitness = Double.parseDouble(bestFitnessStr);
+
+                bestFitnessCondition.setBestFitness(bestFitness);///????
+                ui.getEngine().addStopCondition(bestFitnessCondition);
+            }
+            if(timerCheckBox.isSelected())
+            {
+                timeCondition.setMinutes(Integer.parseInt(timerTextField.getText()));
+                ui.getEngine().addStopCondition(timeCondition);
+            }
         }
-        if(bestFitnessCheckBox.isSelected())
+        catch (Exception e)
         {
-            bestFitnessCondition.setBestFitness(Double.parseDouble(m_SPBestFitness.toString()));///????
-            ui.getEngine().addStopCondition(bestFitnessCondition);
+            m_SPMessageToUser.set("Stop condition chosen is empty");
         }
-        if(timerCheckBox.isSelected())
-        {
-            timeCondition.setMinutes(Integer.parseInt(timerTextField.getText()));
-            ui.getEngine().addStopCondition(timeCondition);
-        }
+
     }
 
     private void handleStopConditionAfterRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition, BestFitnessCondition bestFitnessCondition, TimeCondition timeCondition) {
@@ -408,6 +477,7 @@ public class Controller {
         new Thread(task).start();
     }
 
+
     @FXML
     void OnFileChooser(ActionEvent event)
     {
@@ -419,6 +489,14 @@ public class Controller {
             try
             {
                  ui.loadInfoFromXmlFile(selectedFile);
+                 m_Timetable = ui.getTimeTable();
+                 List<Teacher> teachers = m_Timetable.getTeachers();
+                 List<Grade> grades = m_Timetable.getGrades();
+                 teacherChoiceBox.getItems().addAll(teachers);
+                 gradeChoiceBox.getItems().addAll(grades);
+              //  teacherComboBox.getItems().addAll(teachers);
+
+
                  ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
 
                      Platform.runLater(() -> {
@@ -426,6 +504,9 @@ public class Controller {
                          m_IPCurrentGeneration.set(numberOfGeneration);
                          ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
                          provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
+                         teacherChoiceBox.setOnAction(this::OnOptimalByTeacher);
+                         gradeChoiceBox.setOnAction(this::OnOptimalByGrade);
+
                          updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
                      });});
 
@@ -448,6 +529,21 @@ public class Controller {
             {
                 m_SPMessageToUser.set(e.getMessage());
             }
+    }
+
+    private void OnOptimalByGrade(ActionEvent actionEvent)
+    {
+        TimeTable timeTable = (TimeTable) ui.getEngine().getOptimalSolution();
+        Grade gradeChosen = gradeChoiceBox.getValue();
+        provideInfoAboutGradesFromOptimalSolution(timeTable, gradeChosen);
+    }
+
+
+    private void OnOptimalByTeacher(ActionEvent actionEvent)
+    {
+        TimeTable timeTable = (TimeTable) ui.getEngine().getOptimalSolution();
+        Teacher teacherChosen=teacherChoiceBox.getValue();
+        provideInfoAboutTeachersFromOptimalSolution(timeTable,teacherChosen);
     }
 
     @FXML
@@ -549,12 +645,12 @@ public class Controller {
     }
 
 
-
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize()
-    {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         myInitialize();
     }
+
+
 
     private void myInitialize()
     {
@@ -562,7 +658,6 @@ public class Controller {
         loadFileTextBox.textProperty().bind(m_SPNameLoadFile);
         generation4Update.textProperty().bind(m_IPCurrentGeneration.asString());
         fitness4Update.textProperty().bind(m_DPCurrentFitness.asString());
-
         teacherTextArea.textProperty().bind(m_SPTeachersInfo);
         subjectsTextArea.textProperty().bind(m_SPSubjectsInfo);
         gradesTexArea.textProperty().bind(m_SPGradesInfo);
@@ -625,7 +720,28 @@ public class Controller {
        teacherRowTableColumn.setCellValueFactory(new PropertyValueFactory("Teacher"));
        gradeRowTableColumn.setCellValueFactory(new PropertyValueFactory("Grade"));
         subjectRowTableColumn.setCellValueFactory(new PropertyValueFactory("Subject"));
+
+        //static data for dynamic data teacher / grade tableView
+        teacherDayTableColumn.setText("Day");
+        teacherSundayTableColumn.setText("Sunday");
+        teacherMondayTableColumn.setText("Monday");
+        teacherTuesdayTableColumn.setText("Tuesday");
+        teacherWednesdayTableColumn.setText("Wednesday");
+        teacherThursdayTableColumn.setText("Thursday");
+
+        teacherDayTableColumn.setMinWidth(200);
+        teacherSundayTableColumn.setMinWidth(200);
+        teacherMondayTableColumn.setMinWidth(200);
+        teacherTuesdayTableColumn.setMinWidth(200);
+        teacherWednesdayTableColumn.setMinWidth(200);
+        teacherThursdayTableColumn.setMinWidth(200);
+
+        teacherSundayTableColumn.setCellValueFactory(new PropertyValueFactory("sunday"));
+
+
     }
+
+
 
     public class ProductRule {
         StringProperty m_Name;
@@ -698,5 +814,50 @@ public class Controller {
         public void setTeacher(String teacher){m_Teacher.set(teacher);}
         public void setGrade(String grade){m_Grade.set(grade);}
         public void setSubject(String subject){m_Subject.set(subject);}
+    }
+
+    public class ProductTeacher
+    {
+        StringProperty m_Day;
+        StringProperty m_Hour;
+        StringProperty m_GradeName;
+        StringProperty m_GradeID;
+        StringProperty m_SubjectName;
+        StringProperty m_SubjectID;
+
+
+        public ProductTeacher( String day,  String hour, String gradeName, String gradeID, String subjectName, String subjectID)
+        {
+            m_Day= new SimpleStringProperty(day);
+            m_Hour= new SimpleStringProperty(hour);
+            m_GradeName= new SimpleStringProperty(gradeName);
+            m_GradeID= new SimpleStringProperty(gradeID);
+            m_SubjectName= new SimpleStringProperty(subjectName);
+            m_SubjectID = new SimpleStringProperty(subjectID);
+        }
+
+        public String getDay(){return m_Day.get();}
+        public String getHour(){return m_Hour.get();}
+        public String getGradeName(){return m_GradeName.get();}
+        public String getGradeID(){return m_GradeID.get();}
+        public String getSubjectName(){return m_SubjectName.get();}
+        public String getSubjectID(){return m_SubjectID.get();}
+
+        public void setDay(String day){m_Day.set(day);}
+        public void setHour(String hour){m_Hour.set(hour);}
+        public void setTeacher(String gradeName){m_GradeName.set(gradeName);}
+        public void setGrade(String gradeID){m_GradeID.set(gradeID);}
+        public void setSubjectName(String subjectName){m_SubjectName.set(subjectName);}
+        public void setSubjectID(String subjectID){m_SubjectID.set(subjectID);}
+
+    }
+
+    public class ProductGrade
+    {
+
+        public ProductGrade() {
+
+        }
+
     }
 }
