@@ -166,7 +166,6 @@
                                           <ColumnConstraints fx:id="teachersGridTuesdayCol1" hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="145.0" />
                                           <ColumnConstraints fx:id="teachersGridWednesdayCol1" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                           <ColumnConstraints fx:id="teachersGridThursdayCol1" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                          <ColumnConstraints fx:id="gradesTableView" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                        </columnConstraints>
                                        <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
