@@ -1,14 +1,9 @@
 package JAVAFXUI;
 
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URL;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import engine.selection.RouletteWheel;
+import engine.selection.Tournament;
+import engine.selection.Truncation;
 import engine.stopCondition.BestFitnessCondition;
 import engine.stopCondition.MaxNumOfGenerationCondition;
 import engine.stopCondition.TimeCondition;
@@ -17,26 +12,17 @@ import javafx.animation.RotateTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.util.Pair;
 import timeTable.Grade;
 import timeTable.Rules.Rule;
 import timeTable.Subject;
@@ -45,27 +31,27 @@ import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
 
 import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
 
-import java.net.logstash.logack.encoder.org.apache.commons.lang3.tuple;
+public class Controller implements Initializable
+{
 
-
-public class Controller implements Initializable { //implements Initializable
-
-
-    public Controller()/////////////////
+    public Controller()
     {
-
+        m_Timetable = ui.getTimeTable();
     }
 
     JavaFxUI ui = new JavaFxUI();
-
-    @FXML // ResourceBundle that was given to the FXMLLoader
-    private ResourceBundle resources;
-
-    @FXML // URL location of the FXML file that was given to the FXMLLoader
-    private URL location;
+    TimeTable m_Timetable;
 
     // Values injected by FXMLLoader
+    @FXML private ResourceBundle resources;
+    @FXML private URL location;
     @FXML private Button fileChooserButton;
     @FXML private TextField loadFileTextBox;
     @FXML private Label messageToUserTextBox;
@@ -87,26 +73,32 @@ public class Controller implements Initializable { //implements Initializable
     @FXML private TextArea subjectsTextArea;
     @FXML private TextArea gradesTexArea;
     @FXML private TextArea rulesTextArea;
+    @FXML private TextArea selectionTextArea;
     @FXML private Label hardRulesAvgLabel;
     @FXML private Label softRulesAvgLabel;
-    @FXML private ChoiceBox<String> teacherChoiceBox;
-    @FXML private ChoiceBox<String> gradeChoiceBox;
- //   @FXML private ChoiceBox<String> myChoiceBox;
-
-    @FXML private GridPane teacherGridOptimalSolution;
-    @FXML private GridPane gradeGridOptimalSolution;
-
-
+    @FXML private ChoiceBox<Teacher> teacherChoiceBox;
+    @FXML private ChoiceBox<Grade> gradeChoiceBox;
+    @FXML private ComboBox<Teacher> teacherComboBox;
+    @FXML private Label elitismLabel;
+    @FXML private TextField changeElitismTextField;
+    @FXML private Button changeElitismButton;
     @FXML private TableView<ProductRule> rulesTableView;
     @FXML private TableView<ProductUpdate> updatesTableView;
     @FXML private TableView<ProductRow> rowsTableView;
+    @FXML private TableView<ProductTeacher> teachersTableView;
+    @FXML private TableView<ProductGrade> gradesTableView;
+    @FXML private CheckBox truncationCheckBox;
+    @FXML private CheckBox rouletteWheelCheckBox;
+    @FXML private CheckBox tournamentCheckBox;
+    @FXML private TextField topPercentTextField;
+    @FXML private TextField PTETextfield;
+    @FXML private Button ChangeSelectionButton;
     @FXML private TableColumn<ProductTeacher,String> teacherDayTableColumn;
     @FXML private TableColumn<ProductTeacher,String> teacherSundayTableColumn;
     @FXML private TableColumn<ProductTeacher,String> teacherMondayTableColumn;
     @FXML private TableColumn<ProductTeacher,String> teacherTuesdayTableColumn;
     @FXML private TableColumn<ProductTeacher,String> teacherWednesdayTableColumn;
     @FXML private TableColumn<ProductTeacher,String> teacherThursdayTableColumn;
-
     @FXML private TableColumn<ProductRule, String> nameRulTableColumn;
     @FXML private TableColumn<ProductRule, String> weightRuleTableColumn;
     @FXML private TableColumn<ProductRule, String> scoreRuleTableColumn;
@@ -120,6 +112,10 @@ public class Controller implements Initializable { //implements Initializable
     @FXML private TableColumn<ProductRow, String> subjectRowTableColumn;
 
 
+
+
+    BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
+    IntegerProperty m_SPElitism = new SimpleIntegerProperty();
     IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
     DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
     StringProperty m_SPMessageToUser = new SimpleStringProperty();
@@ -129,22 +125,25 @@ public class Controller implements Initializable { //implements Initializable
     StringProperty  m_SPSubjectsInfo = new SimpleStringProperty();
     StringProperty  m_SPGradesInfo = new SimpleStringProperty();
     StringProperty  m_SPRulesInfo = new SimpleStringProperty();
+    StringProperty m_SPSelectionInfo = new SimpleStringProperty();
     DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
 
-    //Casual reboot
+
+    //Casual reboot--Stop Conditions--//
     MaxNumOfGenerationCondition maxNumOfGenerationCondition =new MaxNumOfGenerationCondition(0);
     BestFitnessCondition bestFitnessCondition = new BestFitnessCondition(0);
     TimeCondition timeCondition = new TimeCondition(0);
+
+    //Casual reboot
+    Truncation truncation = new Truncation(1);
+    RouletteWheel rouletteWheel = new RouletteWheel();
+    Tournament tournament = new Tournament(0);
+
 
     ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
     ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
     ObservableList<ProductTeacher> observableListOfTeachers = FXCollections.observableArrayList();
 
-    TimeTable m_Timetable;
-    List<Teacher> m_Teachers=new ArrayList<>();
-    List<String> m_TeachersNames =new ArrayList<>();
-    List<Grade> m_Grades = new ArrayList<>();
-    List<String> m_GradeNames = new ArrayList<>();
 
 
 
@@ -159,144 +158,30 @@ public class Controller implements Initializable { //implements Initializable
     private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
     private void addToObservableListOfTeachers(ProductTeacher productTeacher) { observableListOfTeachers.add(productTeacher);}
 
-    /*
     private void provideInfoFromOptimalSolution(TimeTable timeTable)
     {
         provideInfoAboutRulesAndFitnessFromOptimalSolution(timeTable);
         provideInfoAboutRowsFromOptimalSolution(timeTable); //row גולמי
-
         //provideInfoAboutTeachersFromOptimalSolution(timeTable);
     }
 
 
-     */
-
-    private void provideInfoAboutGradesFromOptimalSolution(TimeTable optimalTimetable,String grade)
+    private void provideInfoAboutGradesFromOptimalSolution(TimeTable timeTable, Grade gradeChosen)
     {
-        gradeGridOptimalSolution.getChildren().clear();
-        initialGrid(gradeGridOptimalSolution);
-        List<TimeTableChromosome> chromosomes = optimalTimetable.getChromosomes();
-        Label teacherNameLabel = new Label();
-        Label teacherIdLabel = new Label();
-        Label subjectNameLabel = new Label();
-        Label subjectIdLabel = new Label();
-
-        for(TimeTableChromosome chromosome: chromosomes)
-        {
-            if (chromosome.getGrade().getName().equals(grade))
-            {
-                teacherNameLabel.setText(chromosome.getGrade().getName());
-                teacherIdLabel.setText(String.valueOf(chromosome.getTeacher().getIdNumber()));
-                subjectNameLabel.setText(chromosome.getSubject().getName());
-                subjectIdLabel.setText(String.valueOf(chromosome.getSubject().getIdNumber()));
-
-                int dayColumn = chromosome.getDay();
-                int hourRow = chromosome.getHour();
-                gradeGridOptimalSolution.setConstraints(subjectNameLabel,dayColumn,hourRow);
-                gradeGridOptimalSolution.getChildren().add(subjectNameLabel);
-            }
-        }
+        gradesTableView.getItems().clear();
     }
 
-    private void provideInfoAboutTeachersFromOptimalSolution(TimeTable optimalTimetable,String teacher)
-    {
-        teacherGridOptimalSolution.getChildren().clear();
-        initialGrid(teacherGridOptimalSolution);
-        List<TimeTableChromosome> chromosomes = optimalTimetable.getChromosomes();
-        Label gradeNameLabel = new Label();
-        Label gradeIdLabel = new Label();
-        Label subjectNameLabel = new Label();
-        Label subjectIdLabel = new Label();
-
-        Pair<Integer,Integer> pair = Pair
-        List<TimeTableChromosome> filteredByTeacherChromosome = chromosomes.stream().filter(t ->
-                t.getTeacher().getName().equals(teacher)).collect(Collectors.toList());
-
-        Map<Pair<Integer,Integer>, TimeTableChromosome> dateToFive = new HashMap<>();
-        filteredByTeacherChromosome.stream().forEach(t->{
-            if(!dateToFive.containsKey(Pair.of(t.getDay(),t.getHour())))
-            {
-                dateToFive.put(Pair.of(t.getDay(),t.getHour()),t);
-            }
-        });
-
-        }
-        /*
-        for (TimeTableChromosome chromosome : chromosomes)
-        {
-            if (chromosome.getTeacher().getName().equals(teacher))
-            {
-                subjectNameLabel.setText(chromosome.getSubject().getName());
-                subjectIdLabel.setText(String.valueOf(chromosome.getSubject().getIdNumber()));
-                gradeNameLabel.setText(chromosome.getGrade().getName());
-                gradeIdLabel.setText(String.valueOf(chromosome.getGrade().getIdNumber()));
-                int dayColumn = chromosome.getDay();
-                int hourRow = chromosome.getHour();
-                //teacherGridOptimalSolution.getChildren().remove(1,teacherGridOptimalSolution.getChildren().size());
-      //          teacherGridOptimalSolution.isDisable()
-             //   teacherGridOptimalSolution.setConstraints(subjectNameLabel,dayColumn,hourRow);
-      //          teacherGridOptimalSolution.getChildren().add(subjectNameLabel);
-            }
-        }
-
-         */
-        //System.out.println("check");
-    }
-
-    private void initialGrid(GridPane grid) {
-        Label dayTimeLabel = new Label("Time , Day");
-        Label sundayLabel = new Label("Sunday");
-        Label mondayLabel = new Label("Monday");
-        Label tuesdayLabel = new Label("Tuesday");
-        Label wednesdayLabel = new Label("wednesday");
-        Label thursdayLabel = new Label("Thursday");
-
-        Label eightOclockLabel = new Label("8:00");
-        Label nineOclockLabel = new Label("9:00");
-        Label tentOclockLabel = new Label("10:00");
-        Label elevenOclockLabel = new Label("11:00");
-        Label twelveOclockLabel = new Label("12:00");
-        Label oneOclockLabel = new Label("13:00");
-        Label twoOclockLabel = new Label("14:00");
-        Label threeOclockLabel = new Label("15:00");
-        Label fourOclockLabel = new Label("16:00");
-
-        grid.setConstraints(dayTimeLabel,0,0);
-        grid.setConstraints(sundayLabel,1,0);
-        grid.setConstraints(mondayLabel,2,0);
-        grid.setConstraints(tuesdayLabel,3,0);
-        grid.setConstraints(wednesdayLabel,4,0);
-        grid.setConstraints(thursdayLabel,5,0);
-
-        grid.setConstraints(eightOclockLabel,0,1);
-        grid.setConstraints(nineOclockLabel,0,2);
-        grid.setConstraints(tentOclockLabel,0,3);
-        grid.setConstraints(elevenOclockLabel,0,4);
-        grid.setConstraints(twelveOclockLabel,0,5);
-        grid.setConstraints(oneOclockLabel,0,6);
-        grid.setConstraints(twoOclockLabel,0,7);
-        grid.setConstraints(threeOclockLabel,0,8);
-        grid.setConstraints(fourOclockLabel,0,9);
-
-        grid.getChildren().addAll(dayTimeLabel,sundayLabel,mondayLabel,tuesdayLabel
-                ,wednesdayLabel,thursdayLabel,eightOclockLabel,nineOclockLabel,tentOclockLabel,elevenOclockLabel,
-                twelveOclockLabel,oneOclockLabel,twoOclockLabel,threeOclockLabel,fourOclockLabel);
-
-
-    }
-/*
-    private void provideInfoAboutTeachersFromOptimalSolution(TimeTable optimalTimetable,String teacher)
+    private void provideInfoAboutTeachersFromOptimalSolution(TimeTable timeTable, Teacher teacher)
     {
         //TimeTable timeTable = ui.getTimeTable();
-        //teachersTableView.getItems().clear();
-        //observableListOfTeachers.clear();
-        List<TimeTableChromosome> chromosomes = optimalTimetable.getChromosomes();
+        teachersTableView.getItems().clear();
+        observableListOfTeachers.clear();
+        List<TimeTableChromosome> chromosomes = timeTable.getChromosomes();
         chromosomes.sort(Comparator.comparingInt(TimeTableChromosome::getDay)
             .thenComparing(Comparator.comparingInt(TimeTableChromosome::getHour)));
 
-              for(TimeTableChromosome chromosome : chromosomes)
+        for(TimeTableChromosome chromosome : chromosomes)
         {
-
             if(chromosome.getTeacher().equals(teacher))
             {
                 addToObservableListOfTeachers(new ProductTeacher(((Integer)chromosome.getDay()).toString(),
@@ -305,12 +190,9 @@ public class Controller implements Initializable { //implements Initializable
                         ((Integer)chromosome.getSubject().getIdNumber()).toString()));
             }
         }
-              
         teachersTableView.setItems(observableListOfTeachers);
     }
 
-
- */
 
     //private void provideInfoAboutTeacher
     private void provideInfoAboutRowsFromOptimalSolution(TimeTable timeTable)
@@ -349,11 +231,18 @@ public class Controller implements Initializable { //implements Initializable
 
     private void provideInfoFromFile()
     {
+        //time table
         provideInfoAboutTeachers();
         provideInfoAboutSubjects();
         provideInfoAboutGrades();
         provideInfoAboutRules();
-        //engine....
+        //engine
+        provideInfoAboutSelection();
+    }
+
+    private void provideInfoAboutSelection()
+    {
+        m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
     }
 
     private void provideInfoAboutRules() {
@@ -430,13 +319,13 @@ public class Controller implements Initializable { //implements Initializable
         scale.setByY(2.0);
         scale.setByZ(2.0);
         scale.setAutoReverse(true);
-        //loadFileTextBox.toFront();
         scale.play();
 
     }
 
     private void animationForRunAlgorithmButton()
     {
+        runAlgorithmButton.setRotate(0);
         RotateTransition rotate = new RotateTransition();
         rotate.setNode(runAlgorithmButton);
         rotate.setDuration(Duration.millis(1000));
@@ -444,7 +333,7 @@ public class Controller implements Initializable { //implements Initializable
         rotate.setByAngle(360);
         rotate.setInterpolator(Interpolator.LINEAR);
         rotate.play();
-
+        runAlgorithmButton.setRotate(0);
     }
 
     private void handleControls2DisableBeforeRunning(boolean toDisable)
@@ -463,7 +352,7 @@ public class Controller implements Initializable { //implements Initializable
     {
         try
         {
-            if(Integer.parseInt(numberOfGenerationTextField.getText()) < 100 && numOfGenerationCheckBox.isSelected())
+            if(numOfGenerationCheckBox.isSelected() && Integer.parseInt(numberOfGenerationTextField.getText()) < 100)
             {
                 m_SPMessageToUser.set("Number of generation needs to be at least a 100");
                 return false;
@@ -522,7 +411,7 @@ public class Controller implements Initializable { //implements Initializable
                 String bestFitnessStr = m_SPBestFitness.getValue();
                 double bestFitness = Double.parseDouble(bestFitnessStr);
 
-                bestFitnessCondition.setBestFitness(bestFitness);///????
+                bestFitnessCondition.setBestFitness(bestFitness);
                 ui.getEngine().addStopCondition(bestFitnessCondition);
             }
             if(timerCheckBox.isSelected())
@@ -553,90 +442,83 @@ public class Controller implements Initializable { //implements Initializable
         }
     }
 
-    private void handleProgressBarBeforeRunning()///!!!!!!
+    private class TaskService extends Service<Void> {
+
+        @Override
+        protected Task<Void> createTask() {
+
+            Task<Void> task = new Task<Void>() {
+
+                @Override
+                protected Void call() throws Exception {
+
+                    //while (ui.getThreadEngine().isAlive()) + קריאה ךמתודה הזאת רק אחרי הפעלת טריד האלגוריתם
+                    while (!ui.getEngine().isFinishToRun())
+                    {
+                        double progress4Generation = 0;
+                        double progress4Fitness = 0;
+                        double progress4Timer = 0;
+
+                        if (numOfGenerationCheckBox.isSelected()) {
+                            progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
+                        }
+                        if (bestFitnessCheckBox.isSelected()) {
+                            progress4Fitness = ui.getEngine().getOptimalSolution().getFitness() / Double.parseDouble(bestFitnessTextField.getText());
+                        }
+                        if (timerCheckBox.isSelected()) {
+                            progress4Timer = Integer.parseInt(timerTextField.toString()) - timeCondition.getTimeLeft();
+                        }
+
+                        double progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
+                        updateProgress(progress, 1);
+
+                    }
+                    return null;
+                }
+            };
+
+            // This method allows us to handle any Exceptions thrown by the task
+            task.setOnFailed(wse -> m_SPMessageToUser.set(wse.getSource().getException().getMessage()));
+
+            // If the task completed successfully, perform other updates here
+            task.setOnSucceeded(wse -> {
+                handleControls2DisableBeforeRunning(false);
+                handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
+                m_SPMessageToUser.set("The algorithm has run successfully");
+            });
+
+            return task;
+        }
+    }
+
+    private void handleProgressBarBeforeRunning()
     {
-        Task<Void> task = new Task<Void>()
-        {
-            @Override
-            protected Void call()
-            {
-                /*
-                                 //בתכלס לא צריך כי גם ככה לוקח לזה זמן
-                                 Thread.sleep(10); // Pause briefly
-                                 updateProgress(i, steps);
-                */
-                double progress4Generation=0;
-                double progress4Fitness=0;
-                double progress4Timer=0;
-
-                if(numOfGenerationCheckBox.isSelected())
-                {
-                    progress4Generation=(double)m_IPCurrentGeneration.get()/Integer.parseInt(numberOfGenerationTextField.getText());
-                }
-                if(bestFitnessCheckBox.isSelected())
-                {
-                    progress4Fitness=m_DPCurrentFitness.get()/Double.parseDouble(bestFitnessTextField.getText());
-                }
-                if(timerCheckBox.isSelected())
-                {
-                    progress4Timer= Integer.parseInt(timerTextField.toString())-timeCondition.getTimeLeft();
-                }
-
-
-
-
-                double progress = Math.max(Math.max(progress4Generation, progress4Fitness),progress4Timer);
-                //runProgressBar.progressProperty().unbind();
-                //runProgressBar.setProgress(progress);
-                //updateProgress(progress,1);
-                //updateProgress(progress,1);
-                m_DPProgress.set(progress);
-                return null;
-            }
-        };
-
-        // This method allows us to handle any Exceptions thrown by the task
-        task.setOnFailed(wse -> m_SPMessageToUser.set(wse.getSource().getException().getMessage()));
-
-        // If the task completed successfully, perform other updates here
-        task.setOnSucceeded(wse -> {
-            handleControls2DisableBeforeRunning(true);
-            handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
-            m_SPMessageToUser.set("The algorithm has run successfully");
-        });
-
-        // Before starting our task, we need to bind our values to the properties on the task
-        //runProgressBar.progressProperty().bind(task.progressProperty());
-        //m_DPProgress.bind(task.progressProperty());
-        // Now, start the task on a background thread
-        new Thread(task).start();
+        TaskService service = new TaskService();
+        runProgressBar.progressProperty().bind(service.progressProperty());
+        service.restart();
     }
 
 
-    @FXML
-    void OnFileChooser(ActionEvent event)
+    @FXML void OnFileChooser(ActionEvent event)
     {
+            fileChooserButton.setDisable(true);
             FileChooser fileChooser = new FileChooser();
             File selectedFile = fileChooser.showOpenDialog(null);
             if(selectedFile == null)
-                return;
+            {fileChooserButton.setDisable(false);
+                return;}
             m_SPNameLoadFile.set("File: " + selectedFile.getName());
             try
             {
-                ui.loadInfoFromXmlFile(selectedFile);
-                m_Timetable = ui.getTimeTable();
-                m_Teachers = m_Timetable.getTeachers();
-                for (Teacher teacher:m_Teachers)
-                {
-                    m_TeachersNames.add(teacher.getName());
-                }
-                teacherChoiceBox.getItems().addAll(m_TeachersNames);
-                m_Grades = m_Timetable.getGrades();
-                for(Grade grade: m_Grades)
-                {
-                    m_GradeNames.add(grade.getName());
-                }
-                gradeChoiceBox.getItems().addAll(m_GradeNames);
+                 animationForLoadFileTextBox();
+                 ui.loadInfoFromXmlFile(selectedFile);
+                 m_Timetable = ui.getTimeTable();
+                 List<Teacher> teachers = m_Timetable.getTeachers();
+                 List<Grade> grades = m_Timetable.getGrades();
+                 teacherChoiceBox.getItems().addAll(teachers);
+                 gradeChoiceBox.getItems().addAll(grades);
+              //  teacherComboBox.getItems().addAll(teachers);
+
 
                  ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
 
@@ -644,17 +526,24 @@ public class Controller implements Initializable { //implements Initializable
                          m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
                          m_IPCurrentGeneration.set(numberOfGeneration);
                          ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
-
+                         provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
                          teacherChoiceBox.setOnAction(this::OnOptimalByTeacher);
                          gradeChoiceBox.setOnAction(this::OnOptimalByGrade);
+
                          updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
                      });});
 
                 provideInfoFromFile();
-                animationForLoadFileTextBox();
 
                 m_DPProgress.unbind();
                 m_DPProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
+
+                elitismLabel.textProperty().unbind();
+                elitismLabel.textProperty().bind(ui.getEngine().getSelection().getElitismProperty().asString());
+                ui.getEngine().getSelection().getElitismProperty().bind(m_SPElitism);
+
+                m_SPSelectionInfo.unbind();
+                m_SPSelectionInfo.bind(ui.getEngine().getSelection().toStringProperty());
                 m_SPMessageToUser.set("The xml file was loaded");
             }
             catch (JAXBException e)
@@ -669,41 +558,27 @@ public class Controller implements Initializable { //implements Initializable
             {
                 m_SPMessageToUser.set(e.getMessage());
             }
+
+            fileChooserButton.setDisable(false);
     }
 
-    /*
-    private void provideInfoFromOptimalSolution(TimeTable timeTable)
+    @FXML private void OnOptimalByGrade(ActionEvent actionEvent)
     {
-        for(int column=1;column<=5;column++)
-        {
-            for(int row=1;row<=9;row++)
-            {
-                Label test = new Label("test");
-                gridOptimalSolution.setConstraints(test,column,row);
-                gridOptimalSolution.getChildren().add(test);
-            }
-        }
+        TimeTable timeTable = (TimeTable) ui.getEngine().getOptimalSolution();
+        Grade gradeChosen = gradeChoiceBox.getValue();
+        provideInfoAboutGradesFromOptimalSolution(timeTable, gradeChosen);
     }
 
-     */
 
-    private void OnOptimalByGrade(ActionEvent actionEvent)
+    @FXML private void OnOptimalByTeacher(ActionEvent actionEvent)
     {
-        TimeTable optimalTimeTable = (TimeTable) ui.getEngine().getOptimalSolution();
-        String gradeChosen = gradeChoiceBox.getValue();
-        provideInfoAboutGradesFromOptimalSolution(optimalTimeTable, gradeChosen);
+        TimeTable timeTable = (TimeTable) ui.getEngine().getOptimalSolution();
+        Teacher teacherChosen=teacherChoiceBox.getValue();
+        provideInfoAboutTeachersFromOptimalSolution(timeTable,teacherChosen);
     }
 
 
-    private void OnOptimalByTeacher(ActionEvent actionEvent)
-    {
-        TimeTable optimalTimeTable= (TimeTable) ui.getEngine().getOptimalSolution();
-        String teacherChosen=teacherChoiceBox.getValue();
-        provideInfoAboutTeachersFromOptimalSolution(optimalTimeTable,teacherChosen);
-    }
-
-    @FXML
-    void OnRunAlgo(ActionEvent event)
+    @FXML void OnRunAlgo(ActionEvent event)
     {
         if(!ui.getIsXmlFileLoaded())
         {
@@ -711,64 +586,81 @@ public class Controller implements Initializable { //implements Initializable
         }
         else
         {
-            if(handleParametersBeforeRunning())
-            {
-                //handleProgressBarBeforeRunning();
-
+            if(handleParametersBeforeRunning()) {
+                handleProgressBarBeforeRunning();
                 handleStopConditionBeforeRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
-
                 ui.getEngine().setNumberOfGenerationForUpdate(Integer.parseInt(numOfGeneration4Update.getText()));
-
                 ui.getNumOfGeneration2BestFitness().clear();
                 ui.getEngine().clear();
                 animationForRunAlgorithmButton();
-                handleControls2DisableBeforeRunning(false);
-                m_DPCurrentFitness.set(0);
-                m_IPCurrentGeneration.set(0);
+                handleControls2DisableBeforeRunning(true);
                 updatesTableView.getItems().clear();
 
-                ui.setThreadEngine(new Thread(ui.getEngine()));
+
+                ui.setTaskEngine(new Task() {
+                    @Override
+                    public Object call() throws Exception {
+                        try {
+                            ui.getEngine().run();
+                        }
+                       catch (Exception e)
+                       {
+                           e.printStackTrace();
+                       }
+                        return null;
+                    }
+                });
+                ui.setThreadEngine(new Thread(ui.getTaskEngine()));
+                ui.getThreadEngine().setName("ThreadEngine");
                 ui.getThreadEngine().start();
             }
         }
     }
 
-    @FXML
-    void OnNumOfGenerationCheck(ActionEvent event)
+
+    @FXML void OnNumOfGenerationCheck(ActionEvent event)
     {
         numberOfGenerationTextField.setDisable(!numOfGenerationCheckBox.isSelected());
     }
 
-    @FXML
-    void OnBestFitnessCheck(ActionEvent event) {
+
+    @FXML void OnBestFitnessCheck(ActionEvent event) {
         bestFitnessTextField.setDisable(!bestFitnessCheckBox.isSelected());
     }
 
-    @FXML
-    void OnTimerCheck(ActionEvent event) {
+
+    @FXML void OnTimerCheck(ActionEvent event) {
         timerTextField.setDisable(!timerCheckBox.isSelected());
     }
 
-    @FXML
-    void OnPauseResumeClick(ActionEvent event)
+
+    @FXML void OnChangeElitism(ActionEvent event) {
+        if(changeElitismTextField.getText()!=null && !changeElitismTextField.getText().equals(""))
+        {
+            int newElitism=Integer.parseInt(changeElitismTextField.getText());
+            if(newElitism < ui.getEngine().getSizeOfFirstPopulation())
+                m_SPElitism.set(newElitism);
+            else m_SPMessageToUser.set("Elitism is bigger than size of population");
+        }
+    }
+
+
+    @FXML void OnPauseResumeClick(ActionEvent event)
     {
         //////////////////////handle timer need to Pause-Resume////////////////////////////////
-        //if(m_DPProgress.get() == 1)
-        if(ui.getThreadEngine().isAlive())
+        if(ui.getThreadEngine()!=null && ui.getThreadEngine().isAlive())
         {
-            if(pauseResumeButton.getText().equals("Pause"))
+            if(m_BPIsPause.get())
             {
-                try {
-                    ui.getThreadEngine().wait();
-                } catch (InterruptedException | IllegalMonitorStateException ignored) {
-
-                }
+                ui.getEngine().pause();
                 pauseResumeButton.setText("Resume");
+                m_BPIsPause.set(false);
             }
-            else if(pauseResumeButton.getText().equals("Resume"))
+            else
             {
-                ui.getThreadEngine().notify();
+                ui.getEngine().resume();
                 pauseResumeButton.setText("Pause");
+                m_BPIsPause.set(true);
             }
         }
         else
@@ -777,32 +669,86 @@ public class Controller implements Initializable { //implements Initializable
         }
     }
 
-    @FXML//חקא קוד
-    void OnStopRunClick(ActionEvent event) {
-        double progress=m_DPProgress.get();
-        //if(progress == 1)
-        if(!ui.getThreadEngine().isAlive())
-        {
-           m_SPMessageToUser.set("The algorithm already over");
-        }
-        else if(progress <=0)///////////////
+
+    @FXML void OnStopRunClick(ActionEvent event) {
+        //////////////////////handle timer need to stop////////////////////////////////
+
+        if(ui.getThreadEngine()==null || runProgressBar.getProgress() <=0)
         {
             m_SPMessageToUser.set("The algorithm hasn't started yet");
         }
+        else if(!ui.getThreadEngine().isAlive())
+        {
+           m_SPMessageToUser.set("The algorithm already over");
+        }
         else
         {
-            if(pauseResumeButton.getText().equals("Resume"))
-            {
-                ui.getThreadEngine().notify();
-            }
-            ui.getThreadEngine().interrupt();
-            m_DPProgress.set(0);
+            if(!m_BPIsPause.get())
+                {ui.getEngine().resume();}
+
+            synchronized (ui.getThreadEngine())
+            {  ui.getThreadEngine().interrupt();}
         }
     }
 
+    @FXML void OnChangeSelection(ActionEvent event)
+    {
+        if(truncationCheckBox.isSelected()){
+            String topPercent=topPercentTextField.getText();
+            if(topPercent!=null && !topPercent.equals("")) {
+                truncation.setTopPercent(Integer.parseInt(topPercent));
+                truncation.setConfiguration("Top Percent= " + topPercent);
+                truncation.setSizeOfElitism(ui.getEngine().getSelection().getSizeOfElitism());
+                ui.getEngine().setSelection(truncation);
+                m_SPMessageToUser.set("The Selection technique has changed");
+            }
+            else m_SPMessageToUser.set("The parameter 'Top percent' is empty");
+        }
+
+        if (rouletteWheelCheckBox.isSelected())
+        {
+            rouletteWheel.setConfiguration("");
+            rouletteWheel.setSizeOfElitism(ui.getEngine().getSelection().getSizeOfElitism());
+            ui.getEngine().setSelection(rouletteWheel);
+            m_SPMessageToUser.set("The Selection technique has changed");
+        }
+
+        if(tournamentCheckBox.isSelected())
+        {
+            String pte=PTETextfield.getText();
+            if(pte!=null && !pte.equals("")){
+                tournament.setPTE(Integer.parseInt(pte));
+                tournament.setConfiguration("PTE= " + pte);
+                tournament.setSizeOfElitism(ui.getEngine().getSelection().getSizeOfElitism());
+                ui.getEngine().setSelection(tournament);
+                m_SPMessageToUser.set("The Selection technique has changed");
+            }
+            else m_SPMessageToUser.set("The parameter 'PTE' is empty");
+        }
+
+        m_SPSelectionInfo.unbind();
+        m_SPSelectionInfo.bind(ui.getEngine().getSelection().toStringProperty());
+    }
+
+
+
+    @FXML void OnTruncationSelected(ActionEvent event)
+    { truncationCheckBox.setSelected(truncationCheckBox.isSelected() &&
+            !(rouletteWheelCheckBox.isSelected() || tournamentCheckBox.isSelected()));}
+
+    @FXML void OnRouletteWheelSelected(ActionEvent event)
+    { rouletteWheelCheckBox.setSelected(rouletteWheelCheckBox.isSelected() &&
+            !(truncationCheckBox.isSelected() || tournamentCheckBox.isSelected()));}
+
+    @FXML void OnTournamentSelected(ActionEvent event)
+    { tournamentCheckBox.setSelected(tournamentCheckBox.isSelected() &&
+            !(rouletteWheelCheckBox.isSelected() ||  truncationCheckBox.isSelected()));}
+
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location1, ResourceBundle resources1) {
+        location=location1;
+        resources=resources1;
         myInitialize();
     }
 
@@ -818,13 +764,14 @@ public class Controller implements Initializable { //implements Initializable
         subjectsTextArea.textProperty().bind(m_SPSubjectsInfo);
         gradesTexArea.textProperty().bind(m_SPGradesInfo);
         rulesTextArea.textProperty().bind(m_SPRulesInfo);
+        selectionTextArea.textProperty().bind(m_SPSelectionInfo);
+        changeElitismButton.disableProperty().bind(m_BPIsPause);
+        ChangeSelectionButton.disableProperty().bind(m_BPIsPause);
 
-        runProgressBar.progressProperty().bind(m_DPProgress);
 
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
         timerTextField.setDisable(true);
-
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
@@ -862,6 +809,33 @@ public class Controller implements Initializable { //implements Initializable
                 numOfGeneration4Update.setText(newValue.replaceAll("[^\\d]", ""));
             }});
 
+        changeElitismTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                changeElitismTextField.setText(newValue.replaceAll("[^\\d]", ""));
+            }});
+
+        topPercentTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                topPercentTextField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            if(newValue!=null && !newValue.equals("")){
+            int value=Integer.parseInt(newValue);
+            if (value > 100 || value<=0) {
+                topPercentTextField.setText(oldValue);
+            }}
+        });
+
+        PTETextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                PTETextfield.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            if(newValue!=null && !newValue.equals("")){
+            if (Integer.parseInt(newValue) > 1) {
+                PTETextfield.setText(oldValue);
+            }}
+        });
+
+
 
         nameRulTableColumn.setCellValueFactory(new PropertyValueFactory("Name"));
         weightRuleTableColumn.setCellValueFactory(new PropertyValueFactory("Weight"));
@@ -871,9 +845,6 @@ public class Controller implements Initializable { //implements Initializable
         updateGenerationTableColumn.setCellValueFactory(new PropertyValueFactory("Generation"));
         updateFitnessTableColumn.setCellValueFactory(new PropertyValueFactory("Fitness"));
 
-
-
-        /*
         dayRowTableColumn.setCellValueFactory(new PropertyValueFactory("Day"));
         hourRowTableColumn.setCellValueFactory(new PropertyValueFactory("Hour"));
        teacherRowTableColumn.setCellValueFactory(new PropertyValueFactory("Teacher"));
@@ -888,20 +859,14 @@ public class Controller implements Initializable { //implements Initializable
         teacherWednesdayTableColumn.setText("Wednesday");
         teacherThursdayTableColumn.setText("Thursday");
 
-        teacherDayTableColumn.setMinWidth(100);
-        teacherSundayTableColumn.setMinWidth(100);
-        teacherMondayTableColumn.setMinWidth(100);
-        teacherTuesdayTableColumn.setMinWidth(100);
-        teacherWednesdayTableColumn.setMinWidth(100);
-        teacherThursdayTableColumn.setMinWidth(100);
+        teacherDayTableColumn.setMinWidth(200);
+        teacherSundayTableColumn.setMinWidth(200);
+        teacherMondayTableColumn.setMinWidth(200);
+        teacherTuesdayTableColumn.setMinWidth(200);
+        teacherWednesdayTableColumn.setMinWidth(200);
+        teacherThursdayTableColumn.setMinWidth(200);
 
-       // teacherSundayTableColumn.setCellValueFactory(new PropertyValueFactory("SubjectName"));
-        teacherDayTableColumn.setCellValueFactory(new PropertyValueFactory(""));
-        teacherSundayTableColumn.setCellValueFactory(new PropertyValueFactory("GradeName"));
-
-         */
-
-
+        teacherSundayTableColumn.setCellValueFactory(new PropertyValueFactory("sunday"));
     }
 
 

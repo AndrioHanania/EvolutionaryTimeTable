@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-public class Engine implements Runnable
+public class  Engine  implements Runnable
 {
     //Members
     private Crossover m_Crossover;
@@ -28,6 +28,7 @@ public class Engine implements Runnable
     private double m_BestFitnessInCurrentGeneration=0;
     private List<StopCondition> m_StopConditions = new ArrayList<>();
     DataEngine m_DataEngine = new DataEngine();
+    private Boolean m_IsPause=false;
 
     //Constructors
     public Engine(Selection selection, Crossover crossover, List<Mutation> mutations,
@@ -73,7 +74,8 @@ public class Engine implements Runnable
         firstPopulation.calculateFitnessToAll();
         firstPopulation.sort(Comparator.comparingDouble(Solution::getFitness));
         m_BestFitnessInCurrentGeneration = firstPopulation.get(firstPopulation.size()-1).m_Fitness;
-        while (!checkStopConditions())
+
+        while (!checkStopConditions() && !Thread.currentThread().isInterrupted())
         {
            int sizeOfElitism = m_Selection.getSizeOfElitism();
            Population selectedParents = new Population(m_Selection.execute(firstPopulation));
@@ -113,6 +115,18 @@ public class Engine implements Runnable
             }
 
             firstPopulation = nextGeneration;
+
+            synchronized (this)
+            {
+                while(m_IsPause)
+                {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException | IllegalMonitorStateException  e) {
+                        e.printStackTrace();////////!!!!!!!!!!!!!!!!!!
+                    }
+                }
+            }
         }
 
         m_IsFinishToRun = true;
@@ -146,11 +160,7 @@ public class Engine implements Runnable
     public void  setNumberOfGenerationForUpdate(int num){m_NumberOfGenerationForUpdate = num;}
 
     public Solution getOptimalSolution() {
-        //if(m_IsFinishToRun)
-       // {
-            return m_OptimalSolution;
-       // }
-        //else{ return null;}
+        return m_OptimalSolution;
     }
 
 
@@ -173,6 +183,7 @@ public class Engine implements Runnable
     {
         m_NumOfGeneration = 0;
         m_OptimalSolution = null;
+        m_IsFinishToRun=false;
     }
 
     public void setSelection(Selection selection) {
@@ -232,6 +243,27 @@ public class Engine implements Runnable
 
     public int getSizeOfFirstPopulation(){return  m_SizeOfFirstPopulation;}
 
+    public boolean isFinishToRun(){return m_IsFinishToRun;}
+
+    public Selection getSelection()
+    {
+        return m_Selection;
+    }
+
+    public void pause()
+    {
+        m_IsPause=true;
+    }
+
+    public void resume()
+    {
+        m_IsPause=false;
+
+        synchronized (this)
+        {
+            this.notifyAll();
+        }
+    }
 
     public class DataEngine
     {
