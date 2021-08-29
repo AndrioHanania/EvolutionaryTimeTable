@@ -17,8 +17,10 @@ public class Tournament extends Selection
     //Methods
     @Override
     public String toString() {
-        return "Name: Tournament " + "PTE: " + m_Pte + " " + super.toString();
+        return "Name: Tournament, " + "PTE: " + m_Pte + ", " + super.toString();
     }
+
+    public void setPTE(int pte){m_Pte=pte;}
 
     @Override
     public Population execute(Population currentGeneration)

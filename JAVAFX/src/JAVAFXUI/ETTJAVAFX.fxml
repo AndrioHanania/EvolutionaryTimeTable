@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -25,7 +32,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
          <top>
@@ -66,8 +73,10 @@
                         <ProgressBar fx:id="runProgressBar" prefWidth="200.0" />
                         <Button fx:id="pauseResumeButton" mnemonicParsing="false" onAction="#OnPauseResumeClick" text="Pause" />
                         <Button fx:id="stopRunButton" mnemonicParsing="false" onAction="#OnStopRunClick" text="Stop" />
-                        <Label fx:id="messageToUserTextBox" />
-                        <ProgressBar prefWidth="200.0" progress="0.0" />
+                        <Label fx:id="messageToUserTextBox">
+                           <font>
+                              <Font name="System Bold Italic" size="34.0" />
+                           </font></Label>
                      </children>
                   </HBox>
                   <Accordion GridPane.columnIndex="5" GridPane.rowIndex="2" GridPane.rowSpan="3">
@@ -145,7 +154,7 @@
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TableView fx:id="rowsTableView" layoutX="7.0" layoutY="80.0" prefHeight="502.0" prefWidth="924.0">
+                                    <TableView fx:id="rowsTableView" layoutX="7.0" layoutY="80.0">
                                       <columns>
                                         <TableColumn fx:id="dayRowTableColumn" prefWidth="114.0" text="Day" />
                                         <TableColumn fx:id="hourRowTableColumn" prefWidth="146.0" text="Hour" />
@@ -172,7 +181,7 @@
                                           <Insets left="20.0" right="20.0" top="25.0" />
                                        </padding>
                                     </HBox>
-                                    <TableView fx:id="rulesTableView" layoutX="1.0" layoutY="78.0" prefHeight="504.0" prefWidth="931.0">
+                                    <TableView fx:id="rulesTableView" layoutX="1.0" layoutY="78.0">
                                       <columns>
                                         <TableColumn fx:id="nameRulTableColumn" prefWidth="208.0" text="Name" />
                                         <TableColumn fx:id="weightRuleTableColumn" prefWidth="227.0" text="Weight" />
@@ -188,7 +197,7 @@
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TableView fx:id="updatesTableView" layoutY="79.0" prefHeight="503.0" prefWidth="931.0">
+                                    <TableView fx:id="updatesTableView" layoutY="79.0">
                                       <columns>
                                         <TableColumn fx:id="updateGenerationTableColumn" prefWidth="461.0" text="Generation" />
                                         <TableColumn fx:id="updateFitnessTableColumn" prefWidth="469.0" text="Fitness" />
@@ -230,9 +239,36 @@
                   </ToolBar>
                   <Accordion GridPane.rowIndex="2" GridPane.rowSpan="3">
                     <panes>
-                      <TitledPane animated="false" text="untitled 1">
+                        <TitledPane prefHeight="200.0" prefWidth="200.0" text="Elitism">
+                           <content>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <Label layoutX="14.0" layoutY="60.0" text="size of elitism: " />
+                                    <TextField fx:id="changeElitismTextField" layoutX="40.0" layoutY="197.0" />
+                                    <Button fx:id="changeElitismButton" layoutX="83.0" layoutY="255.0" mnemonicParsing="false" onAction="#OnChangeElitism" text="Change size" />
+                                    <Label fx:id="elitismLabel" layoutX="125.0" layoutY="60.0" />
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </TitledPane>
+                      <TitledPane animated="false" text="Selection">
                         <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TextArea fx:id="selectionTextArea" layoutX="1.0" layoutY="31.0" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="15.0" />
+                                    <Label layoutX="14.0" layoutY="4.0" text="Cuurent Selection technique: " />
+                                    <Label layoutX="15.0" layoutY="117.0" text="Top Percent: " />
+                                    <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="112.0" maxHeight="31.0" maxWidth="120.0" />
+                                    <Button fx:id="ChangeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
+                                    <CheckBox fx:id="truncationCheckBox" layoutX="32.0" layoutY="83.0" mnemonicParsing="false" onAction="#OnTruncationSelected" text="Truncation: " AnchorPane.leftAnchor="32.0" />
+                                    <Line endX="100.0" layoutX="134.0" layoutY="150.0" startX="-100.0" />
+                                    <CheckBox fx:id="rouletteWheelCheckBox" layoutX="32.0" layoutY="161.0" mnemonicParsing="false" onAction="#OnRouletteWheelSelected" text="RouletteWheel: " AnchorPane.leftAnchor="32.0" />
+                                    <Line endX="100.0" layoutX="134.0" layoutY="200.0" startX="-100.0" />
+                                    <CheckBox fx:id="tournamentCheckBox" layoutX="32.0" layoutY="223.0" mnemonicParsing="false" onAction="#OnTournamentSelected" text="Tournament: " AnchorPane.leftAnchor="32.0" />
+                                    <Label layoutX="18.0" layoutY="257.0" text="PTE: " />
+                                    <TextField fx:id="PTETextfield" layoutX="66.0" layoutY="252.0" maxHeight="31.0" maxWidth="120.0" />
+                                    <Line endX="100.0" layoutX="126.0" layoutY="300.0" startX="-100.0" />
+                                 </children></AnchorPane>
                         </content>
                       </TitledPane>
                       <TitledPane animated="false" text="untitled 2">
