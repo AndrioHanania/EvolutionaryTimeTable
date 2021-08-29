@@ -1,10 +1,13 @@
 package JAVAFXUI;
 
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import engine.stopCondition.BestFitnessCondition;
 import engine.stopCondition.MaxNumOfGenerationCondition;
@@ -22,12 +25,18 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.util.Pair;
 import timeTable.Grade;
 import timeTable.Rules.Rule;
 import timeTable.Subject;
@@ -36,6 +45,9 @@ import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
 
 import javax.xml.bind.JAXBException;
+
+import java.net.logstash.logack.encoder.org.apache.commons.lang3.tuple;
+
 
 public class Controller implements Initializable { //implements Initializable
 
@@ -189,13 +201,27 @@ public class Controller implements Initializable { //implements Initializable
     private void provideInfoAboutTeachersFromOptimalSolution(TimeTable optimalTimetable,String teacher)
     {
         teacherGridOptimalSolution.getChildren().clear();
-        teacherGridOptimalSolution
         initialGrid(teacherGridOptimalSolution);
         List<TimeTableChromosome> chromosomes = optimalTimetable.getChromosomes();
         Label gradeNameLabel = new Label();
         Label gradeIdLabel = new Label();
         Label subjectNameLabel = new Label();
         Label subjectIdLabel = new Label();
+
+        Pair<Integer,Integer> pair = Pair
+        List<TimeTableChromosome> filteredByTeacherChromosome = chromosomes.stream().filter(t ->
+                t.getTeacher().getName().equals(teacher)).collect(Collectors.toList());
+
+        Map<Pair<Integer,Integer>, TimeTableChromosome> dateToFive = new HashMap<>();
+        filteredByTeacherChromosome.stream().forEach(t->{
+            if(!dateToFive.containsKey(Pair.of(t.getDay(),t.getHour())))
+            {
+                dateToFive.put(Pair.of(t.getDay(),t.getHour()),t);
+            }
+        });
+
+        }
+        /*
         for (TimeTableChromosome chromosome : chromosomes)
         {
             if (chromosome.getTeacher().getName().equals(teacher))
@@ -207,11 +233,13 @@ public class Controller implements Initializable { //implements Initializable
                 int dayColumn = chromosome.getDay();
                 int hourRow = chromosome.getHour();
                 //teacherGridOptimalSolution.getChildren().remove(1,teacherGridOptimalSolution.getChildren().size());
-                teacherGridOptimalSolution.isDisable()
-                teacherGridOptimalSolution.setConstraints(subjectNameLabel,dayColumn,hourRow);
-                teacherGridOptimalSolution.getChildren().add(subjectNameLabel);
+      //          teacherGridOptimalSolution.isDisable()
+             //   teacherGridOptimalSolution.setConstraints(subjectNameLabel,dayColumn,hourRow);
+      //          teacherGridOptimalSolution.getChildren().add(subjectNameLabel);
             }
         }
+
+         */
         //System.out.println("check");
     }
 
