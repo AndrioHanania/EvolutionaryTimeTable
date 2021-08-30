@@ -14,7 +14,9 @@ public class TimeCondition implements StopCondition{
     private TimerTask timerTaskMinute;
     private TimerTask timerTaskUpdateSecond;
     private Timer timerUpdateSecond;
-
+    private int m_Seconds;
+    private boolean forHelper=false;
+    private int helper=0;
     private int secondLeft;
 
     public TimeCondition(int minutes)
@@ -24,16 +26,25 @@ public class TimeCondition implements StopCondition{
         timerTaskUpdateSecond = null;
     }
 
-    public int getMinutes(){return  m_minutes;}
-
-    public void setMinutes(int minutes){m_minutes=minutes;}
+    public void setMinutes(int minutes){
+        m_minutes=minutes;
+        m_Seconds= m_minutes*60;
+    }
 
     @Override
     public boolean execute(Engine.DataEngine dataEngine) {
 
         if(m_FirstExecute)
         {
-            secondLeft=0;
+            if(m_IsPause)
+            {
+                m_IsPause=false;
+            }
+            else
+            {
+                secondLeft=0;
+            }
+            m_IsStop=false;
             m_ReturnValue = false;
             timerMinute = new Timer();
             timerUpdateSecond = new Timer();
@@ -50,11 +61,23 @@ public class TimeCondition implements StopCondition{
                 @Override
                 public void run()
                 {
+                    if(m_IsStop)
+                    {
+                        stop();
+                        return;
+                    }
+
+                    if(forHelper)
+                    {
+                        secondLeft=helper;
+                        forHelper=false;
+                    }
+
                     secondLeft += 1;
                 }
             };
 
-            timerMinute.schedule(timerTaskMinute, (long) m_minutes * 60 * 1000);
+            timerMinute.schedule(timerTaskMinute, (long)  m_Seconds * 1000);
             timerUpdateSecond.schedule(timerTaskUpdateSecond, 0, 1000);
             m_FirstExecute = false;
         }
@@ -67,5 +90,39 @@ public class TimeCondition implements StopCondition{
         return m_ReturnValue;
     }
 
-    public int getSecondLeft(){return secondLeft;}
+    public int getSecondLeft(){
+
+            return secondLeft;
+    }
+
+    boolean m_IsStop=false;
+
+    public void toFinish() {
+        m_IsStop=true;
+
+    }
+
+
+    private void stop()
+    {
+        timerTaskUpdateSecond.cancel();
+        timerTaskMinute.cancel();
+        m_FirstExecute = true;
+    }
+
+    boolean m_IsPause=false;
+
+    public void pause()
+    {
+        toFinish();
+        m_IsPause=true;
+    }
+
+    public void resume()
+    {
+       m_Seconds = m_minutes * 60 - secondLeft;
+       helper=secondLeft;
+       forHelper=true;
+       execute(null);
+    }
 }

@@ -5,6 +5,7 @@ import engine.crossover.Crossover;
 import engine.mutation.Mutation;
 import engine.selection.Selection;
 import engine.stopCondition.StopCondition;
+import engine.stopCondition.TimeCondition;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -75,7 +76,8 @@ public class  Engine  implements Runnable
         firstPopulation.sort(Comparator.comparingDouble(Solution::getFitness));
         m_BestFitnessInCurrentGeneration = firstPopulation.get(firstPopulation.size()-1).m_Fitness;
 
-        while (!checkStopConditions() && !Thread.currentThread().isInterrupted())
+
+        while (isDone())
         {
            int sizeOfElitism = m_Selection.getSizeOfElitism();
            Population selectedParents = new Population(m_Selection.execute(firstPopulation));
@@ -120,17 +122,28 @@ public class  Engine  implements Runnable
             {
                 while(m_IsPause)
                 {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException | IllegalMonitorStateException  e) {
-                        e.printStackTrace();////////!!!!!!!!!!!!!!!!!!
-                    }
+                    try {this.wait();}
+                    catch (InterruptedException | IllegalMonitorStateException  e) {}
                 }
             }
         }
 
         m_IsFinishToRun = true;
         updateOptimalSolution(firstPopulation);
+    }
+
+    private boolean isDone() {
+        if(Thread.currentThread().isInterrupted())
+        {
+            for(StopCondition stopCondition : m_StopConditions)
+            {
+                if(stopCondition.getClass().equals(TimeCondition.class))
+                {
+                    ((TimeCondition)stopCondition).toFinish();
+                }
+            }
+        }
+        return !checkStopConditions() && !Thread.currentThread().isInterrupted();
     }
 
     public String toString()
@@ -252,20 +265,37 @@ public class  Engine  implements Runnable
 
     public void pause()
     {
-        m_IsPause=true;
+        for(StopCondition stopCondition : m_StopConditions)
+        {
+            if(stopCondition.getClass().equals(TimeCondition.class))
+            {
+                ((TimeCondition)stopCondition).pause();
+            }
+        }
+        synchronized (this){
+        m_IsPause=true;}
     }
 
     public void resume()
     {
-        m_IsPause=false;
-
-        synchronized (this)
+        for(StopCondition stopCondition : m_StopConditions)
         {
-            this.notifyAll();
+            if(stopCondition.getClass().equals(TimeCondition.class))
+            {
+                ((TimeCondition)stopCondition).resume();
+            }
         }
+
+        synchronized (this){
+        m_IsPause=false;
+        this.notifyAll();}
     }
 
     public double getBestFitnessInCurrentGeneration(){return m_BestFitnessInCurrentGeneration;}
+
+    public Crossover getCrossover() {
+        return m_Crossover;
+    }
 
     public class DataEngine
     {

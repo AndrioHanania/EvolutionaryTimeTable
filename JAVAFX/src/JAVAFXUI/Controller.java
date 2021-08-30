@@ -116,6 +116,42 @@ public class Controller implements Initializable///heloooooo
 
 
 
+    @FXML private TextArea crossoverTextArea;
+    @FXML private Button changeCrossover;
+    @FXML private CheckBox dayTimeOrientedCheckBox;
+    @FXML private CheckBox aspectOrientedCheckBox;
+    @FXML private CheckBox orientedByClass;
+    @FXML private CheckBox orientedByTeacher;
+    @FXML private CheckBox cuttingPointsTextField;
+
+    @FXML void OnChangeCrossover(ActionEvent event)
+    {
+
+
+    }
+
+    @FXML private void OnDayTimeOrientedSelected(ActionEvent event)
+    {
+
+    }
+
+    @FXML private void voidOnAspectOrientedSelected(ActionEvent event)
+    {
+
+    }
+
+    @FXML private void OnOrientedByClassSelected(ActionEvent event)
+    {
+
+    }
+
+    @FXML private void OnOrientedByTeacherSelected(ActionEvent event)
+    {
+
+    }
+
+
+
 
 
     BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
@@ -125,11 +161,12 @@ public class Controller implements Initializable///heloooooo
     StringProperty m_SPMessageToUser = new SimpleStringProperty();
     StringProperty m_SPNameLoadFile = new SimpleStringProperty("File: ");
     StringProperty m_SPBestFitness = new SimpleStringProperty();
-    StringProperty  m_SPTeachersInfo = new SimpleStringProperty();
-    StringProperty  m_SPSubjectsInfo = new SimpleStringProperty();
-    StringProperty  m_SPGradesInfo = new SimpleStringProperty();
-    StringProperty  m_SPRulesInfo = new SimpleStringProperty();
+    StringProperty m_SPTeachersInfo = new SimpleStringProperty();
+    StringProperty m_SPSubjectsInfo = new SimpleStringProperty();
+    StringProperty m_SPGradesInfo = new SimpleStringProperty();
+    StringProperty m_SPRulesInfo = new SimpleStringProperty();
     StringProperty m_SPSelectionInfo = new SimpleStringProperty();
+    StringProperty m_SPCrossoverInfo = new SimpleStringProperty();
     DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
 
 
@@ -142,7 +179,7 @@ public class Controller implements Initializable///heloooooo
     Truncation truncation = new Truncation(1);
     RouletteWheel rouletteWheel = new RouletteWheel();
     Tournament tournament = new Tournament(0);
-
+///note andrio
 
     ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
     ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
@@ -319,12 +356,8 @@ public class Controller implements Initializable///heloooooo
         provideInfoAboutGrades();
         provideInfoAboutRules();
         //engine
-        provideInfoAboutSelection();
-    }
-
-    private void provideInfoAboutSelection()
-    {
         m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
+        m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
     }
 
     private void provideInfoAboutRules() {
@@ -374,6 +407,7 @@ public class Controller implements Initializable///heloooooo
         m_SPSubjectsInfo.set(sb.toString());
     }
 
+    //note
     private void provideInfoAboutTeachers()
     {
         StringBuilder sb =new StringBuilder();
@@ -538,6 +572,8 @@ public class Controller implements Initializable///heloooooo
         }
     }
 
+int ppp=0;
+
     private class TaskService extends Service<Void> {
 
         @Override
@@ -548,26 +584,31 @@ public class Controller implements Initializable///heloooooo
                 @Override
                 protected Void call() throws Exception {
 
-                    //while (ui.getThreadEngine().isAlive()) + קריאה ךמתודה הזאת רק אחרי הפעלת טריד האלגוריתם
+                    double progress4Generation = 0;
+                    double progress4Fitness = 0;
+                    double progress4Timer = 0;
+                    double progress=0;
+
                     while (!ui.getEngine().isFinishToRun())
                     {
-                        double progress4Generation = 0;
-                        double progress4Fitness = 0;
-                        double progress4Timer = 0;
+                        if(m_BPIsPause.get())//isnot
+                        {
 
-                        if (numOfGenerationCheckBox.isSelected()) {
-                            progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
-                        }
-                        if (bestFitnessCheckBox.isSelected()) {
-                            progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() / Double.parseDouble(bestFitnessTextField.getText());
-                        }
-                        if (timerCheckBox.isSelected()) {
-                            progress4Timer = (double) timeCondition.getSecondLeft() / (60 * Integer.parseInt(timerTextField.getText()));
-                        }
+                            if (numOfGenerationCheckBox.isSelected()) {
+                                progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
+                            }
+                            if (bestFitnessCheckBox.isSelected()) {
+                                progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() / Double.parseDouble(bestFitnessTextField.getText());
+                            }
 
-                        double progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
-                        updateProgress(progress, 1);
+                            if (timerCheckBox.isSelected()) {
 
+                                progress4Timer = (double) timeCondition.getSecondLeft() / (60 * Integer.parseInt(timerTextField.getText()));
+                            }
+
+                           progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
+                            updateProgress(progress, 1);
+                        }
                     }
                     return null;
                 }
@@ -681,15 +722,7 @@ public class Controller implements Initializable///heloooooo
                 ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
 
                      Platform.runLater(() -> {
-                         //if(!bestFitnessCheckBox.isSelected() && bestFitnessInCurrentGeneration <= Double.parseDouble(bestFitnessTextField.getText()))
-                                //m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
-
-
-                         if(bestFitnessCheckBox.isSelected() && bestFitnessInCurrentGeneration > Double.parseDouble(bestFitnessTextField.getText()))
-                         {
-
-                         }
-                         else {
+                         if (!bestFitnessCheckBox.isSelected() || !(bestFitnessInCurrentGeneration > Double.parseDouble(bestFitnessTextField.getText()))) {
                              m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
                          }
 
@@ -707,9 +740,6 @@ public class Controller implements Initializable///heloooooo
                 elitismLabel.textProperty().unbind();
                 elitismLabel.textProperty().bind(ui.getEngine().getSelection().getElitismProperty().asString());
                 ui.getEngine().getSelection().getElitismProperty().bind(m_SPElitism);
-
-                m_SPSelectionInfo.unbind();
-                m_SPSelectionInfo.bind(ui.getEngine().getSelection().toStringProperty());
                 m_SPMessageToUser.set("The xml file was loaded");
             }
             catch (JAXBException e)
@@ -755,6 +785,7 @@ public class Controller implements Initializable///heloooooo
         else
         {
             if(handleParametersBeforeRunning()) {
+
                 handleProgressBarBeforeRunning();
                 handleStopConditionBeforeRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
                 ui.getEngine().setNumberOfGenerationForUpdate(Integer.parseInt(numOfGeneration4Update.getText()));
@@ -830,7 +861,6 @@ public class Controller implements Initializable///heloooooo
 
     @FXML void OnPauseResumeClick(ActionEvent event)
     {
-        //////////////////////handle timer need to Pause-Resume////////////////////////////////
         if(ui.getThreadEngine()!=null && ui.getThreadEngine().isAlive())
         {
             if(m_BPIsPause.get())
@@ -855,9 +885,8 @@ public class Controller implements Initializable///heloooooo
     }
 
 
-    @FXML void OnStopRunClick(ActionEvent event) {
-        //////////////////////handle timer need to stop////////////////////////////////
-
+    @FXML void OnStopRunClick(ActionEvent event)
+    {
         if(ui.getThreadEngine()==null || runProgressBar.getProgress() <=0)
         {
             m_SPMessageToUser.set("The algorithm hasn't started yet");
@@ -873,6 +902,8 @@ public class Controller implements Initializable///heloooooo
 
             synchronized (ui.getThreadEngine())
             {  ui.getThreadEngine().interrupt();}
+
+            m_SPMessageToUser.set("The algorithm has stopped");
         }
     }
 
@@ -911,8 +942,7 @@ public class Controller implements Initializable///heloooooo
             else m_SPMessageToUser.set("The parameter 'PTE' is empty");
         }
 
-        m_SPSelectionInfo.unbind();
-        m_SPSelectionInfo.bind(ui.getEngine().getSelection().toStringProperty());
+        m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
     }
 
 
@@ -952,6 +982,7 @@ public class Controller implements Initializable///heloooooo
         selectionTextArea.textProperty().bind(m_SPSelectionInfo);
         changeElitismButton.disableProperty().bind(m_BPIsPause);
         ChangeSelectionButton.disableProperty().bind(m_BPIsPause);
+        crossoverTextArea.textProperty().bind(m_SPCrossoverInfo);
 
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
