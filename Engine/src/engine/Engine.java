@@ -265,6 +265,8 @@ public class  Engine  implements Runnable
         }
     }
 
+    public double getBestFitnessInCurrentGeneration(){return m_BestFitnessInCurrentGeneration;}
+
     public class DataEngine
     {
 

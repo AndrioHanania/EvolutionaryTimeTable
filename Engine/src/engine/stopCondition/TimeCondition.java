@@ -10,27 +10,21 @@ public class TimeCondition implements StopCondition{
     private static boolean m_FirstExecute = true;
     private boolean m_ReturnValue = false;
     private int m_minutes;
-    private Timer timer = new Timer();
-    private TimerTask timerTask = new TimerTask() {
-        @Override
-        public void run() {
-            m_ReturnValue = true;
-            endTime = (int) (System.currentTimeMillis() / 60000);
-            timeLeft = endTime-startTime;
-        }
-    };
+    private Timer timerMinute;
+    private TimerTask timerTaskMinute;
+    private TimerTask timerTaskUpdateSecond;
+    private Timer timerUpdateSecond;
 
+    private int secondLeft;
 
-    private int startTime;
-    private int endTime;
-    private int timeLeft;
-
-    public TimeCondition(int second)
+    public TimeCondition(int minutes)
     {
-        m_minutes = second;
+        m_minutes = minutes;
+        timerTaskMinute = null;
+        timerTaskUpdateSecond = null;
     }
 
-    public int getSecond(){return m_minutes;}
+    public int getMinutes(){return  m_minutes;}
 
     public void setMinutes(int minutes){m_minutes=minutes;}
 
@@ -39,8 +33,30 @@ public class TimeCondition implements StopCondition{
 
         if(m_FirstExecute)
         {
-            startTime = (int) (System.currentTimeMillis() / 60000);
-            timer.schedule(timerTask, m_minutes * 60 * 1000);
+            secondLeft=0;
+            m_ReturnValue = false;
+            timerMinute = new Timer();
+            timerUpdateSecond = new Timer();
+            timerTaskMinute = new TimerTask() {
+                @Override
+                public void run() {
+                    m_ReturnValue = true;
+                    timerUpdateSecond.cancel();
+                    timerMinute.cancel();
+                    //secondLeft=0;
+                }
+            };
+            timerTaskUpdateSecond = new TimerTask()
+            {
+                @Override
+                public void run()
+                {
+                    secondLeft += 1;
+                }
+            };
+
+            timerMinute.schedule(timerTaskMinute, (long) m_minutes * 60 * 1000);
+            timerUpdateSecond.schedule(timerTaskUpdateSecond, 0, 1000);
             m_FirstExecute = false;
         }
 
@@ -52,5 +68,5 @@ public class TimeCondition implements StopCondition{
         return m_ReturnValue;
     }
 
-    public int getTimeLeft(){return timeLeft;}
+    public int getSecondLeft(){return secondLeft;}
 }
