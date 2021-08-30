@@ -43,7 +43,6 @@ public class TimeCondition implements StopCondition{
                     m_ReturnValue = true;
                     timerUpdateSecond.cancel();
                     timerMinute.cancel();
-                    //secondLeft=0;
                 }
             };
             timerTaskUpdateSecond = new TimerTask()
