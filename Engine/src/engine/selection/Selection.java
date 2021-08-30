@@ -3,8 +3,6 @@ package engine.selection;
 import engine.Population;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import java.util.Random;
 
@@ -35,6 +33,4 @@ public abstract class Selection
     public String toString() {
         return "Configuration: " + m_Configuration;
     }
-
-    public StringProperty toStringProperty(){return new SimpleStringProperty(this.toString());}
 }

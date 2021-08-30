@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -22,10 +29,9 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
          <top>
@@ -120,15 +126,15 @@
                                  <children>
                                     <ChoiceBox fx:id="teacherChoiceBox" layoutX="217.0" layoutY="27.0" prefWidth="150.0" />
                                     <Label layoutX="79.0" layoutY="32.0" text="Choose teacher: " />
-                                    <GridPane fx:id="teacherGridOptimalSolution" layoutX="23.0" layoutY="62.0" prefHeight="525.0" prefWidth="933.0" AnchorPane.leftAnchor="23.0" AnchorPane.rightAnchor="-26.0">
+                                    <GridPane fx:id="teacherGridOptimalSolution" layoutX="80.0" layoutY="73.0" prefHeight="514.0" prefWidth="795.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="55.0">
                                       <columnConstraints>
-                                          <ColumnConstraints fx:id="teachersGridDayCol" hgrow="SOMETIMES" maxWidth="144.0" minWidth="10.0" prefWidth="104.0" />
-                                          <ColumnConstraints fx:id="teachersGridSundayCol" hgrow="SOMETIMES" maxWidth="165.0" minWidth="10.0" prefWidth="148.0" />
-                                          <ColumnConstraints fx:id="teachersGridMondayyCol" hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0" prefWidth="154.0" />
-                                          <ColumnConstraints fx:id="teachersGridTuesdayCol" hgrow="SOMETIMES" maxWidth="182.0" minWidth="10.0" prefWidth="164.0" />
-                                        <ColumnConstraints fx:id="teachersGridWednesdayCol" hgrow="SOMETIMES" maxWidth="157.0" minWidth="10.0" prefWidth="146.0" />
-                                        <ColumnConstraints fx:id="teachersGridThursdayCol" hgrow="SOMETIMES" maxWidth="144.0" minWidth="10.0" prefWidth="130.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="98.0" minWidth="10.0" prefWidth="97.0" />
+                                          <ColumnConstraints fx:id="teachersGridDayCol" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints fx:id="teachersGridSundayCol" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints fx:id="teachersGridMondayyCol" hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="141.0" />
+                                          <ColumnConstraints fx:id="teachersGridTuesdayCol" hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="145.0" />
+                                        <ColumnConstraints fx:id="teachersGridWednesdayCol" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints fx:id="teachersGridThursdayCol" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                       </columnConstraints>
                                       <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -152,14 +158,14 @@
                                  <children>
                                     <ChoiceBox id="gradeChoiceBox" fx:id="gradeChoiceBox" layoutX="212.0" layoutY="24.0" prefWidth="150.0" />
                                     <Label layoutX="82.0" layoutY="29.0" text="Chosse grade: " />
-                                    <GridPane fx:id="gradeGridOptimalSolution" layoutX="25.0" layoutY="56.0" prefHeight="527.0" prefWidth="931.0">
+                                    <GridPane fx:id="gradeGridOptimalSolution" layoutX="32.0" layoutY="71.0" prefHeight="512.0" prefWidth="818.0">
                                        <columnConstraints>
-                                          <ColumnConstraints fx:id="teachersGridDayCol1" hgrow="SOMETIMES" maxWidth="158.0" minWidth="10.0" prefWidth="114.0" />
-                                          <ColumnConstraints fx:id="teachersGridSundayCol1" hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="182.0" />
-                                          <ColumnConstraints fx:id="teachersGridMondayyCol1" hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="162.0" />
-                                          <ColumnConstraints fx:id="teachersGridTuesdayCol1" hgrow="SOMETIMES" maxWidth="172.0" minWidth="10.0" prefWidth="172.0" />
-                                          <ColumnConstraints fx:id="teachersGridWednesdayCol1" hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="165.0" />
-                                          <ColumnConstraints fx:id="teachersGridThursdayCol1" hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="137.0" />
+                                          <ColumnConstraints fx:id="teachersGridDayCol1" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints fx:id="teachersGridSundayCol1" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints fx:id="teachersGridMondayyCol1" hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="141.0" />
+                                          <ColumnConstraints fx:id="teachersGridTuesdayCol1" hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="145.0" />
+                                          <ColumnConstraints fx:id="teachersGridWednesdayCol1" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                          <ColumnConstraints fx:id="teachersGridThursdayCol1" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                        </columnConstraints>
                                        <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -283,7 +289,7 @@
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
                                     <TextArea fx:id="selectionTextArea" layoutX="1.0" layoutY="31.0" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="15.0" />
-                                    <Label layoutX="14.0" layoutY="4.0" text="Curent Selection technique: " />
+                                    <Label layoutX="14.0" layoutY="4.0" text="Cuurent Selection technique: " />
                                     <Label layoutX="15.0" layoutY="117.0" text="Top Percent: " />
                                     <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="112.0" maxHeight="31.0" maxWidth="120.0" />
                                     <Button fx:id="ChangeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
@@ -303,23 +309,9 @@
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" text="Mutation">
+                      <TitledPane animated="false" text="untitled 3">
                         <content>
-                          <AnchorPane fx:id="mutationSwitch" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <TableView layoutX="36.0" layoutY="450.0" prefHeight="56.0" prefWidth="119.0">
-                                      <columns>
-                                        <TableColumn fx:id="flippingControl" prefWidth="107.0" text="Flipping" />
-                                        <TableColumn fx:id="sizerControl" prefWidth="110.0" text="Sizer" />
-                                      </columns>
-                                    </TableView>
-                                    <Label layoutX="26.0" layoutY="6.0" prefHeight="30.0" prefWidth="195.0" text="Mutation technique to alter:" />
-                                    <CheckBox fx:id="flippingCheckBox" layoutX="20.0" layoutY="38.0" mnemonicParsing="false" onAction="#OnFlippingChecked" prefHeight="93.0" prefWidth="85.0" text="Flipping" />
-                                    <CheckBox fx:id="sizerCheckBox" layoutX="142.0" layoutY="79.0" mnemonicParsing="false" onAction="#OnSizerChecked" prefHeight="17.0" prefWidth="87.0" text="Sizer" />
-                                    <Label layoutX="57.0" layoutY="115.0" prefHeight="17.0" prefWidth="116.0" text="Top Percent" />
-                                    <TextField fx:id="flippingTopPercentTextField" disable="true" layoutX="11.0" layoutY="163.0" prefHeight="25.0" prefWidth="78.0" />
-                                    <TextField fx:id="sizerTopPercentTextField" disable="true" layoutX="140.0" layoutY="163.0" prefHeight="25.0" prefWidth="92.0" />
-                                 </children></AnchorPane>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                         </content>
                       </TitledPane>
                     </panes>
