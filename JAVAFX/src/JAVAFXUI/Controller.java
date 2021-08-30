@@ -674,18 +674,6 @@ public class Controller implements Initializable///heloooooo
                  animationForLoadFileTextBox();
                  ui.loadInfoFromXmlFile(selectedFile);
                  m_Timetable = ui.getTimeTable();
-                 m_Teachers = m_Timetable.getTeachers();
-                for (Teacher teacher:m_Teachers)
-                {
-                    m_TeachersNames.add(teacher.getName());
-                }
-                teacherChoiceBox.getItems().addAll(m_TeachersNames);
-                m_Grades = m_Timetable.getGrades();
-                for(Grade grade: m_Grades)
-                {
-                    m_GradeNames.add(grade.getName());
-                }
-                gradeChoiceBox.getItems().addAll(m_GradeNames);
 
                 setTeachersChoiceBox();
                 setGradesChoiceBox();
