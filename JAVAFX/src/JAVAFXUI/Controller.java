@@ -17,7 +17,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -441,11 +440,11 @@ public class Controller implements Initializable
     private void handleControls2DisableBeforeRunning(boolean toDisable)
     {
         numOfGenerationCheckBox.setDisable(toDisable);
-        numberOfGenerationTextField.setDisable(toDisable);
         bestFitnessCheckBox.setDisable(toDisable);
-        bestFitnessTextField.setDisable(toDisable);
         timerCheckBox.setDisable(toDisable);
-        timerTextField.setDisable(toDisable);
+        numberOfGenerationTextField.setDisable(toDisable ? toDisable : !numOfGenerationCheckBox.isSelected());
+        bestFitnessTextField.setDisable(toDisable ? toDisable : !bestFitnessCheckBox.isSelected());
+        timerTextField.setDisable(toDisable ? toDisable : !timerCheckBox.isSelected());
         numOfGeneration4Update.setDisable(toDisable);
         runAlgorithmButton.setDisable(toDisable);
     }
@@ -465,6 +464,7 @@ public class Controller implements Initializable
             m_SPMessageToUser.set("Please set number of generations");
             return false;
         }
+
         try
         {
             String txt = numOfGeneration4Update.getText();
@@ -480,6 +480,19 @@ public class Controller implements Initializable
             m_SPMessageToUser.set("Please set number of generations to update");
             return false;
         }
+
+        if(bestFitnessCheckBox.isSelected() && bestFitnessTextField.getText().equals(""))
+        {
+            m_SPMessageToUser.set("Please set number of maximum fitness");
+            return false;
+        }
+
+        if(timerCheckBox.isSelected() && timerTextField.getText().equals(""))
+        {
+            m_SPMessageToUser.set("Please set number of minutes for the timer");
+            return false;
+        }
+
         try
         {
             if(!(numOfGenerationCheckBox.isSelected() || bestFitnessCheckBox.isSelected() || timerCheckBox.isSelected()))
@@ -565,10 +578,10 @@ public class Controller implements Initializable
                             progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
                         }
                         if (bestFitnessCheckBox.isSelected()) {
-                            progress4Fitness = ui.getEngine().getOptimalSolution().getFitness() / Double.parseDouble(bestFitnessTextField.getText());
+                            progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() / Double.parseDouble(bestFitnessTextField.getText());
                         }
                         if (timerCheckBox.isSelected()) {
-                            progress4Timer = Integer.parseInt(timerTextField.toString()) - timeCondition.getTimeLeft();
+                            progress4Timer = (double) timeCondition.getSecondLeft() / (60 * Integer.parseInt(timerTextField.getText()));
                         }
 
                         double progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
@@ -582,13 +595,6 @@ public class Controller implements Initializable
             // This method allows us to handle any Exceptions thrown by the task
             task.setOnFailed(wse -> m_SPMessageToUser.set(wse.getSource().getException().getMessage()));
 
-            // If the task completed successfully, perform other updates here
-            task.setOnSucceeded(wse -> {
-                handleControls2DisableBeforeRunning(false);
-                handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
-                m_SPMessageToUser.set("The algorithm has run successfully");
-            });
-
             return task;
         }
     }
@@ -598,6 +604,14 @@ public class Controller implements Initializable
         TaskService service = new TaskService();
         runProgressBar.progressProperty().bind(service.progressProperty());
         service.restart();
+    }
+
+    private void provideInfoFromOptimalSolution(TimeTable timeTable)
+    {
+        provideInfoAboutRulesAndFitnessFromOptimalSolution(timeTable);
+        provideInfoAboutRowsFromOptimalSolution(timeTable);
+        teacherChoiceBox.setOnAction(this::OnOptimalByTeacher);
+        gradeChoiceBox.setOnAction(this::OnOptimalByGrade);
     }
 
 
@@ -631,12 +645,21 @@ public class Controller implements Initializable
                 ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
 
                      Platform.runLater(() -> {
-                         m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
+                         //if(!bestFitnessCheckBox.isSelected() && bestFitnessInCurrentGeneration <= Double.parseDouble(bestFitnessTextField.getText()))
+                                //m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
+
+
+                         if(bestFitnessCheckBox.isSelected() && bestFitnessInCurrentGeneration > Double.parseDouble(bestFitnessTextField.getText()))
+                         {
+
+                         }
+                         else {
+                             m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
+                         }
+
                          m_IPCurrentGeneration.set(numberOfGeneration);
                          ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
-                         teacherChoiceBox.setOnAction(this::OnOptimalByTeacher);
-                         gradeChoiceBox.setOnAction(this::OnOptimalByGrade);
-
+                         provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
                          updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
                      });});
 
@@ -705,17 +728,32 @@ public class Controller implements Initializable
 
                 ui.setTaskEngine(new Task() {
                     @Override
-                    public Object call() throws Exception {
+                    public Object call(){
                         try {
                             ui.getEngine().run();
                         }
                        catch (Exception e)
                        {
-                           e.printStackTrace();
+                           Platform.runLater(()->{
+                               m_SPMessageToUser.set(e.getMessage());
+                           });
                        }
                         return null;
                     }
+
+                    @Override
+                    protected void succeeded() {
+                        handleControls2DisableBeforeRunning(false);
+                        handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
+                        m_SPMessageToUser.set("The algorithm has run successfully");
+                    }
+
+                    @Override
+                    protected void running() {
+                        m_SPMessageToUser.set("Process...");
+                    }
                 });
+
                 ui.setThreadEngine(new Thread(ui.getTaskEngine()));
                 ui.getThreadEngine().setName("ThreadEngine");
                 ui.getThreadEngine().start();
@@ -760,12 +798,14 @@ public class Controller implements Initializable
             {
                 ui.getEngine().pause();
                 pauseResumeButton.setText("Resume");
+                m_SPMessageToUser.set("Pause");
                 m_BPIsPause.set(false);
             }
             else
             {
                 ui.getEngine().resume();
                 pauseResumeButton.setText("Pause");
+                m_SPMessageToUser.set("Process...");
                 m_BPIsPause.set(true);
             }
         }
@@ -874,13 +914,11 @@ public class Controller implements Initializable
         changeElitismButton.disableProperty().bind(m_BPIsPause);
         ChangeSelectionButton.disableProperty().bind(m_BPIsPause);
 
-
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
         timerTextField.setDisable(true);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-
 
         numberOfGenerationTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
@@ -897,7 +935,8 @@ public class Controller implements Initializable
                     }
 
                     m_SPBestFitness.set(newValue.replaceAll("[^\\d.]", ""));
-                }if (Double.parseDouble(newValue) > 100) {
+                }
+                if(!newValue.equals("") && Double.parseDouble(newValue) > 100) {
                     m_SPBestFitness.set(oldValue);
                 }
                 bestFitnessTextField.textProperty().unbind();
@@ -941,8 +980,6 @@ public class Controller implements Initializable
             }}
         });
 
-
-
         nameRulTableColumn.setCellValueFactory(new PropertyValueFactory("Name"));
         weightRuleTableColumn.setCellValueFactory(new PropertyValueFactory("Weight"));
         scoreRuleTableColumn.setCellValueFactory(new PropertyValueFactory("Score"));
@@ -950,6 +987,12 @@ public class Controller implements Initializable
 
         updateGenerationTableColumn.setCellValueFactory(new PropertyValueFactory("Generation"));
         updateFitnessTableColumn.setCellValueFactory(new PropertyValueFactory("Fitness"));
+
+        dayRowTableColumn.setCellValueFactory(new PropertyValueFactory("Day"));
+        hourRowTableColumn.setCellValueFactory(new PropertyValueFactory("Hour"));
+        teacherRowTableColumn.setCellValueFactory(new PropertyValueFactory("Teacher"));
+        gradeRowTableColumn.setCellValueFactory(new PropertyValueFactory("Grade"));
+        subjectRowTableColumn.setCellValueFactory(new PropertyValueFactory("Subject"));
     }
 
 
@@ -1004,7 +1047,7 @@ public class Controller implements Initializable
         StringProperty m_Grade;
         StringProperty m_Subject;
 
-        public ProductRow( String day,  String hour, String teacher, String grade, String subject)
+        public ProductRow(String day,  String hour, String teacher, String grade, String subject)
         {
             m_Day= new SimpleStringProperty(day);
             m_Hour= new SimpleStringProperty(hour);
