@@ -374,6 +374,7 @@ public class Controller implements Initializable///heloooooo
         m_SPSubjectsInfo.set(sb.toString());
     }
 
+    //note
     private void provideInfoAboutTeachers()
     {
         StringBuilder sb =new StringBuilder();
