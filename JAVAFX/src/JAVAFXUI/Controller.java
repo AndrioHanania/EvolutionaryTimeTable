@@ -46,6 +46,7 @@ public class Controller implements Initializable///heloooooo
     {
 
     }
+    //note
 
     JavaFxUI ui = new JavaFxUI();
 
