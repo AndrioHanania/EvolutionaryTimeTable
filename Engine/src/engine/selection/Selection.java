@@ -33,4 +33,5 @@ public abstract class Selection
     public String toString() {
         return "Configuration: " + m_Configuration;
     }
+
 }

@@ -126,11 +126,10 @@ public class Controller implements Initializable///heloooooo
     @FXML private CheckBox aspectOrientedCheckBox;
     @FXML private CheckBox orientedByClass;
     @FXML private CheckBox orientedByTeacher;
-    @FXML private CheckBox cuttingPointsTextField;
+    @FXML private TextField cuttingPointsTextField;
 
     @FXML void OnChangeCrossover(ActionEvent event)
     {
-
 
     }
 
@@ -139,7 +138,7 @@ public class Controller implements Initializable///heloooooo
 
     }
 
-    @FXML private void voidOnAspectOrientedSelected(ActionEvent event)
+    @FXML private void OnAspectOrientedSelected(ActionEvent event)
     {
 
     }
