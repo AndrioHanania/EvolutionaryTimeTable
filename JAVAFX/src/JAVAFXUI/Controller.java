@@ -1220,6 +1220,39 @@ public class Controller implements Initializable///heloooooo
         public void setGeneration(String generation){m_Generation.set(generation);}
     }
 
+    public class ProductMutation
+    {
+        StringProperty m_Probability;
+        StringProperty m_Component;
+        StringProperty m_MaxTupples;
+
+        public ProductMutation(String probability, String component, String tupples)
+        {
+            m_Probability = new SimpleStringProperty(probability);
+            m_Component   = new SimpleStringProperty(component);
+            m_MaxTupples  = new SimpleStringProperty(tupples);
+        }
+
+        public String getM_Probability() { return m_Probability.get(); }
+
+        public StringProperty m_ProbabilityProperty() { return m_Probability; }
+
+        public String getM_Component() { return m_Component.get(); }
+
+        public StringProperty m_ComponentProperty() { return m_Component; }
+
+        public String getM_MaxTupples() { return m_MaxTupples.get(); }
+
+        public StringProperty m_MaxTupplesProperty() { return m_MaxTupples; }
+
+        public void setM_Probability(String m_Probability) { this.m_Probability.set(m_Probability); }
+
+        public void setM_Component(String m_Component) { this.m_Component.set(m_Component); }
+
+        public void setM_MaxTupples(String m_MaxTupples) { this.m_MaxTupples.set(m_MaxTupples); }
+    }
+
+
     public class ProductRow
     {
         StringProperty m_Day;
