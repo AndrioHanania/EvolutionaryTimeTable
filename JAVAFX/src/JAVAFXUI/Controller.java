@@ -19,6 +19,8 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -31,6 +33,8 @@ import timeTable.Subject;
 import timeTable.Teacher;
 import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
+import timeTable.crossover.AspectOriented;
+import timeTable.crossover.DayTimeOriented;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -40,7 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class Controller implements Initializable///heloooooo
+public class Controller implements Initializable
 {
 
     public Controller()
@@ -55,15 +59,12 @@ public class Controller implements Initializable///heloooooo
     @FXML private URL location;
     @FXML private Button fileChooserButton;
     @FXML private TextField loadFileTextBox;
-    @FXML private Label messageToUserTextBox;
     @FXML private Button runAlgorithmButton;
     @FXML private CheckBox bestFitnessCheckBox;
     @FXML private CheckBox timerCheckBox;
     @FXML private CheckBox numOfGenerationCheckBox;
-
     @FXML private CheckBox flippingCheckBox;
     @FXML private CheckBox sizerCheckBox;
-
     @FXML private TextField numberOfGenerationTextField;
     @FXML private TextField bestFitnessTextField;
     @FXML private TextField timerTextField;
@@ -96,10 +97,8 @@ public class Controller implements Initializable///heloooooo
     @FXML private CheckBox tournamentCheckBox;
     @FXML private TextField topPercentTextField;
     @FXML private TextField PTETextfield;
-    @FXML private Button ChangeSelectionButton;
-
+    @FXML private Button changeSelectionButton;
     @FXML private AnchorPane mutationSwitch;
-
     @FXML private TableColumn<ProductRule, String> nameRulTableColumn;
     @FXML private TableColumn<ProductRule, String> weightRuleTableColumn;
     @FXML private TableColumn<ProductRule, String> scoreRuleTableColumn;
@@ -114,109 +113,69 @@ public class Controller implements Initializable///heloooooo
     @FXML private ChoiceBox<String> teacherChoiceBox;
     @FXML private ChoiceBox<String> gradeChoiceBox;
     //   @FXML private ChoiceBox<String> myChoiceBox;
-
     @FXML private GridPane teacherGridOptimalSolution;
     @FXML private GridPane gradeGridOptimalSolution;
-
-
-
     @FXML private TextArea crossoverTextArea;
-    @FXML private Button changeCrossover;
+    @FXML private Button changeCrossoverButton;
     @FXML private CheckBox dayTimeOrientedCheckBox;
     @FXML private CheckBox aspectOrientedCheckBox;
     @FXML private CheckBox orientedByClass;
     @FXML private CheckBox orientedByTeacher;
-    @FXML private CheckBox cuttingPointsTextField;
+    @FXML private TextField cuttingPointsTextField;
+    @FXML private javafx.scene.chart.LineChart<String, Number> LineChart;
+    @FXML private NumberAxis fitnessNumberAxis;
+    @FXML private Label sizeOfPopulationLabel;
+    @FXML private TextArea messageToUserTextArea;
 
-    @FXML void OnChangeCrossover(ActionEvent event)
-    {
-
-
-    }
-
-    @FXML private void OnDayTimeOrientedSelected(ActionEvent event)
-    {
-
-    }
-
-    @FXML private void voidOnAspectOrientedSelected(ActionEvent event)
-    {
-
-    }
-
-    @FXML private void OnOrientedByClassSelected(ActionEvent event)
-    {
-
-    }
-
-    @FXML private void OnOrientedByTeacherSelected(ActionEvent event)
-    {
-
-    }
-
-
-
-
-
-    BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
-    IntegerProperty m_SPElitism = new SimpleIntegerProperty();
-    IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
-    DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
-    StringProperty m_SPMessageToUser = new SimpleStringProperty();
-    StringProperty m_SPNameLoadFile = new SimpleStringProperty("File: ");
-    StringProperty m_SPBestFitness = new SimpleStringProperty();
-    StringProperty m_SPTeachersInfo = new SimpleStringProperty();
-    StringProperty m_SPSubjectsInfo = new SimpleStringProperty();
-    StringProperty m_SPGradesInfo = new SimpleStringProperty();
-    StringProperty m_SPRulesInfo = new SimpleStringProperty();
-    StringProperty m_SPSelectionInfo = new SimpleStringProperty();
-    StringProperty m_SPCrossoverInfo = new SimpleStringProperty();
-    DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
-
-
-    //Casual reboot--Stop Conditions--//
-    MaxNumOfGenerationCondition maxNumOfGenerationCondition =new MaxNumOfGenerationCondition(0);
-    BestFitnessCondition bestFitnessCondition = new BestFitnessCondition(0);
-    TimeCondition timeCondition = new TimeCondition(0);
+    private BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
+    private IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
+    private DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
+    private StringProperty m_SPMessageToUser = new SimpleStringProperty();
+    private StringProperty m_SPNameLoadFile = new SimpleStringProperty("File: ");
+    private StringProperty m_SPBestFitness = new SimpleStringProperty();
+    private StringProperty m_SPTeachersInfo = new SimpleStringProperty();
+    private StringProperty m_SPSubjectsInfo = new SimpleStringProperty();
+    private StringProperty m_SPGradesInfo = new SimpleStringProperty();
+    private StringProperty m_SPRulesInfo = new SimpleStringProperty();
+    private StringProperty m_SPSelectionInfo = new SimpleStringProperty();
+    private StringProperty m_SPCrossoverInfo = new SimpleStringProperty();
+    private StringProperty m_SPPTE = new SimpleStringProperty();
+    private StringProperty m_SPElitism = new SimpleStringProperty();
+    private DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
 
     //Casual reboot
-    Truncation truncation = new Truncation(1);
-    RouletteWheel rouletteWheel = new RouletteWheel();
-    Tournament tournament = new Tournament(0);
+    //-Stop Conditions--//
+    private MaxNumOfGenerationCondition maxNumOfGenerationCondition =new MaxNumOfGenerationCondition(0);
+    private BestFitnessCondition bestFitnessCondition = new BestFitnessCondition(0);
+    private TimeCondition timeCondition = new TimeCondition(0);
+
+    //-Selections--//
+    private Truncation truncation = new Truncation(1);
+    private RouletteWheel rouletteWheel = new RouletteWheel();
+    private Tournament tournament = new Tournament(0);
+    //-Crossovers--//
+    private DayTimeOriented dayTimeOriented = new DayTimeOriented(0);
+    private AspectOriented aspectOriented = new AspectOriented(0, "");
 
 
-    ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
-    ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
-    ObservableList<String> observableListOfTeachers = FXCollections.observableArrayList();
-    ObservableList<String> observableListOfGrades = FXCollections.observableArrayList();
+    private ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
+    private ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
+    private ObservableList<String> observableListOfTeachers = FXCollections.observableArrayList();
+    private ObservableList<String> observableListOfGrades = FXCollections.observableArrayList();
 
+    private List<Teacher> m_Teachers=new ArrayList<>();
+    private List<String> m_TeachersNames =new ArrayList<>();
+    private List<Grade> m_Grades = new ArrayList<>();
+    private List<String> m_GradeNames = new ArrayList<>();
 
-    TimeTable m_Timetable;
-    List<Teacher> m_Teachers=new ArrayList<>();
-    List<String> m_TeachersNames =new ArrayList<>();
-    List<Grade> m_Grades = new ArrayList<>();
-    List<String> m_GradeNames = new ArrayList<>();
-
-
-
-
-
+    private TimeTable m_Timetable;
+    private int maxSizeChromosomes = 0;
+    private String saveErrorMessage;
 
     //reminder that some codes need to be in synchronized!!!!!
 
-
-
-
-
-
     private void addToObservableListOfRules(ProductRule productRule){observableListOfRules.add(productRule);}
     private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
-
-
-
-
-
-
 
     private void provideInfoAboutGradesFromOptimalSolution(TimeTable optimalTimetable,String grade)
     {
@@ -312,8 +271,6 @@ public class Controller implements Initializable///heloooooo
         grid.getChildren().addAll(dayTimeLabel,sundayLabel,mondayLabel,tuesdayLabel
                 ,wednesdayLabel,thursdayLabel,eightOclockLabel,nineOclockLabel,tentOclockLabel,elevenOclockLabel,
                 twelveOclockLabel,oneOclockLabel,twoOclockLabel,threeOclockLabel,fourOclockLabel);
-
-
     }
 
     //private void provideInfoAboutTeacher
@@ -361,17 +318,20 @@ public class Controller implements Initializable///heloooooo
         //engine
         m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
         m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
+        sizeOfPopulationLabel.setText(((Integer)ui.getEngine().getSizeOfFirstPopulation()).toString());
+        m_SPElitism.set(((Integer)ui.getEngine().getSelection().getSizeOfElitism()).toString());
     }
 
     private void provideInfoAboutRules() {
         StringBuilder sb =new StringBuilder();
         List<Rule> rules= ui.getTimeTable().getRules();
         int size = rules.size();
-        for(int i=1;i<size;i++)
+        for(int i=1;i<=size;i++)
         {
             sb.append("Rule ").append(i).append(": ");
             sb.append(System.lineSeparator());
-            sb.append("Name: ").append(rules.get(i - 1).getClass().getSimpleName()).append(", Strictness: ").append(rules.get(i - 1).getRuleWeight());
+            sb.append("Name: ").append(rules.get(i - 1).getClass().getSimpleName()).
+                    append(", Strictness: ").append(rules.get(i - 1).getRuleWeight());
             sb.append(System.lineSeparator());
             sb.append(System.lineSeparator());
         }
@@ -383,7 +343,7 @@ public class Controller implements Initializable///heloooooo
         StringBuilder sb =new StringBuilder();
         List<Grade> grades= ui.getTimeTable().getGrades();
         int size = grades.size();
-        for(int i=1;i<size;i++)
+        for(int i=1;i<=size;i++)
         {
             sb.append("Grade ").append(i).append(": ");
             sb.append(System.lineSeparator());
@@ -399,7 +359,7 @@ public class Controller implements Initializable///heloooooo
         StringBuilder sb =new StringBuilder();
         List<Subject> subjects= ui.getTimeTable().getSubjects();
         int size = subjects.size();
-        for(int i=1;i<size;i++)
+        for(int i=1;i<=size;i++)
         {
             sb.append("Subject ").append(i).append(": ");
             sb.append(System.lineSeparator());
@@ -415,10 +375,11 @@ public class Controller implements Initializable///heloooooo
         StringBuilder sb =new StringBuilder();
         List<Teacher> teachers= ui.getTimeTable().getTeachers();
         int size = teachers.size();
-        for(int i=1;i<size;i++)
+        for(int i=1;i<=size;i++)
         {
             sb.append("Teacher ").append(i).append(": ");
             sb.append(System.lineSeparator());
+            Collections.sort(teachers.get(i-1).getIdOfSubjectsTeachable());
             sb.append(teachers.get(i-1));
             sb.append(System.lineSeparator());
             sb.append(System.lineSeparator());
@@ -464,6 +425,7 @@ public class Controller implements Initializable///heloooooo
         timerTextField.setDisable(toDisable ? toDisable : !timerCheckBox.isSelected());
         numOfGeneration4Update.setDisable(toDisable);
         runAlgorithmButton.setDisable(toDisable);
+        fileChooserButton.setDisable(toDisable);
     }
 
     private boolean handleParametersBeforeRunning()
@@ -512,7 +474,8 @@ public class Controller implements Initializable///heloooooo
 
         try
         {
-            if(!(numOfGenerationCheckBox.isSelected() || bestFitnessCheckBox.isSelected() || timerCheckBox.isSelected()))
+            if(!(numOfGenerationCheckBox.isSelected() || bestFitnessCheckBox.isSelected() ||
+                    timerCheckBox.isSelected()))
             {
                 m_SPMessageToUser.set("Need to choose at lest 1 stop condition");
                 return false;
@@ -529,13 +492,16 @@ public class Controller implements Initializable///heloooooo
 
 
 
-    private void handleStopConditionBeforeRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition, BestFitnessCondition bestFitnessCondition ,TimeCondition timeCondition)
+    private void handleStopConditionBeforeRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition,
+                                                  BestFitnessCondition bestFitnessCondition,
+                                                  TimeCondition timeCondition)
     {
         try
         {
             if(numOfGenerationCheckBox.isSelected())
             {
-                maxNumOfGenerationCondition.setMaxNumOfGeneration(Integer.parseInt(numberOfGenerationTextField.getText()));
+                maxNumOfGenerationCondition.setMaxNumOfGeneration(Integer.parseInt(
+                        numberOfGenerationTextField.getText()));
                 ui.getEngine().addStopCondition(maxNumOfGenerationCondition);
             }
             if(bestFitnessCheckBox.isSelected())
@@ -559,7 +525,9 @@ public class Controller implements Initializable///heloooooo
 
     }
 
-    private void handleStopConditionAfterRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition, BestFitnessCondition bestFitnessCondition, TimeCondition timeCondition) {
+    private void handleStopConditionAfterRunning(MaxNumOfGenerationCondition maxNumOfGenerationCondition,
+                                                 BestFitnessCondition bestFitnessCondition,
+                                                 TimeCondition timeCondition) {
         if(numOfGenerationCheckBox.isSelected())
         {
             ui.getEngine().removeStopCondition(maxNumOfGenerationCondition);
@@ -595,18 +563,22 @@ public class Controller implements Initializable///heloooooo
                         {
 
                             if (numOfGenerationCheckBox.isSelected()) {
-                                progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
+                                progress4Generation = (double) ui.getEngine().getNumOfGeneration() /
+                                        Integer.parseInt(numberOfGenerationTextField.getText());
                             }
                             if (bestFitnessCheckBox.isSelected()) {
-                                progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() / Double.parseDouble(bestFitnessTextField.getText());
+                                progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() /
+                                        Double.parseDouble(bestFitnessTextField.getText());
                             }
 
                             if (timerCheckBox.isSelected()) {
 
-                                progress4Timer = (double) timeCondition.getSecondLeft() / (60 * Integer.parseInt(timerTextField.getText()));
+                                progress4Timer = (double) timeCondition.getSecondLeft() /
+                                        (60 * Integer.parseInt(timerTextField.getText()));
                             }
 
-                           progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
+                           progress = Math.max(Math.max(progress4Generation, progress4Fitness),
+                                   progress4Timer);
                             updateProgress(progress, 1);
                         }
                     }
@@ -692,7 +664,8 @@ public class Controller implements Initializable///heloooooo
                 Integer hourInt = Integer.valueOf(hour);
                 // subjectNameLabel.setText(t.getSubject().getName());
                 label.textProperty().bind(Bindings.concat("Grade: ",t.getGrade().getName()," ID: ",
-                        t.getGrade().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().getName()," ID: ",
+                        t.getGrade().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().
+                                getName()," ID: ",
                         t.getSubject().getIdNumber()));
                 // teacherGridOptimalSolution.setConstraints.(subjectNameLabel,day,hour);
                 label.setWrapText(true);
@@ -702,6 +675,8 @@ public class Controller implements Initializable///heloooooo
         });
     }
 
+    XYChart.Series<String, Number> series = new XYChart.Series<>();
+
     @FXML void OnFileChooser(ActionEvent event)
     {
             fileChooserButton.setDisable(true);
@@ -710,10 +685,8 @@ public class Controller implements Initializable///heloooooo
             if(selectedFile == null)
             {fileChooserButton.setDisable(false);
                 return;}
-            teacherGridOptimalSolution.getChildren().clear();
-            teacherGridOptimalSolution.getChildren().removeAll();
+            clearInfoFromUser();
             m_SPNameLoadFile.set("File: " + selectedFile.getName());
-
             teacherChoiceBox.setOnAction(this::OnOptimalByTeacher);
             gradeChoiceBox.setOnAction(this::OnOptimalByGrade);
 
@@ -726,29 +699,38 @@ public class Controller implements Initializable///heloooooo
                 setTeachersChoiceBox();
                 setGradesChoiceBox();
 
-                ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
+                ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration,
+                                                              numberOfGeneration) -> {
 
                      Platform.runLater(() -> {
-                         if (!bestFitnessCheckBox.isSelected() || !(bestFitnessInCurrentGeneration > Double.parseDouble(bestFitnessTextField.getText()))) {
-                             m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
+                         if (!bestFitnessCheckBox.isSelected() ||
+                                 !(bestFitnessInCurrentGeneration > Double.parseDouble(
+                                         bestFitnessTextField.getText()))) {
+                             m_DPCurrentFitness.set(Double.parseDouble(
+                                     String.format("%.2f", bestFitnessInCurrentGeneration)));
                          }
                          updateOptimalByTeacher();
                          updateOptimalByGrade();
 
                          m_IPCurrentGeneration.set(numberOfGeneration);
-                         ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
                          provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
-                         updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
-                     });});
+                         updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).
+                                 toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
+                         updatesTableView.scrollTo(updatesTableView.getItems().size());
+
+
+                         series.getData().add(new XYChart.Data(((Integer)numberOfGeneration).toString(),
+                                 Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration))));
+                    });});
 
                 provideInfoFromFile();
 
-                m_DPProgress.unbind();
-                m_DPProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
+                //runProgressBar.progressProperty().unbind();
+               // runProgressBar.progressProperty().bind(m_DPProgress);
+               // m_DPProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
 
-                elitismLabel.textProperty().unbind();
-                elitismLabel.textProperty().bind(ui.getEngine().getSelection().getElitismProperty().asString());
-                ui.getEngine().getSelection().getElitismProperty().bind(m_SPElitism);
+
+                maxSizeChromosomes=ui.getTimeTable().getMaxSizeChromosomes();
                 m_SPMessageToUser.set("The xml file was loaded");
             }
             catch (JAXBException e)
@@ -764,7 +746,40 @@ public class Controller implements Initializable///heloooooo
                 m_SPMessageToUser.set(e.getMessage());
             }
 
+            saveErrorMessage=m_SPMessageToUser.get();
             fileChooserButton.setDisable(false);
+    }
+
+    private void clearInfoFromUser() {
+        m_SPMessageToUser.set("");
+        //time table
+        m_SPTeachersInfo.set("");
+        m_SPSubjectsInfo.set("");
+        m_SPGradesInfo.set("");
+        m_SPRulesInfo.set("");
+        teacherChoiceBox.getItems().clear();
+        gradeChoiceBox.getItems().clear();
+        teacherGridOptimalSolution.getChildren().clear();
+        gradeGridOptimalSolution.getChildren().clear();
+        updatesTableView.getItems().clear();
+        rulesTableView.getItems().clear();
+        series.getData().clear();
+        hardRulesAvgLabel.setText("0.0");
+        softRulesAvgLabel.setText("0.0");
+        rowsTableView.getItems().clear();
+
+        runProgressBar.progressProperty().unbind();
+        runProgressBar.progressProperty().bind(m_DPProgress);
+        m_DPProgress.set(ProgressBar.INDETERMINATE_PROGRESS);
+
+        //engine
+        if(ui.getEngine()!=null)
+            ui.getEngine().clear();
+        m_SPElitism.set("");
+        sizeOfPopulationLabel.setText("");
+        m_SPSelectionInfo.set("");
+        m_SPCrossoverInfo.set("");
+        //mutations
     }
 
 
@@ -808,53 +823,76 @@ public class Controller implements Initializable///heloooooo
         {
             m_SPMessageToUser.set("Can't run the algorithm before loading xml file");
         }
+        else if(ui.getEngine()==null)
+        {
+            m_SPMessageToUser.set(saveErrorMessage);
+            return;
+        }
         else
         {
             if(handleParametersBeforeRunning()) {
 
-                handleProgressBarBeforeRunning();
-                handleStopConditionBeforeRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
-                ui.getEngine().setNumberOfGenerationForUpdate(Integer.parseInt(numOfGeneration4Update.getText()));
-                ui.getNumOfGeneration2BestFitness().clear();
+                m_IPCurrentGeneration.set(0);
+                m_DPCurrentFitness.set(0.0);
+                handleStopConditionBeforeRunning(maxNumOfGenerationCondition, bestFitnessCondition,
+                        timeCondition);
+                ui.getEngine().setNumberOfGenerationForUpdate(Integer.parseInt(numOfGeneration4Update.
+                        getText()));
                 ui.getEngine().clear();
                 animationForRunAlgorithmButton();
                 handleControls2DisableBeforeRunning(true);
                 updatesTableView.getItems().clear();
+                series.getData().clear();
 
-
-                ui.setTaskEngine(new Task() {
-                    @Override
-                    public Object call(){
-                        try {
-                            ui.getEngine().run();
-                        }
-                       catch (Exception e)
-                       {
-                           Platform.runLater(()->{
-                               m_SPMessageToUser.set(e.getMessage());
-                           });
-                       }
-                        return null;
-                    }
-
-                    @Override
-                    protected void succeeded() {
-                        handleControls2DisableBeforeRunning(false);
-                        handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
-                        m_SPMessageToUser.set("The algorithm has run successfully");
-                    }
-
-                    @Override
-                    protected void running() {
-                        m_SPMessageToUser.set("Process...");
-                    }
-                });
-
+                ui.setTaskEngine(makeTaskForEngine());
                 ui.setThreadEngine(new Thread(ui.getTaskEngine()));
                 ui.getThreadEngine().setName("ThreadEngine");
+                handleProgressBarBeforeRunning();
                 ui.getThreadEngine().start();
             }
         }
+    }
+
+    private Task makeTaskForEngine()
+    {
+        return new Task() {
+            @Override
+            public Object call(){
+                try {
+                    ui.getEngine().run();
+                }
+                catch (Exception e)
+                {
+                    Platform.runLater(()->{
+                        m_SPMessageToUser.set("Exception in engine: " + e.getMessage());});
+                    this.setOnSucceeded(null);
+                }
+                return null;
+            }
+
+            private void finish()
+            {
+                handleControls2DisableBeforeRunning(false);
+                handleStopConditionAfterRunning(maxNumOfGenerationCondition, bestFitnessCondition,
+                        timeCondition);
+            }
+
+            @Override
+            protected void succeeded() {
+                finish();
+                m_SPMessageToUser.set("The algorithm has run successfully");
+            }
+
+            @Override
+            protected void running() {
+                m_SPMessageToUser.set("Process...");
+            }
+
+            @Override
+            protected void failed() {
+                finish();
+            }
+        };
     }
 
     @FXML void OnSizerChecked(ActionEvent event)
@@ -903,7 +941,11 @@ public class Controller implements Initializable///heloooooo
         {
             int newElitism=Integer.parseInt(changeElitismTextField.getText());
             if(newElitism < ui.getEngine().getSizeOfFirstPopulation())
-                m_SPElitism.set(newElitism);
+            {
+                m_SPElitism.set(changeElitismTextField.getText());
+                ui.getEngine().getSelection().setSizeOfElitism(newElitism);
+                m_SPMessageToUser.set("Elitism was changed");
+            }
             else m_SPMessageToUser.set("Elitism is bigger than size of population");
         }
     }
@@ -911,7 +953,6 @@ public class Controller implements Initializable///heloooooo
 
     @FXML void OnPauseResumeClick(ActionEvent event)
     {
-        //////////////////////handle timer need to Pause-Resume////////////////////////////////
         if(ui.getThreadEngine()!=null && ui.getThreadEngine().isAlive())
         {
             if(m_BPIsPause.get())
@@ -954,6 +995,12 @@ public class Controller implements Initializable///heloooooo
             synchronized (ui.getThreadEngine())
             {  ui.getThreadEngine().interrupt();}
 
+            if(!m_BPIsPause.get())
+            {
+                pauseResumeButton.setText("Pause");
+                m_BPIsPause.set(true);
+            }
+
             m_SPMessageToUser.set("The algorithm has stopped");
         }
     }
@@ -984,7 +1031,7 @@ public class Controller implements Initializable///heloooooo
         {
             String pte=PTETextfield.getText();
             if(pte!=null && !pte.equals("")){
-                tournament.setPTE(Integer.parseInt(pte));
+                tournament.setPTE(Double.parseDouble(pte));
                 tournament.setConfiguration("PTE= " + pte);
                 tournament.setSizeOfElitism(ui.getEngine().getSelection().getSizeOfElitism());
                 ui.getEngine().setSelection(tournament);
@@ -1010,6 +1057,76 @@ public class Controller implements Initializable///heloooooo
     { tournamentCheckBox.setSelected(tournamentCheckBox.isSelected() &&
             !(rouletteWheelCheckBox.isSelected() ||  truncationCheckBox.isSelected()));}
 
+    @FXML void OnChangeCrossover(ActionEvent event)
+    {
+        String cuttingPoints = cuttingPointsTextField.getText();
+
+        if(cuttingPoints == null || cuttingPoints.equals(""))
+        {
+            m_SPMessageToUser.set("The parameter 'cutting point' is empty");
+            return;
+        }
+
+        int cuttingPointsInt = Integer.parseInt(cuttingPoints);
+
+        if(dayTimeOrientedCheckBox.isSelected())
+        {
+            dayTimeOriented.setCuttingPoints(cuttingPointsInt);
+            ui.getEngine().setCrossover(dayTimeOriented);
+            m_SPMessageToUser.set("The Crossover mechanism has changed");
+        }
+
+        if(aspectOrientedCheckBox.isSelected())
+        {
+            aspectOriented.setCuttingPoints(cuttingPointsInt);
+
+            if(orientedByClass.isSelected())
+            {
+                aspectOriented.setOrientedBy("CLASS");
+            }
+            else if(orientedByTeacher.isSelected())
+            {
+                aspectOriented.setOrientedBy("TEACHER");
+            }
+            else
+            {
+                m_SPMessageToUser.set("The parameter 'oriented' was not selected");
+                return;
+            }
+
+            ui.getEngine().setCrossover(aspectOriented);
+            m_SPMessageToUser.set("The Crossover mechanism has changed");
+        }
+
+        m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
+    }
+
+    @FXML private void OnDayTimeOrientedSelected(ActionEvent event)
+    {
+        dayTimeOrientedCheckBox.setSelected(dayTimeOrientedCheckBox.isSelected() &&
+                !aspectOrientedCheckBox.isSelected());
+    }
+
+    @FXML private void OnAspectOrientedSelected(ActionEvent event)
+    {
+        aspectOrientedCheckBox.setSelected(aspectOrientedCheckBox.isSelected() &&
+                !dayTimeOrientedCheckBox.isSelected());
+    }
+
+    @FXML private void OnOrientedByClassSelected(ActionEvent event)
+    {
+        orientedByClass.setSelected(orientedByClass.isSelected() &&
+                !orientedByTeacher.isSelected());
+    }
+
+    @FXML private void OnOrientedByTeacherSelected(ActionEvent event)
+    {
+        orientedByTeacher.setSelected(orientedByTeacher.isSelected() &&
+                !orientedByClass.isSelected());
+    }
+
+    @FXML private void OnClearGraph(ActionEvent event)
+    {series.getData().clear();}
 
     @Override
     public void initialize(URL location1, ResourceBundle resources1) {
@@ -1018,11 +1135,9 @@ public class Controller implements Initializable///heloooooo
         myInitialize();
     }
 
-
-
     private void myInitialize()
     {
-        messageToUserTextBox.textProperty().bind(m_SPMessageToUser);
+        messageToUserTextArea.textProperty().bind(m_SPMessageToUser);
         loadFileTextBox.textProperty().bind(m_SPNameLoadFile);
         generation4Update.textProperty().bind(m_IPCurrentGeneration.asString());
         fitness4Update.textProperty().bind(m_DPCurrentFitness.asString());
@@ -1032,8 +1147,11 @@ public class Controller implements Initializable///heloooooo
         rulesTextArea.textProperty().bind(m_SPRulesInfo);
         selectionTextArea.textProperty().bind(m_SPSelectionInfo);
         changeElitismButton.disableProperty().bind(m_BPIsPause);
-        ChangeSelectionButton.disableProperty().bind(m_BPIsPause);
+        changeElitismTextField.disableProperty().bind(m_BPIsPause);
+        changeSelectionButton.disableProperty().bind(m_BPIsPause);
         crossoverTextArea.textProperty().bind(m_SPCrossoverInfo);
+        changeCrossoverButton.disableProperty().bind(m_BPIsPause);
+        elitismLabel.textProperty().bind(m_SPElitism);
 
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
@@ -1041,64 +1159,119 @@ public class Controller implements Initializable///heloooooo
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
+        LineChart.getData().add(series);
+        LineChart.setLegendVisible(false);
+
+
         numberOfGenerationTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 numberOfGenerationTextField.setText(newValue.replaceAll("[^\\d]", ""));
-            }});
+            }
+            else if(newValue!=null && !newValue.equals(""))
+            {
+                int value=Integer.parseInt(newValue);
+                if (value > 100000) {
+                    numberOfGenerationTextField.setText(oldValue);
+                }
+            }
+        });
 
         bestFitnessTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(oldValue.length() <= newValue.length()) {
+
                 m_SPBestFitness.set(newValue);
                 bestFitnessTextField.textProperty().bind(m_SPBestFitness);
                 if (!newValue.matches("\\d*")) {
-                    if (newValue.substring(0, newValue.length() - 1).contains(".") && newValue.endsWith(".")) {
+                    if (newValue.substring(0, newValue.length() - 1).contains(".") && newValue.endsWith(".")
+                            || newValue.endsWith("100.") || newValue.startsWith(".")) {
                         newValue = oldValue;
                     }
-
                     m_SPBestFitness.set(newValue.replaceAll("[^\\d.]", ""));
                 }
-                if(!newValue.equals("") && Double.parseDouble(newValue) > 100) {
+                else if(!newValue.equals("") && Double.parseDouble(newValue) > 100) {
                     m_SPBestFitness.set(oldValue);
                 }
                 bestFitnessTextField.textProperty().unbind();
-            }});
+        });
 
+        PTETextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            m_SPPTE.set(newValue);
+                PTETextfield.textProperty().bind( m_SPPTE);
+                if (!newValue.matches("\\d*")) {
+                    if (newValue.substring(0, newValue.length() - 1).contains(".") && newValue.endsWith(".")
+                    || newValue.endsWith("1.") || newValue.startsWith(".")) {
+                        newValue = oldValue;
+                    }
+                    m_SPPTE.set(newValue.replaceAll("[^\\d.]", ""));
+                }
+                else if(!newValue.equals("") && Double.parseDouble(newValue) > 1) {
+                    m_SPPTE.set(oldValue);
+                }
+                PTETextfield.textProperty().unbind();
+        });
 
         timerTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 timerTextField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            else if(newValue!=null && !newValue.equals(""))
+            {
+                int value=Integer.parseInt(newValue);
+                if (value > 60) {
+                    timerTextField.setText(oldValue);
+                }
             }
         });
 
         numOfGeneration4Update.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 numOfGeneration4Update.setText(newValue.replaceAll("[^\\d]", ""));
-            }});
+            }
+            else if(newValue!=null && !newValue.equals(""))
+            {
+                int value=Integer.parseInt(newValue);
+                if (value > 100000) {
+                    numOfGeneration4Update.setText(oldValue);
+                }
+            }
+        });
 
         changeElitismTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 changeElitismTextField.setText(newValue.replaceAll("[^\\d]", ""));
-            }});
+            }
+            else if(ui.getEngine()!=null)
+            {
+                if(newValue!=null && !newValue.equals(""))
+                {
+                    int value=Integer.parseInt(newValue);
+                    if (value > ui.getEngine().getSizeOfFirstPopulation()) {
+                        changeElitismTextField.setText(oldValue);
+                    }
+                }
+            }
+        });
 
         topPercentTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 topPercentTextField.setText(newValue.replaceAll("[^\\d]", ""));
             }
-            if(newValue!=null && !newValue.equals("")){
+            else if(newValue!=null && !newValue.equals("")){
             int value=Integer.parseInt(newValue);
             if (value > 100 || value<=0) {
                 topPercentTextField.setText(oldValue);
             }}
         });
 
-        PTETextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+        cuttingPointsTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                PTETextfield.setText(newValue.replaceAll("[^\\d]", ""));
+                cuttingPointsTextField.setText(newValue.replaceAll("[^\\d]", ""));
             }
-            if(newValue!=null && !newValue.equals("")){
-            if (Integer.parseInt(newValue) > 1) {
-                PTETextfield.setText(oldValue);
-            }}
+            else if(newValue!=null && !newValue.equals("")){
+                int value=Integer.parseInt(newValue);
+                if (value > maxSizeChromosomes || value<=0) {
+                    cuttingPointsTextField.setText(oldValue);
+                }}
         });
 
         nameRulTableColumn.setCellValueFactory(new PropertyValueFactory("Name"));

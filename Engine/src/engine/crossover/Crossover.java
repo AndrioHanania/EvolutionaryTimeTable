@@ -15,6 +15,9 @@ public abstract class Crossover
     {
 
     }
+
+    public void setCuttingPoints(int cuttingPoints){m_NumOfCuttingPoints=cuttingPoints;}
+
     public abstract List<Solution> execute(Solution parent1, Solution parent2);
 
    public void setConfiguration(String configuration){m_Configuration= configuration; }

@@ -8,7 +8,7 @@ public class RouletteWheel extends Selection
     //Methods
     @Override
     public String toString() {
-        return "Name: RouletteWheel, " + super.toString();
+        return "Name: RouletteWheel";
     }
 
     @Override

@@ -18,7 +18,7 @@ public class Truncation extends Selection
     //Methods
     @Override
     public String toString() {
-        return "Name: Truncation, " + "Top percent: " + m_TopPercent + ", "+ super.toString();
+        return "Name: Truncation, " + "Top percent: " + m_TopPercent;
     }
 
     public void setTopPercent(int topPercent){m_TopPercent=topPercent;}

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.shape.*?>
 <?import java.lang.*?>
@@ -72,10 +73,12 @@
                         <ProgressBar fx:id="runProgressBar" prefWidth="200.0" />
                         <Button fx:id="pauseResumeButton" mnemonicParsing="false" onAction="#OnPauseResumeClick" text="Pause" />
                         <Button fx:id="stopRunButton" mnemonicParsing="false" onAction="#OnStopRunClick" text="Stop" />
-                        <Label fx:id="messageToUserTextBox">
+                        <Label text="Messages: " />
+                        <TextArea fx:id="messageToUserTextArea" prefHeight="72.0" prefWidth="530.0">
                            <font>
-                              <Font name="System Bold Italic" size="34.0" />
-                           </font></Label>
+                              <Font name="System Bold Italic" size="29.0" />
+                           </font>
+                        </TextArea>
                      </children>
                   </HBox>
                   <Accordion GridPane.columnIndex="5" GridPane.rowIndex="2" GridPane.rowSpan="3">
@@ -240,6 +243,33 @@
                               </AnchorPane>
                           </content>
                         </Tab>
+                        <Tab text="Development graph">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart fx:id="LineChart" layoutX="136.0" layoutY="53.0" AnchorPane.bottomAnchor="129.0" AnchorPane.leftAnchor="136.0" AnchorPane.rightAnchor="92.0" AnchorPane.topAnchor="53.0">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis prefHeight="342.0" prefWidth="32.0" side="LEFT" />
+                                      </yAxis>
+                                    </LineChart>
+                                    <Label layoutX="-85.0" layoutY="183.0" prefHeight="52.0" prefWidth="254.0" rotate="-90.0" text="Fitness" textAlignment="JUSTIFY">
+                                       <font>
+                                          <Font size="39.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="420.0" layoutY="514.0" prefHeight="39.0" prefWidth="207.0" text="Generation">
+                                       <font>
+                                          <Font size="37.0" />
+                                       </font>
+                                    </Label>
+                                    <Button layoutX="455.0" layoutY="14.0" mnemonicParsing="false" onAction="#OnClearGraph" text="Clear graph" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
                     </tabs>
                   </TabPane>
                   <HBox prefHeight="100.0" prefWidth="200.0" spacing="25.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
@@ -272,14 +302,17 @@
                   </ToolBar>
                   <Accordion GridPane.rowIndex="2" GridPane.rowSpan="3">
                     <panes>
-                        <TitledPane prefHeight="200.0" prefWidth="200.0" text="Elitism">
+                        <TitledPane prefHeight="200.0" prefWidth="200.0" text="Elitism &amp; Population">
                            <content>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                  <children>
                                     <Label layoutX="14.0" layoutY="60.0" text="size of elitism: " />
-                                    <TextField fx:id="changeElitismTextField" layoutX="40.0" layoutY="197.0" />
-                                    <Button fx:id="changeElitismButton" layoutX="83.0" layoutY="255.0" mnemonicParsing="false" onAction="#OnChangeElitism" text="Change size" />
+                                    <TextField fx:id="changeElitismTextField" layoutX="32.0" layoutY="119.0" />
+                                    <Button fx:id="changeElitismButton" layoutX="75.0" layoutY="186.0" mnemonicParsing="false" onAction="#OnChangeElitism" text="Change size" />
                                     <Label fx:id="elitismLabel" layoutX="125.0" layoutY="60.0" />
+                                    <Label layoutX="15.0" layoutY="302.0" text="size of population: " />
+                                    <Label fx:id="sizeOfPopulationLabel" layoutX="148.0" layoutY="302.0" />
+                                    <Line endX="100.0" layoutX="141.0" layoutY="257.0" startX="-100.0" />
                                  </children>
                               </AnchorPane>
                            </content>
@@ -291,7 +324,7 @@
                                     <TextArea fx:id="selectionTextArea" layoutX="17.0" layoutY="25.0" maxHeight="65.0" maxWidth="232.0" minHeight="65.0" minWidth="232.0" prefHeight="65.0" prefWidth="232.0" AnchorPane.bottomAnchor="370.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="25.0" />
                                     <Label layoutX="15.0" layoutY="223.0" text="Top Percent: " />
                                     <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="218.0" maxHeight="31.0" maxWidth="120.0" />
-                                    <Button fx:id="ChangeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
+                                    <Button fx:id="changeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
                                     <CheckBox fx:id="truncationCheckBox" layoutX="56.0" layoutY="189.0" mnemonicParsing="false" onAction="#OnTruncationSelected" text="Truncation: " AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="175.0" />
                                     <Line endX="135.0" layoutX="134.0" layoutY="256.0" startX="-135.0" />
                                     <CheckBox fx:id="rouletteWheelCheckBox" layoutX="56.0" layoutY="267.0" mnemonicParsing="false" onAction="#OnRouletteWheelSelected" text="RouletteWheel: " AnchorPane.leftAnchor="56.0" />
@@ -359,7 +392,7 @@
                                                 <Insets top="20.0" />
                                              </VBox.margin>
                                           </Line>
-                                          <Button fx:id="changeCrossover" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
+                                          <Button fx:id="changeCrossoverButton" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
                                              <VBox.margin>
                                                 <Insets left="50.0" top="40.0" />
                                              </VBox.margin>
