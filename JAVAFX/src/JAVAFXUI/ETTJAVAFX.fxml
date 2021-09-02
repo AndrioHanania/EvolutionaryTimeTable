@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -22,10 +29,9 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
          <top>
@@ -282,44 +288,90 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TextArea fx:id="selectionTextArea" layoutX="1.0" layoutY="31.0" AnchorPane.bottomAnchor="460.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="15.0" />
-                                    <Label layoutX="14.0" layoutY="4.0" text="Curent Selection technique: " />
-                                    <Label layoutX="15.0" layoutY="117.0" text="Top Percent: " />
-                                    <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="112.0" maxHeight="31.0" maxWidth="120.0" />
+                                    <TextArea fx:id="selectionTextArea" layoutX="17.0" layoutY="25.0" maxHeight="65.0" maxWidth="232.0" minHeight="65.0" minWidth="232.0" prefHeight="65.0" prefWidth="232.0" AnchorPane.bottomAnchor="370.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="25.0" />
+                                    <Label layoutX="15.0" layoutY="223.0" text="Top Percent: " />
+                                    <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="218.0" maxHeight="31.0" maxWidth="120.0" />
                                     <Button fx:id="ChangeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
-                                    <CheckBox fx:id="truncationCheckBox" layoutX="32.0" layoutY="83.0" mnemonicParsing="false" onAction="#OnTruncationSelected" text="Truncation: " AnchorPane.leftAnchor="32.0" />
-                                    <Line endX="100.0" layoutX="134.0" layoutY="150.0" startX="-100.0" />
-                                    <CheckBox fx:id="rouletteWheelCheckBox" layoutX="32.0" layoutY="161.0" mnemonicParsing="false" onAction="#OnRouletteWheelSelected" text="RouletteWheel: " AnchorPane.leftAnchor="32.0" />
-                                    <Line endX="100.0" layoutX="134.0" layoutY="200.0" startX="-100.0" />
-                                    <CheckBox fx:id="tournamentCheckBox" layoutX="32.0" layoutY="223.0" mnemonicParsing="false" onAction="#OnTournamentSelected" text="Tournament: " AnchorPane.leftAnchor="32.0" />
-                                    <Label layoutX="18.0" layoutY="257.0" text="PTE: " />
-                                    <TextField fx:id="PTETextfield" layoutX="66.0" layoutY="252.0" maxHeight="31.0" maxWidth="120.0" />
-                                    <Line endX="100.0" layoutX="126.0" layoutY="300.0" startX="-100.0" />
+                                    <CheckBox fx:id="truncationCheckBox" layoutX="56.0" layoutY="189.0" mnemonicParsing="false" onAction="#OnTruncationSelected" text="Truncation: " AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="175.0" />
+                                    <Line endX="135.0" layoutX="134.0" layoutY="256.0" startX="-135.0" />
+                                    <CheckBox fx:id="rouletteWheelCheckBox" layoutX="56.0" layoutY="267.0" mnemonicParsing="false" onAction="#OnRouletteWheelSelected" text="RouletteWheel: " AnchorPane.leftAnchor="56.0" />
+                                    <Line endX="135.0" layoutX="134.0" layoutY="306.0" startX="-135.0" />
+                                    <CheckBox fx:id="tournamentCheckBox" layoutX="56.0" layoutY="329.0" mnemonicParsing="false" onAction="#OnTournamentSelected" text="Tournament: " AnchorPane.leftAnchor="56.0" />
+                                    <Label layoutX="18.0" layoutY="363.0" text="PTE: " />
+                                    <TextField fx:id="PTETextfield" layoutX="66.0" layoutY="358.0" maxHeight="31.0" maxWidth="120.0" />
+                                    <Line endX="140.0" layoutX="126.0" layoutY="406.0" startX="-130.0" />
+                                    <Label layoutX="14.0" layoutY="4.0" text="Cuurent Selection technique: " />
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="false" text="Crossover">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <VBox layoutX="7.0" layoutY="6.0" prefHeight="477.0" prefWidth="256.0" AnchorPane.bottomAnchor="-10.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="-11.0">
+                                       <children>
+                                          <Label text="Current crossover mechanism: " />
+                                          <TextArea fx:id="crossoverTextArea" prefHeight="88.0" prefWidth="264.0" />
+                                          <CheckBox fx:id="dayTimeOrientedCheckBox" mnemonicParsing="false" onAction="#OnDayTimeOrientedSelected" text="Daytime Oriented: ">
+                                             <VBox.margin>
+                                                <Insets bottom="10.0" left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </CheckBox>
+                                          <Line endX="160.0" startX="-100.0" />
+                                          <CheckBox fx:id="aspectOrientedCheckBox" mnemonicParsing="false" onAction="#OnAspectOrientedSelected" text="Aspect Oriented: ">
+                                             <VBox.margin>
+                                                <Insets bottom="10.0" left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </CheckBox>
+                                          <Label text="Orientation: ">
+                                             <VBox.margin>
+                                                <Insets left="10.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <CheckBox fx:id="orientedByClass" mnemonicParsing="false" onAction="#OnOrientedByClassSelected" text="Class">
+                                             <VBox.margin>
+                                                <Insets left="110.0" top="-20.0" />
+                                             </VBox.margin>
+                                          </CheckBox>
+                                          <CheckBox fx:id="orientedByTeacher" mnemonicParsing="false" onAction="#OnOrientedByTeacherSelected" text="Teacher">
+                                             <VBox.margin>
+                                                <Insets left="110.0" top="10.0" />
+                                             </VBox.margin>
+                                          </CheckBox>
+                                          <Line endX="160.0" startX="-100.0">
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </Line>
+                                          <Label text="Cutting point (For all options): ">
+                                             <VBox.margin>
+                                                <Insets left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <TextField fx:id="cuttingPointsTextField" prefHeight="31.0" prefWidth="210.0">
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </TextField>
+                                          <Line endX="160.0" startX="-100.0">
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </Line>
+                                          <Button fx:id="changeCrossover" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
+                                             <VBox.margin>
+                                                <Insets left="50.0" top="40.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
                                  </children></AnchorPane>
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" text="untitled 2">
+                      <TitledPane animated="false" text="untitled 3">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </TitledPane>
-                      <TitledPane animated="false" text="Mutation">
-                        <content>
-                          <AnchorPane fx:id="mutationSwitch" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <TableView layoutX="36.0" layoutY="450.0" prefHeight="56.0" prefWidth="119.0">
-                                      <columns>
-                                        <TableColumn fx:id="flippingControl" prefWidth="107.0" text="Flipping" />
-                                        <TableColumn fx:id="sizerControl" prefWidth="110.0" text="Sizer" />
-                                      </columns>
-                                    </TableView>
-                                    <Label layoutX="26.0" layoutY="6.0" prefHeight="30.0" prefWidth="195.0" text="Mutation technique to alter:" />
-                                    <CheckBox fx:id="flippingCheckBox" layoutX="20.0" layoutY="38.0" mnemonicParsing="false" onAction="#OnFlippingChecked" prefHeight="93.0" prefWidth="85.0" text="Flipping" />
-                                    <CheckBox fx:id="sizerCheckBox" layoutX="142.0" layoutY="79.0" mnemonicParsing="false" onAction="#OnSizerChecked" prefHeight="17.0" prefWidth="87.0" text="Sizer" />
-                                    <Label layoutX="57.0" layoutY="115.0" prefHeight="17.0" prefWidth="116.0" text="Top Percent" />
-                                    <TextField fx:id="flippingTopPercentTextField" disable="true" layoutX="11.0" layoutY="163.0" prefHeight="25.0" prefWidth="78.0" />
-                                    <TextField fx:id="sizerTopPercentTextField" disable="true" layoutX="140.0" layoutY="163.0" prefHeight="25.0" prefWidth="92.0" />
-                                 </children></AnchorPane>
                         </content>
                       </TitledPane>
                     </panes>

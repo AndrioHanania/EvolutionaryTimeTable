@@ -47,7 +47,6 @@ public class Controller implements Initializable///heloooooo
     {
 
     }
-    //note
 
     JavaFxUI ui = new JavaFxUI();
 
@@ -121,6 +120,42 @@ public class Controller implements Initializable///heloooooo
 
 
 
+    @FXML private TextArea crossoverTextArea;
+    @FXML private Button changeCrossover;
+    @FXML private CheckBox dayTimeOrientedCheckBox;
+    @FXML private CheckBox aspectOrientedCheckBox;
+    @FXML private CheckBox orientedByClass;
+    @FXML private CheckBox orientedByTeacher;
+    @FXML private CheckBox cuttingPointsTextField;
+
+    @FXML void OnChangeCrossover(ActionEvent event)
+    {
+
+
+    }
+
+    @FXML private void OnDayTimeOrientedSelected(ActionEvent event)
+    {
+
+    }
+
+    @FXML private void voidOnAspectOrientedSelected(ActionEvent event)
+    {
+
+    }
+
+    @FXML private void OnOrientedByClassSelected(ActionEvent event)
+    {
+
+    }
+
+    @FXML private void OnOrientedByTeacherSelected(ActionEvent event)
+    {
+
+    }
+
+
+
 
 
     BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
@@ -130,11 +165,12 @@ public class Controller implements Initializable///heloooooo
     StringProperty m_SPMessageToUser = new SimpleStringProperty();
     StringProperty m_SPNameLoadFile = new SimpleStringProperty("File: ");
     StringProperty m_SPBestFitness = new SimpleStringProperty();
-    StringProperty  m_SPTeachersInfo = new SimpleStringProperty();
-    StringProperty  m_SPSubjectsInfo = new SimpleStringProperty();
-    StringProperty  m_SPGradesInfo = new SimpleStringProperty();
-    StringProperty  m_SPRulesInfo = new SimpleStringProperty();
+    StringProperty m_SPTeachersInfo = new SimpleStringProperty();
+    StringProperty m_SPSubjectsInfo = new SimpleStringProperty();
+    StringProperty m_SPGradesInfo = new SimpleStringProperty();
+    StringProperty m_SPRulesInfo = new SimpleStringProperty();
     StringProperty m_SPSelectionInfo = new SimpleStringProperty();
+    StringProperty m_SPCrossoverInfo = new SimpleStringProperty();
     DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
 
 
@@ -163,10 +199,23 @@ public class Controller implements Initializable///heloooooo
 
 
 
+
+
+
     //reminder that some codes need to be in synchronized!!!!!
+
+
+
+
+
 
     private void addToObservableListOfRules(ProductRule productRule){observableListOfRules.add(productRule);}
     private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
+
+
+
+
+
 
 
     private void provideInfoAboutGradesFromOptimalSolution(TimeTable optimalTimetable,String grade)
@@ -197,12 +246,12 @@ public class Controller implements Initializable///heloooooo
                     label.textProperty().bind(Bindings.concat("Teacher: ",t.getTeacher().getName()," ID: ",
                             t.getTeacher().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().getName()," ID: ",
                             t.getSubject().getIdNumber()));
-
                     gradeGridOptimalSolution.add(label,dayInt,hourInt);
                 }
             });
         }
     }
+
 
         /*
         for (TimeTableChromosome chromosome : chromosomes)
@@ -310,12 +359,8 @@ public class Controller implements Initializable///heloooooo
         provideInfoAboutGrades();
         provideInfoAboutRules();
         //engine
-        provideInfoAboutSelection();
-    }
-
-    private void provideInfoAboutSelection()
-    {
         m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
+        m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
     }
 
     private void provideInfoAboutRules() {
@@ -539,26 +584,31 @@ public class Controller implements Initializable///heloooooo
                 @Override
                 protected Void call() throws Exception {
 
-                    //while (ui.getThreadEngine().isAlive()) + קריאה ךמתודה הזאת רק אחרי הפעלת טריד האלגוריתם
+                    double progress4Generation = 0;
+                    double progress4Fitness = 0;
+                    double progress4Timer = 0;
+                    double progress=0;
+
                     while (!ui.getEngine().isFinishToRun())
                     {
-                        double progress4Generation = 0;
-                        double progress4Fitness = 0;
-                        double progress4Timer = 0;
+                        if(m_BPIsPause.get())//isnot
+                        {
 
-                        if (numOfGenerationCheckBox.isSelected()) {
-                            progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
-                        }
-                        if (bestFitnessCheckBox.isSelected()) {
-                            progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() / Double.parseDouble(bestFitnessTextField.getText());
-                        }
-                        if (timerCheckBox.isSelected()) {
-                            progress4Timer = (double) timeCondition.getSecondLeft() / (60 * Integer.parseInt(timerTextField.getText()));
-                        }
+                            if (numOfGenerationCheckBox.isSelected()) {
+                                progress4Generation = (double) ui.getEngine().getNumOfGeneration() / Integer.parseInt(numberOfGenerationTextField.getText());
+                            }
+                            if (bestFitnessCheckBox.isSelected()) {
+                                progress4Fitness = ui.getEngine().getBestFitnessInCurrentGeneration() / Double.parseDouble(bestFitnessTextField.getText());
+                            }
 
-                        double progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
-                        updateProgress(progress, 1);
+                            if (timerCheckBox.isSelected()) {
 
+                                progress4Timer = (double) timeCondition.getSecondLeft() / (60 * Integer.parseInt(timerTextField.getText()));
+                            }
+
+                           progress = Math.max(Math.max(progress4Generation, progress4Fitness), progress4Timer);
+                            updateProgress(progress, 1);
+                        }
                     }
                     return null;
                 }
@@ -677,17 +727,13 @@ public class Controller implements Initializable///heloooooo
                 setGradesChoiceBox();
 
                 ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
-                     Platform.runLater(() -> {
-                         //if(!bestFitnessCheckBox.isSelected() && bestFitnessInCurrentGeneration <= Double.parseDouble(bestFitnessTextField.getText()))
-                                //m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
-                         updateOptimalByTeacher();
-                         updateOptimalByGrade();
 
-                         if(bestFitnessCheckBox.isSelected() && bestFitnessInCurrentGeneration > Double.parseDouble(bestFitnessTextField.getText())) {
-                         }
-                         else {
+                     Platform.runLater(() -> {
+                         if (!bestFitnessCheckBox.isSelected() || !(bestFitnessInCurrentGeneration > Double.parseDouble(bestFitnessTextField.getText()))) {
                              m_DPCurrentFitness.set(Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration)));
                          }
+                         updateOptimalByTeacher();
+                         updateOptimalByGrade();
 
                          m_IPCurrentGeneration.set(numberOfGeneration);
                          ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
@@ -703,9 +749,6 @@ public class Controller implements Initializable///heloooooo
                 elitismLabel.textProperty().unbind();
                 elitismLabel.textProperty().bind(ui.getEngine().getSelection().getElitismProperty().asString());
                 ui.getEngine().getSelection().getElitismProperty().bind(m_SPElitism);
-
-                m_SPSelectionInfo.unbind();
-                m_SPSelectionInfo.bind(ui.getEngine().getSelection().toStringProperty());
                 m_SPMessageToUser.set("The xml file was loaded");
             }
             catch (JAXBException e)
@@ -768,6 +811,7 @@ public class Controller implements Initializable///heloooooo
         else
         {
             if(handleParametersBeforeRunning()) {
+
                 handleProgressBarBeforeRunning();
                 handleStopConditionBeforeRunning(maxNumOfGenerationCondition, bestFitnessCondition, timeCondition);
                 ui.getEngine().setNumberOfGenerationForUpdate(Integer.parseInt(numOfGeneration4Update.getText()));
@@ -892,9 +936,8 @@ public class Controller implements Initializable///heloooooo
     }
 
 
-    @FXML void OnStopRunClick(ActionEvent event) {
-        //////////////////////handle timer need to stop////////////////////////////////
-
+    @FXML void OnStopRunClick(ActionEvent event)
+    {
         if(ui.getThreadEngine()==null || runProgressBar.getProgress() <=0)
         {
             m_SPMessageToUser.set("The algorithm hasn't started yet");
@@ -910,6 +953,8 @@ public class Controller implements Initializable///heloooooo
 
             synchronized (ui.getThreadEngine())
             {  ui.getThreadEngine().interrupt();}
+
+            m_SPMessageToUser.set("The algorithm has stopped");
         }
     }
 
@@ -948,8 +993,7 @@ public class Controller implements Initializable///heloooooo
             else m_SPMessageToUser.set("The parameter 'PTE' is empty");
         }
 
-        m_SPSelectionInfo.unbind();
-        m_SPSelectionInfo.bind(ui.getEngine().getSelection().toStringProperty());
+        m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
     }
 
 
@@ -989,6 +1033,7 @@ public class Controller implements Initializable///heloooooo
         selectionTextArea.textProperty().bind(m_SPSelectionInfo);
         changeElitismButton.disableProperty().bind(m_BPIsPause);
         ChangeSelectionButton.disableProperty().bind(m_BPIsPause);
+        crossoverTextArea.textProperty().bind(m_SPCrossoverInfo);
 
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
