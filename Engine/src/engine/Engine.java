@@ -258,6 +258,10 @@ public class  Engine  implements Runnable
 
     public boolean isFinishToRun(){return m_IsFinishToRun;}
 
+    public List<Mutation> getMutations()
+    {
+        return m_Mutations;
+    }
     public Selection getSelection()
     {
         return m_Selection;

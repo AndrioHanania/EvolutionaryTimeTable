@@ -1,5 +1,6 @@
 package JAVAFXUI;
 
+import engine.mutation.Mutation;
 import engine.selection.RouletteWheel;
 import engine.selection.Tournament;
 import engine.selection.Truncation;
@@ -26,6 +27,8 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import timeTable.Grade;
+import timeTable.Mutation.Flipping;
+import timeTable.Mutation.Sizer;
 import timeTable.Rules.Rule;
 import timeTable.Subject;
 import timeTable.Teacher;
@@ -89,8 +92,15 @@ public class Controller implements Initializable///heloooooo
     @FXML private TableView<ProductRule> rulesTableView;
     @FXML private TableView<ProductUpdate> updatesTableView;
     @FXML private TableView<ProductRow> rowsTableView;
-    @FXML private TableView<ProductTeacher> teachersTableView;
-    @FXML private TableView<ProductGrade> gradesTableView;
+
+
+    @FXML private TableView<Sizer> sizerTableView;
+    @FXML private TableView<Flipping> flippingTableView;
+    @FXML private TableColumn<Flipping,String> flippingProbabilityTableCol;
+    @FXML private TableColumn<Flipping,String> flippingComponentTableCol;
+    @FXML private TableColumn<Flipping,String> flippingMaxTupplesTableCol;
+
+
     @FXML private CheckBox truncationCheckBox;
     @FXML private CheckBox rouletteWheelCheckBox;
     @FXML private CheckBox tournamentCheckBox;
@@ -188,6 +198,7 @@ public class Controller implements Initializable///heloooooo
     ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
     ObservableList<String> observableListOfTeachers = FXCollections.observableArrayList();
     ObservableList<String> observableListOfGrades = FXCollections.observableArrayList();
+    ObservableList<Flipping> observableListOfFlipping = FXCollections.observableArrayList();
 
 
     TimeTable m_Timetable;
@@ -210,6 +221,7 @@ public class Controller implements Initializable///heloooooo
 
     private void addToObservableListOfRules(ProductRule productRule){observableListOfRules.add(productRule);}
     private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
+    private void addToObservableListOfFlipping(Flipping flipping){observableListOfFlipping.add(flipping);}
 
 
 
@@ -315,6 +327,45 @@ public class Controller implements Initializable///heloooooo
 
     }
 
+    private void provideInfoAboutMutations(TimeTable timeTable)
+    {
+        flippingTableView.getItems().clear();
+        observableListOfFlipping.clear();
+        flippingTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+       // flippingTableView.getColumns().add(flippingProbabilityTableCol);
+      //  flippingTableView.getColumns().add(flippingComponentTableCol);
+      //  flippingTableView.getColumns().add(flippingMaxTupplesTableCol);
+        List<Mutation> mutations =  ui.getEngine().getMutations();
+        for(Mutation mutation : mutations)
+        {
+            if(mutation.getClass().equals(Flipping.class))
+            {
+                Flipping flip = (Flipping) mutation;
+                addToObservableListOfFlipping(flip);
+            }
+        }
+      //  addToObservableListOfFlipping(new Flipping(4, 'c',3));
+       // same as flippingTableView.getItems().add(new Flipping(4, 'c',3));
+        flippingTableView.setItems(observableListOfFlipping);
+
+
+        if (m_BPIsPause.get()) {
+            flippingTableView.setEditable(true);
+        }
+      //  flippingProbabilityTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+      //  flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+      //  flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+       // flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+
+       // flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.<Flipping, String>forTableColumn(new DefaultStringConverter()));
+
+    }
+
+
+
     //private void provideInfoAboutTeacher
     private void provideInfoAboutRowsFromOptimalSolution(TimeTable timeTable)
     {
@@ -357,6 +408,7 @@ public class Controller implements Initializable///heloooooo
         provideInfoAboutSubjects();
         provideInfoAboutGrades();
         provideInfoAboutRules();
+        provideInfoAboutMutations(ui.getTimeTable());
         //engine
         m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
         m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
@@ -631,6 +683,7 @@ public class Controller implements Initializable///heloooooo
     {
         provideInfoAboutRulesAndFitnessFromOptimalSolution(timeTable);
         provideInfoAboutRowsFromOptimalSolution(timeTable);
+
 
     }
 
@@ -1113,6 +1166,14 @@ public class Controller implements Initializable///heloooooo
         teacherRowTableColumn.setCellValueFactory(new PropertyValueFactory("Teacher"));
         gradeRowTableColumn.setCellValueFactory(new PropertyValueFactory("Grade"));
         subjectRowTableColumn.setCellValueFactory(new PropertyValueFactory("Subject"));
+
+        flippingProbabilityTableCol.setCellValueFactory(new PropertyValueFactory("Probability"));
+        flippingComponentTableCol.setCellValueFactory(new PropertyValueFactory("Component"));
+        flippingMaxTupplesTableCol.setCellValueFactory(new PropertyValueFactory("MaxTupples"));
+
+   //    flippingProbabilityTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        //flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+       // flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
     }
 
 
