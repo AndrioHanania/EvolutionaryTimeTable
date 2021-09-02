@@ -19,6 +19,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -31,6 +32,8 @@ import timeTable.Subject;
 import timeTable.Teacher;
 import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
+import timeTable.crossover.AspectOriented;
+import timeTable.crossover.DayTimeOriented;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -96,7 +99,7 @@ public class Controller implements Initializable///heloooooo
     @FXML private CheckBox tournamentCheckBox;
     @FXML private TextField topPercentTextField;
     @FXML private TextField PTETextfield;
-    @FXML private Button ChangeSelectionButton;
+    @FXML private Button changeSelectionButton;
 
     @FXML private AnchorPane mutationSwitch;
 
@@ -121,38 +124,18 @@ public class Controller implements Initializable///heloooooo
 
 
     @FXML private TextArea crossoverTextArea;
-    @FXML private Button changeCrossover;
+    @FXML private Button changeCrossoverButton;
     @FXML private CheckBox dayTimeOrientedCheckBox;
     @FXML private CheckBox aspectOrientedCheckBox;
     @FXML private CheckBox orientedByClass;
     @FXML private CheckBox orientedByTeacher;
-    @FXML private CheckBox cuttingPointsTextField;
+    @FXML private TextField cuttingPointsTextField;
 
-    @FXML void OnChangeCrossover(ActionEvent event)
-    {
+    @FXML private javafx.scene.chart.LineChart<String, Number> LineChart;
 
 
-    }
 
-    @FXML private void OnDayTimeOrientedSelected(ActionEvent event)
-    {
 
-    }
-
-    @FXML private void voidOnAspectOrientedSelected(ActionEvent event)
-    {
-
-    }
-
-    @FXML private void OnOrientedByClassSelected(ActionEvent event)
-    {
-
-    }
-
-    @FXML private void OnOrientedByTeacherSelected(ActionEvent event)
-    {
-
-    }
 
 
 
@@ -171,18 +154,22 @@ public class Controller implements Initializable///heloooooo
     StringProperty m_SPRulesInfo = new SimpleStringProperty();
     StringProperty m_SPSelectionInfo = new SimpleStringProperty();
     StringProperty m_SPCrossoverInfo = new SimpleStringProperty();
+    StringProperty pte=new SimpleStringProperty();
     DoubleProperty m_DPProgress = new SimpleDoubleProperty(0.0);
 
-
-    //Casual reboot--Stop Conditions--//
+    //Casual reboot
+    //-Stop Conditions--//
     MaxNumOfGenerationCondition maxNumOfGenerationCondition =new MaxNumOfGenerationCondition(0);
     BestFitnessCondition bestFitnessCondition = new BestFitnessCondition(0);
     TimeCondition timeCondition = new TimeCondition(0);
 
-    //Casual reboot
+    //-Selections--//
     Truncation truncation = new Truncation(1);
     RouletteWheel rouletteWheel = new RouletteWheel();
     Tournament tournament = new Tournament(0);
+    //-Crossovers--//
+    DayTimeOriented dayTimeOriented = new DayTimeOriented(0);
+    AspectOriented aspectOriented = new AspectOriented(0, "");
 
 
     ObservableList<ProductRule> observableListOfRules = FXCollections.observableArrayList();
@@ -192,6 +179,7 @@ public class Controller implements Initializable///heloooooo
 
 
     TimeTable m_Timetable;
+    private int maxSizeChromosomes = 0;
     List<Teacher> m_Teachers=new ArrayList<>();
     List<String> m_TeachersNames =new ArrayList<>();
     List<Grade> m_Grades = new ArrayList<>();
@@ -702,6 +690,8 @@ public class Controller implements Initializable///heloooooo
         });
     }
 
+    XYChart.Series<String, Number> series = new XYChart.Series<>();
+
     @FXML void OnFileChooser(ActionEvent event)
     {
             fileChooserButton.setDisable(true);
@@ -725,6 +715,8 @@ public class Controller implements Initializable///heloooooo
                 m_Timetable = ui.getTimeTable();
                 setTeachersChoiceBox();
                 setGradesChoiceBox();
+                LineChart.getData().clear();
+                series.getData().clear();
 
                 ui.getEngine().addListenerToUpdateGeneration((bestFitnessInCurrentGeneration, numberOfGeneration) -> {
 
@@ -739,6 +731,18 @@ public class Controller implements Initializable///heloooooo
                          ui.getNumOfGeneration2BestFitness().put(numberOfGeneration, bestFitnessInCurrentGeneration);
                          provideInfoFromOptimalSolution((TimeTable) ui.getEngine().getOptimalSolution());
                          updatesTableView.getItems().add(new ProductUpdate(((Integer)numberOfGeneration).toString(), String.format("%.2f", bestFitnessInCurrentGeneration))  );
+                         updatesTableView.scrollTo(updatesTableView.getItems().size());
+
+                        /* LineChart.getData().clear();
+                         series.getData().add(new XYChart.Data(((Integer)numberOfGeneration).toString(),
+                                 Double.parseDouble(String.format("%.2f", bestFitnessInCurrentGeneration))));
+
+
+                         LineChart.getData().add(series);*/
+
+
+
+                         // LineChart.getData().add(new XYChart.Series<Integer,Double>(new XYChart.Data<Integer,Double>(numberOfGeneration, bestFitnessInCurrentGeneration)));
                      });});
 
                 provideInfoFromFile();
@@ -749,6 +753,7 @@ public class Controller implements Initializable///heloooooo
                 elitismLabel.textProperty().unbind();
                 elitismLabel.textProperty().bind(ui.getEngine().getSelection().getElitismProperty().asString());
                 ui.getEngine().getSelection().getElitismProperty().bind(m_SPElitism);
+                maxSizeChromosomes=ui.getTimeTable().getMaxSizeChromosomes();
                 m_SPMessageToUser.set("The xml file was loaded");
             }
             catch (JAXBException e)
@@ -820,6 +825,8 @@ public class Controller implements Initializable///heloooooo
                 animationForRunAlgorithmButton();
                 handleControls2DisableBeforeRunning(true);
                 updatesTableView.getItems().clear();
+                LineChart.getData().clear();
+                series.getData().clear();
 
 
                 ui.setTaskEngine(new Task() {
@@ -1010,6 +1017,73 @@ public class Controller implements Initializable///heloooooo
     { tournamentCheckBox.setSelected(tournamentCheckBox.isSelected() &&
             !(rouletteWheelCheckBox.isSelected() ||  truncationCheckBox.isSelected()));}
 
+    @FXML void OnChangeCrossover(ActionEvent event)
+    {
+        String cuttingPoints = cuttingPointsTextField.getText();
+
+        if(cuttingPoints == null || cuttingPoints.equals(""))
+        {
+            m_SPMessageToUser.set("The parameter 'cutting point' is empty");
+            return;
+        }
+
+        int cuttingPointsInt = Integer.parseInt(cuttingPoints);
+
+        if(dayTimeOrientedCheckBox.isSelected())
+        {
+            dayTimeOriented.setCuttingPoints(cuttingPointsInt);
+            ui.getEngine().setCrossover(dayTimeOriented);
+            m_SPMessageToUser.set("The Crossover mechanism has changed");
+        }
+
+        if(aspectOrientedCheckBox.isSelected())
+        {
+            aspectOriented.setCuttingPoints(cuttingPointsInt);
+
+            if(orientedByClass.isSelected())
+            {
+                aspectOriented.setOrientedBy("Class");
+            }
+            else if(orientedByTeacher.isSelected())
+            {
+                aspectOriented.setOrientedBy("Teacher");
+            }
+            else
+            {
+                m_SPMessageToUser.set("The parameter 'oriented' was not selected");
+                return;
+            }
+
+            ui.getEngine().setCrossover(aspectOriented);
+            m_SPMessageToUser.set("The Crossover mechanism has changed");
+        }
+
+        m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
+    }
+
+    @FXML private void OnDayTimeOrientedSelected(ActionEvent event)
+    {
+        dayTimeOrientedCheckBox.setSelected(dayTimeOrientedCheckBox.isSelected() &&
+                !aspectOrientedCheckBox.isSelected());
+    }
+
+    @FXML private void OnAspectOrientedSelected(ActionEvent event)
+    {
+        aspectOrientedCheckBox.setSelected(aspectOrientedCheckBox.isSelected() &&
+                !dayTimeOrientedCheckBox.isSelected());
+    }
+
+    @FXML private void OnOrientedByClassSelected(ActionEvent event)
+    {
+        orientedByClass.setSelected(orientedByClass.isSelected() &&
+                !orientedByTeacher.isSelected());
+    }
+
+    @FXML private void OnOrientedByTeacherSelected(ActionEvent event)
+    {
+        orientedByTeacher.setSelected(orientedByTeacher.isSelected() &&
+                !orientedByClass.isSelected());
+    }
 
     @Override
     public void initialize(URL location1, ResourceBundle resources1) {
@@ -1017,8 +1091,6 @@ public class Controller implements Initializable///heloooooo
         resources=resources1;
         myInitialize();
     }
-
-
 
     private void myInitialize()
     {
@@ -1032,8 +1104,9 @@ public class Controller implements Initializable///heloooooo
         rulesTextArea.textProperty().bind(m_SPRulesInfo);
         selectionTextArea.textProperty().bind(m_SPSelectionInfo);
         changeElitismButton.disableProperty().bind(m_BPIsPause);
-        ChangeSelectionButton.disableProperty().bind(m_BPIsPause);
+        changeSelectionButton.disableProperty().bind(m_BPIsPause);
         crossoverTextArea.textProperty().bind(m_SPCrossoverInfo);
+        changeCrossoverButton.disableProperty().bind(m_BPIsPause);
 
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
@@ -1047,21 +1120,38 @@ public class Controller implements Initializable///heloooooo
             }});
 
         bestFitnessTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if(oldValue.length() <= newValue.length()) {
+
                 m_SPBestFitness.set(newValue);
                 bestFitnessTextField.textProperty().bind(m_SPBestFitness);
                 if (!newValue.matches("\\d*")) {
-                    if (newValue.substring(0, newValue.length() - 1).contains(".") && newValue.endsWith(".")) {
+                    if (newValue.substring(0, newValue.length() - 1).contains(".") && newValue.endsWith(".")
+                            || newValue.endsWith("100.") || newValue.startsWith(".")) {
                         newValue = oldValue;
                     }
-
                     m_SPBestFitness.set(newValue.replaceAll("[^\\d.]", ""));
                 }
-                if(!newValue.equals("") && Double.parseDouble(newValue) > 100) {
+                else if(!newValue.equals("") && Double.parseDouble(newValue) > 100) {
                     m_SPBestFitness.set(oldValue);
                 }
                 bestFitnessTextField.textProperty().unbind();
-            }});
+        });
+
+        PTETextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+
+                pte.set(newValue);
+                PTETextfield.textProperty().bind(pte);
+                if (!newValue.matches("\\d*")) {
+                    if (newValue.substring(0, newValue.length() - 1).contains(".") && newValue.endsWith(".")
+                    || newValue.endsWith("1.") || newValue.startsWith(".")) {
+                        newValue = oldValue;
+                    }
+                    pte.set(newValue.replaceAll("[^\\d.]", ""));
+                }
+                else if(!newValue.equals("") && Double.parseDouble(newValue) > 1) {
+                    pte.set(oldValue);
+                }
+                PTETextfield.textProperty().unbind();
+        });
 
 
         timerTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -1091,14 +1181,15 @@ public class Controller implements Initializable///heloooooo
             }}
         });
 
-        PTETextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+        cuttingPointsTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                PTETextfield.setText(newValue.replaceAll("[^\\d]", ""));
+                cuttingPointsTextField.setText(newValue.replaceAll("[^\\d]", ""));
             }
             if(newValue!=null && !newValue.equals("")){
-            if (Integer.parseInt(newValue) > 1) {
-                PTETextfield.setText(oldValue);
-            }}
+                int value=Integer.parseInt(newValue);
+                if (value > maxSizeChromosomes || value<=0) {
+                    cuttingPointsTextField.setText(oldValue);
+                }}
         });
 
         nameRulTableColumn.setCellValueFactory(new PropertyValueFactory("Name"));

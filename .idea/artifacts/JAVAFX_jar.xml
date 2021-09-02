@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JAVAFX:jar">
+    <output-path>$PROJECT_DIR$/../Evolutionary Time Table/out/artifacts/JAVAFX_jar</output-path>
+    <root id="archive" name="JAVAFX.jar">
+      <element id="module-output" name="JAVAFX" />
+      <element id="module-output" name="TimeTable" />
+      <element id="module-output" name="Engine" />
+      <element id="module-output" name="Jaxb" />
+    </root>
+  </artifact>
+</component>

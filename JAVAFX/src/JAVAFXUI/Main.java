@@ -19,7 +19,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         primaryStage.setTitle("Evolutionary Time Table");
-        Parent load = FXMLLoader.load(getClass().getResource("ettjavafx.fxml"));
+        Parent load = FXMLLoader.load(getClass().getResource("/JAVAFXUI/ETTJAVAFX.fxml"));
         Scene scene = new Scene(load);
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);

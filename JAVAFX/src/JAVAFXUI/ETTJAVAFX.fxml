@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.shape.*?>
 <?import java.lang.*?>
@@ -240,6 +241,22 @@
                               </AnchorPane>
                           </content>
                         </Tab>
+                        <Tab text="Development graph">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart fx:id="LineChart" layoutX="87.0" layoutY="104.0" AnchorPane.bottomAnchor="78.0" AnchorPane.leftAnchor="87.0" AnchorPane.rightAnchor="141.0" AnchorPane.topAnchor="104.0">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </LineChart>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
                     </tabs>
                   </TabPane>
                   <HBox prefHeight="100.0" prefWidth="200.0" spacing="25.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
@@ -291,7 +308,7 @@
                                     <TextArea fx:id="selectionTextArea" layoutX="17.0" layoutY="25.0" maxHeight="65.0" maxWidth="232.0" minHeight="65.0" minWidth="232.0" prefHeight="65.0" prefWidth="232.0" AnchorPane.bottomAnchor="370.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="25.0" />
                                     <Label layoutX="15.0" layoutY="223.0" text="Top Percent: " />
                                     <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="218.0" maxHeight="31.0" maxWidth="120.0" />
-                                    <Button fx:id="ChangeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
+                                    <Button fx:id="changeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
                                     <CheckBox fx:id="truncationCheckBox" layoutX="56.0" layoutY="189.0" mnemonicParsing="false" onAction="#OnTruncationSelected" text="Truncation: " AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="175.0" />
                                     <Line endX="135.0" layoutX="134.0" layoutY="256.0" startX="-135.0" />
                                     <CheckBox fx:id="rouletteWheelCheckBox" layoutX="56.0" layoutY="267.0" mnemonicParsing="false" onAction="#OnRouletteWheelSelected" text="RouletteWheel: " AnchorPane.leftAnchor="56.0" />
@@ -359,7 +376,7 @@
                                                 <Insets top="20.0" />
                                              </VBox.margin>
                                           </Line>
-                                          <Button fx:id="changeCrossover" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
+                                          <Button fx:id="changeCrossoverButton" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
                                              <VBox.margin>
                                                 <Insets left="50.0" top="40.0" />
                                              </VBox.margin>
