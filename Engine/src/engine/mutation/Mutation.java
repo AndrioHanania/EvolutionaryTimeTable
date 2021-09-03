@@ -25,6 +25,8 @@ public abstract class Mutation
         return m_Probability;
     }
 
+    public void setProbability(Double probability){m_Probability = probability;}
+
     @Override
     public String toString() {
         return "Probability: " + m_Probability +

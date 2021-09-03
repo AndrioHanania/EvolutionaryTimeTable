@@ -379,12 +379,12 @@
                                           </TableColumn>
                                       </columns>
                                     </TableView>
-                                    <TableView fx:id="sizerTableView" layoutX="33.0" layoutY="226.0" prefHeight="268.0" prefWidth="204.0">
+                                    <TableView fx:id="sizerTableView" layoutX="32.0" layoutY="223.0" prefHeight="283.0" prefWidth="202.0">
                                        <columns>
-                                          <TableColumn prefWidth="200.0" text="Sizer">
+                                          <TableColumn fx:id="sizerTableColumn" prefWidth="221.0" text="Sizer">
                                              <columns>
-                                                <TableColumn prefWidth="111.0" text="Probability" />
-                                                <TableColumn prefWidth="88.0" text="Total Tupples" />
+                                                <TableColumn fx:id="sizerProbabilityTableCol" prefWidth="107.0" text="Probability" />
+                                                <TableColumn fx:id="sizerTotalTupplesTableCol" prefWidth="92.0" text="Total Tupples" />
                                              </columns>
                                           </TableColumn>
                                        </columns>
