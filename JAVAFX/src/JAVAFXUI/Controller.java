@@ -151,7 +151,7 @@ public class Controller implements Initializable
     @FXML private Label sizeOfPopulationLabel;
     @FXML private TextArea messageToUserTextArea;
 
-    private BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
+    private BooleanProperty m_BPIsPause = new SimpleBooleanProperty(false);
     private IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
     private DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
     private StringProperty m_SPMessageToUser = new SimpleStringProperty();
@@ -394,16 +394,22 @@ public class Controller implements Initializable
         sizerProbabilityTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductSizer, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<ProductSizer, String> event) {
-                Double val = Double.parseDouble(event.getNewValue());
-                if(val<0 || val>1)
-                {
-                    m_SPMessageToUser.set("probability is not vetween 0 and 1");
+                try{
+                    Double val = Double.parseDouble(event.getNewValue());
+                    if(val<0 || val>1)
+                    {
+                        m_SPMessageToUser.set("probability is not vetween 0 and 1");
+                    }
+                    else
+                    {
+                        ProductSizer sizerProduct = event.getRowValue();
+                        sizerProduct.setProbability(event.getNewValue());
+                        sizer.setProbability(Double.parseDouble(sizerProduct.getProbability()));
+                    }
                 }
-                else
-                {
-                    ProductSizer sizerProduct = event.getRowValue();
-                    sizerProduct.setProbability(event.getNewValue());
-                    sizer.setProbability(Double.parseDouble(sizerProduct.getProbability()));
+                catch (NumberFormatException e) {
+                    m_SPMessageToUser.set("Probability must be an Integer");
+                    // not an integer!
                 }
             }
         });
@@ -436,17 +442,24 @@ public class Controller implements Initializable
         flippingProbabilityTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
 
             @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
-                Double val = Double.parseDouble(event.getNewValue());
-                if(val<0 || val>1)
+                try
                 {
-                    m_SPMessageToUser.set("probability is not between 0 and 1");
+                    Double val = Double.parseDouble(event.getNewValue());
+                    if(val<0 || val>1)
+                    {
+                        m_SPMessageToUser.set("probability is not between 0 and 1");
+                    }
+                    else
+                    {
+                        ProductFlipping flippingProduct = event.getRowValue();
+                        flippingProduct.setProbability(event.getNewValue());
+                        //validate prarameters
+                        flip.setProbability(Double.parseDouble(flippingProduct.getProbability()));
+                    }
                 }
-                else
-                {
-                    ProductFlipping flippingProduct = event.getRowValue();
-                    flippingProduct.setProbability(event.getNewValue());
-                    //validate prarameters
-                    flip.setProbability(Double.parseDouble(flippingProduct.getProbability()));
+                catch (NumberFormatException e) {
+                    m_SPMessageToUser.set("Probability must be an Integer");
+                    // not an integer!
                 }
             }
         });
@@ -456,18 +469,22 @@ public class Controller implements Initializable
             @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
                 String component = event.getNewValue();
                 int size = component.length();
+                Character c = component.charAt(0);
                 if (size != 1) {
                     m_SPMessageToUser.set("please enter one character for component");
                 }
-                Character c = component.charAt(0);
-                if (c != 'D' || c != 'S' || c != 'T' || c != 'H' || c != 'C')
+                else if (c != 'D' || c != 'S' || c != 'T' || c != 'H' || c != 'C')
                 {
                     m_SPMessageToUser.set("Component has to be 'D' 'H' 'T' 'S' or 'C'");
                 }
-                ProductFlipping flippingProduct = event.getRowValue();
-                flippingProduct.setComponent(event.getNewValue());
-                //changeFlippingInEngine(flip);
-                flip.setComponent((flippingProduct.getComponent().charAt(0)));
+                else
+                {
+                    ProductFlipping flippingProduct = event.getRowValue();
+                    flippingProduct.setComponent(event.getNewValue());
+                    //changeFlippingInEngine(flip);
+                    flip.setComponent((flippingProduct.getComponent().charAt(0)));
+                }
+
             }
         });
 
@@ -809,7 +826,7 @@ public class Controller implements Initializable
 
                     while (!ui.getEngine().isFinishToRun())
                     {
-                        if(!m_BPIsPause.get()) //isnot
+                        //if(!m_BPIsPause.get()) //isnot
                         {
 
                             if (numOfGenerationCheckBox.isSelected()) {
@@ -928,7 +945,7 @@ public class Controller implements Initializable
 
     @FXML void OnFileChooser(ActionEvent event)
     {
-
+            m_BPIsPause.set(false);
             fileChooserButton.setDisable(true);
             FileChooser fileChooser = new FileChooser();
             File selectedFile = fileChooser.showOpenDialog(null);

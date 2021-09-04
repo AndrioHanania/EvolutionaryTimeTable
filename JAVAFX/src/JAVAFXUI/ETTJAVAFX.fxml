@@ -403,23 +403,23 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TableView fx:id="flippingTableView" layoutX="19.0" layoutY="30.0" prefHeight="239.0" prefWidth="229.0">
+                                    <TableView fx:id="flippingTableView" layoutY="23.0" prefHeight="260.0" prefWidth="265.0">
                                       <columns>
-                                        <TableColumn prefWidth="262.0" text="Flipping">
+                                        <TableColumn fx:id="flippingTableColum" prefWidth="115.0" text="Flipping">
                                              <columns>
-                                                <TableColumn fx:id="flippingProbabilityTableCol" prefWidth="75.0" text="Probability" />
-                                                <TableColumn fx:id="flippingComponentTableCol" prefWidth="75.0" text="Component" />
-                                                <TableColumn fx:id="flippingMaxTupplesTableCol" prefWidth="75.0" text="Max Tupples" />
+                                                <TableColumn fx:id="flippingProbabilityTableCol" prefWidth="85.0" text="Probability" />
+                                                <TableColumn fx:id="flippingComponentTableCol" prefWidth="85.0" text="Component" />
+                                                <TableColumn fx:id="flippingMaxTupplesTableCol" prefWidth="95.0" text="Max Tupples" />
                                              </columns>
                                           </TableColumn>
                                       </columns>
                                     </TableView>
-                                    <TableView fx:id="sizerTableView" layoutX="59.0" layoutY="285.0" prefHeight="200.0" prefWidth="149.0">
+                                    <TableView fx:id="sizerTableView" layoutX="1.0" layoutY="285.0" prefHeight="241.0" prefWidth="263.0">
                                       <columns>
-                                          <TableColumn fx:id="sizerTableColumn" prefWidth="75.0" text="Sizer">
+                                          <TableColumn fx:id="sizerTableColumn" prefWidth="262.0" text="Sizer">
                                              <columns>
-                                              <TableColumn fx:id="sizerProbabilityTableCol" prefWidth="75.0" text="Probability" />
-                                              <TableColumn fx:id="sizerTotalTupplesTableCol" prefWidth="75.0" text="Total Tupples" />
+                                              <TableColumn fx:id="sizerProbabilityTableCol" prefWidth="135.0" text="Probability" />
+                                              <TableColumn fx:id="sizerTotalTupplesTableCol" prefWidth="135.0" text="Total Tupples" />
                                              </columns>
                                           </TableColumn>
                                       </columns>
