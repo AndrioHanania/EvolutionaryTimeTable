@@ -461,6 +461,7 @@ public class Controller implements Initializable
         flippingMaxTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
 
             @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
+
                 ProductFlipping flippingProduct = event.getRowValue();
                 flippingProduct.setMaxTupples(event.getNewValue());
                 //changeFlippingInEngine(flip);

@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.shape.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -30,9 +25,11 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
          <top>
@@ -402,9 +399,32 @@
                                  </children></AnchorPane>
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" text="untitled 3">
+                      <TitledPane fx:id="mutationPane" animated="false" text="Mutation">
                         <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="flippingTableView" layoutX="19.0" layoutY="30.0" prefHeight="239.0" prefWidth="229.0">
+                                      <columns>
+                                        <TableColumn prefWidth="262.0" text="Flipping">
+                                             <columns>
+                                                <TableColumn fx:id="flippingProbabilityTableCol" prefWidth="75.0" text="Probability" />
+                                                <TableColumn fx:id="flippingComponentTableCol" prefWidth="75.0" text="Component" />
+                                                <TableColumn fx:id="flippingMaxTupplesTableCol" prefWidth="75.0" text="Max Tupples" />
+                                             </columns>
+                                          </TableColumn>
+                                      </columns>
+                                    </TableView>
+                                    <TableView fx:id="sizerTableView" layoutX="59.0" layoutY="285.0" prefHeight="200.0" prefWidth="149.0">
+                                      <columns>
+                                          <TableColumn fx:id="sizerTableColumn" prefWidth="75.0" text="Sizer">
+                                             <columns>
+                                              <TableColumn fx:id="sizerProbabilityTableCol" prefWidth="75.0" text="Probability" />
+                                              <TableColumn fx:id="sizerTotalTupplesTableCol" prefWidth="75.0" text="Total Tupples" />
+                                             </columns>
+                                          </TableColumn>
+                                      </columns>
+                                    </TableView>
+                                 </children></AnchorPane>
                         </content>
                       </TitledPane>
                     </panes>
