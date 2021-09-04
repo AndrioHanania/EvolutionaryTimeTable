@@ -7,9 +7,18 @@ import timeTable.chromosome.TimeTableChromosome;
 
 public class Sizer extends Mutation
 {
+
     //Members
     private int m_TotalTupples;
 
+    public void setTotalTupples(int totalTupples) {
+        m_TotalTupples = totalTupples;
+    }
+
+
+    public int getTotalTupples() {
+        return m_TotalTupples;
+    }
 
     //Constructors
     public Sizer(int totalTupples, double probability)

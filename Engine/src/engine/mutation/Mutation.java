@@ -9,6 +9,9 @@ public abstract class Mutation
     //Members
     protected double m_Probability;
     protected Random m_Random = new Random();
+
+
+
     protected String m_Configuration;
 
     //Methods
@@ -17,6 +20,12 @@ public abstract class Mutation
     public void setConfiguration(String configuration){m_Configuration = configuration;}
 
     public String getConfiguration(){return  m_Configuration;}
+
+    public double getProbability() {
+        return m_Probability;
+    }
+
+    public void setProbability(Double probability){m_Probability = probability;}
 
     @Override
     public String toString() {

@@ -1,5 +1,6 @@
 package JAVAFXUI;
 
+import engine.mutation.Mutation;
 import engine.selection.RouletteWheel;
 import engine.selection.Tournament;
 import engine.selection.Truncation;
@@ -17,16 +18,20 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import timeTable.Grade;
+import timeTable.Mutation.Flipping;
+import timeTable.Mutation.Sizer;
 import timeTable.Rules.Rule;
 import timeTable.Subject;
 import timeTable.Teacher;
@@ -92,8 +97,19 @@ public class Controller implements Initializable///heloooooo
     @FXML private TableView<ProductRule> rulesTableView;
     @FXML private TableView<ProductUpdate> updatesTableView;
     @FXML private TableView<ProductRow> rowsTableView;
-    @FXML private TableView<ProductTeacher> teachersTableView;
-    @FXML private TableView<ProductGrade> gradesTableView;
+
+
+    @FXML private TableView<ProductSizer> sizerTableView;
+    @FXML private TableColumn<ProductSizer,String> sizerTableColumn;
+    @FXML private TableColumn<ProductSizer,String> sizerProbabilityTableCol;
+    @FXML private TableColumn<ProductSizer,String> sizerTotalTupplesTableCol;
+
+    @FXML private TableView<ProductFlipping> flippingTableView;
+    @FXML private TableColumn<ProductFlipping,String> flippingProbabilityTableCol;
+    @FXML private TableColumn<ProductFlipping,String> flippingComponentTableCol;
+    @FXML private TableColumn<ProductFlipping,String> flippingMaxTupplesTableCol;
+
+
     @FXML private CheckBox truncationCheckBox;
     @FXML private CheckBox rouletteWheelCheckBox;
     @FXML private CheckBox tournamentCheckBox;
@@ -139,9 +155,7 @@ public class Controller implements Initializable///heloooooo
 
 
 
-
-
-    BooleanProperty m_BPIsPause = new SimpleBooleanProperty(true);
+    BooleanProperty m_BPIsPause = new SimpleBooleanProperty(false);
     IntegerProperty m_SPElitism = new SimpleIntegerProperty();
     IntegerProperty m_IPCurrentGeneration = new SimpleIntegerProperty(0);
     DoubleProperty m_DPCurrentFitness = new SimpleDoubleProperty(0.0);
@@ -176,6 +190,8 @@ public class Controller implements Initializable///heloooooo
     ObservableList<ProductRow> observableListOfRows = FXCollections.observableArrayList();
     ObservableList<String> observableListOfTeachers = FXCollections.observableArrayList();
     ObservableList<String> observableListOfGrades = FXCollections.observableArrayList();
+    ObservableList<ProductFlipping> observableListOfFlipping = FXCollections.observableArrayList();
+    ObservableList<ProductSizer> observableListOfSizer = FXCollections.observableArrayList();
 
 
     TimeTable m_Timetable;
@@ -199,12 +215,8 @@ public class Controller implements Initializable///heloooooo
 
     private void addToObservableListOfRules(ProductRule productRule){observableListOfRules.add(productRule);}
     private void addToObservableListOfRows(ProductRow productRow){observableListOfRows.add(productRow);}
-
-
-
-
-
-
+    private void addToObservableListOfFlipping(ProductFlipping flipping){observableListOfFlipping.add(flipping);}
+    private void addToObservableListOfSizer(ProductSizer sizer){observableListOfSizer.add(sizer);}
 
     private void provideInfoAboutGradesFromOptimalSolution(TimeTable optimalTimetable,String grade)
     {
@@ -304,6 +316,217 @@ public class Controller implements Initializable///heloooooo
 
     }
 
+
+
+    private void provideInfoAboutMutations()
+    {
+        sizerTableView.editableProperty().unbind();
+        flippingTableView.editableProperty().unbind();
+        sizerTableView.editableProperty().bindBidirectional(m_BPIsPause);
+        flippingTableView.editableProperty().bindBidirectional(m_BPIsPause);
+        flippingTableView.getItems().clear();
+        sizerTableView.getItems().clear();
+        observableListOfFlipping.clear();
+        observableListOfSizer.clear();
+        flippingTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        sizerTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+       // flippingTableView.getColumns().add(flippingProbabilityTableCol);
+      //  flippingTableView.getColumns().add(flippingComponentTableCol);
+      //  flippingTableView.getColumns().add(flippingMaxTupplesTableCol);
+
+        List<Mutation> mutations =  ui.getEngine().getMutations();
+        for(Mutation mutation : mutations)
+        {
+            if(mutation.getClass().equals(Flipping.class))
+            {
+                Flipping flip = (Flipping) mutation;
+                String probability = String.valueOf(flip.getProbability());
+                String component   = String.valueOf(flip.getComponent());
+                String maxTupples  = String.valueOf(flip.getMaxTupples());
+                ProductFlipping flippingProduct = new ProductFlipping(probability,component,maxTupples);
+                addToObservableListOfFlipping(flippingProduct);
+                flippingTableView.setItems(observableListOfFlipping);
+                flippingProbabilityTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+                flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+                flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+                if ((m_BPIsPause.get())) {
+                    flippingTableView.setEditable(true);
+                    sizerTableView.setEditable(true);
+                }
+                else{
+                    flippingTableView.setEditable(false);
+                    sizerTableView.setEditable(false);
+
+                }
+                onEditingFlippingValues(flip);
+
+            }
+
+            else if(mutation.getClass().equals(Sizer.class))
+            {
+                Sizer sizer = (Sizer)mutation;
+                String probability = String.valueOf(sizer.getProbability());
+                String totalTupples   = String.valueOf(sizer.getTotalTupples());
+                ProductSizer sizerProduct = new ProductSizer(probability,totalTupples);
+                addToObservableListOfSizer(sizerProduct);
+                sizerTableView.setItems(observableListOfSizer);
+                sizerProbabilityTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+                sizerTotalTupplesTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+                if ((m_BPIsPause.get())) {
+                    flippingTableView.setEditable(true);
+                    sizerTableView.setEditable(true);
+                }
+                else{
+                    flippingTableView.setEditable(false);
+                    sizerTableView.setEditable(false);
+
+                }
+                onEditingSizerValues(sizer);
+
+
+            }
+
+            //flippingTableView.editableProperty().bind(m_BPIsPause.not());
+            //sizerProbabilityTableCol.onEditCommitProperty();
+
+        }
+    }
+
+    private void onEditingSizerValues(Sizer sizer) {
+
+        sizerProbabilityTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductSizer, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<ProductSizer, String> event) {
+                Double val = Double.parseDouble(event.getNewValue());
+                if(val<0 || val>1)
+                {
+                    m_SPMessageToUser.set("probability must be between 0 and 1");
+                }
+                else
+                {
+                    ProductSizer sizerProduct = event.getRowValue();
+                    sizerProduct.setProbability(event.getNewValue());
+                    sizer.setProbability(Double.parseDouble(sizerProduct.getProbability()));
+                }
+            }
+        });
+
+        sizerTotalTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductSizer, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<ProductSizer, String> event) {
+                String str = event.getNewValue();
+                try {
+                    int num = Integer.parseInt(str);
+                    ProductSizer sizerProduct = event.getRowValue();
+                    sizerProduct.setTotalTupples(event.getNewValue());
+                    sizer.setTotalTupples(num);
+
+                } catch (NumberFormatException e)
+                {
+                    m_SPMessageToUser.set("Total Tupples must be an Integer");
+                    // not an integer!
+                }
+         //      ProductSizer sizerProduct = event.getRowValue();
+            //    sizerProduct.setTotalTupples(event.getNewValue());
+         //       sizer.setTotalTupples(Integer.parseInt(sizerProduct.getTotalTupples()));
+            }
+        });
+    }
+
+    private void onEditingFlippingValues(Flipping flip)
+    {
+        flippingProbabilityTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
+
+            @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
+                Double val = Double.parseDouble(event.getNewValue());
+                if(val<0 || val>1)
+                {
+                    m_SPMessageToUser.set("probability is not between 0 and 1");
+                }
+                else
+                {
+                    ProductFlipping flippingProduct = event.getRowValue();
+                    flippingProduct.setProbability(event.getNewValue());
+                    //validate prarameters
+                    flip.setProbability(Double.parseDouble(flippingProduct.getProbability()));
+                }
+            }
+        });
+
+        flippingComponentTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
+
+            @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
+                String component = event.getNewValue();
+                int size = component.length();
+                if (size != 1) {
+                    m_SPMessageToUser.set("please enter one character for component");
+                }
+                Character c = component.charAt(0);
+                if (c != 'D' || c != 'S' || c != 'T' || c != 'H' || c != 'C')
+                {
+                    m_SPMessageToUser.set("Component has to be 'D' 'H' 'T' 'S' or 'C'");
+                }
+                ProductFlipping flippingProduct = event.getRowValue();
+                flippingProduct.setComponent(event.getNewValue());
+                //changeFlippingInEngine(flip);
+                flip.setComponent((flippingProduct.getComponent().charAt(0)));
+            }
+        });
+
+        flippingMaxTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
+
+            @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
+                String str = event.getNewValue();
+                try{
+                    int num = Integer.parseInt(str);
+                        ProductFlipping flippingProduct = event.getRowValue();
+                        flippingProduct.setMaxTupples(event.getNewValue());
+                        //changeFlippingInEngine(flip);
+                        flip.setMaxTupples(num);
+                        // is an integer!
+
+                } catch (NumberFormatException e) {
+                    m_SPMessageToUser.set("Max Tupples must be an Integer");
+                    // not an integer!
+                }
+            }
+        });
+    }
+
+
+    //  flippingProbabilityTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+      //  flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+      //  flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+       // flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+
+       // flippingMaxTupplesTableCol.setCellFactory(TextFieldTableCell.<Flipping, String>forTableColumn(new DefaultStringConverter()));
+
+
+
+    private void changeFlippingInEngine(Flipping flipping)
+    {
+        Double probability = flipping.getProbability();
+        Character component   = flipping.getComponent();
+        Integer maxTupples  = flipping.getMaxTupples();
+
+        for (Mutation mutation : ui.getEngine().getMutations())
+        {
+            if (mutation.getClass().equals(Flipping.class))
+            {
+                Flipping flipping1 = (Flipping) mutation;
+                flipping1.setProbability(probability);
+               // flipping1.setComponent();
+            }
+        }
+
+    }
+
+
     //private void provideInfoAboutTeacher
     private void provideInfoAboutRowsFromOptimalSolution(TimeTable timeTable)
     {
@@ -346,6 +569,7 @@ public class Controller implements Initializable///heloooooo
         provideInfoAboutSubjects();
         provideInfoAboutGrades();
         provideInfoAboutRules();
+        provideInfoAboutMutations();
         //engine
         m_SPSelectionInfo.set(ui.getEngine().getSelection().toString());
         m_SPCrossoverInfo.set(ui.getEngine().getCrossover().toString());
@@ -579,7 +803,7 @@ public class Controller implements Initializable///heloooooo
 
                     while (!ui.getEngine().isFinishToRun())
                     {
-                        if(m_BPIsPause.get())//isnot
+                        if(!m_BPIsPause.get()) //isnot
                         {
 
                             if (numOfGenerationCheckBox.isSelected()) {
@@ -620,6 +844,7 @@ public class Controller implements Initializable///heloooooo
     {
         provideInfoAboutRulesAndFitnessFromOptimalSolution(timeTable);
         provideInfoAboutRowsFromOptimalSolution(timeTable);
+
 
     }
 
@@ -709,7 +934,6 @@ public class Controller implements Initializable///heloooooo
 
             try
             {
-
                 animationForLoadFileTextBox();
                 ui.loadInfoFromXmlFile(selectedFile);
                 m_Timetable = ui.getTimeTable();
@@ -921,19 +1145,20 @@ public class Controller implements Initializable///heloooooo
         //////////////////////handle timer need to Pause-Resume////////////////////////////////
         if(ui.getThreadEngine()!=null && ui.getThreadEngine().isAlive())
         {
-            if(m_BPIsPause.get())
+            if(!m_BPIsPause.get())
             {
                 ui.getEngine().pause();
                 pauseResumeButton.setText("Resume");
-                m_SPMessageToUser.set("Pause");
-                m_BPIsPause.set(false);
+                m_SPMessageToUser.set("Paused");
+                m_BPIsPause.set(true);
+
             }
             else
             {
                 ui.getEngine().resume();
                 pauseResumeButton.setText("Pause");
                 m_SPMessageToUser.set("Process...");
-                m_BPIsPause.set(true);
+                m_BPIsPause.set(false);
             }
         }
         else
@@ -955,7 +1180,7 @@ public class Controller implements Initializable///heloooooo
         }
         else
         {
-            if(!m_BPIsPause.get())
+            if(m_BPIsPause.get())
                 {ui.getEngine().resume();}
 
             synchronized (ui.getThreadEngine())
@@ -1108,11 +1333,15 @@ public class Controller implements Initializable///heloooooo
         crossoverTextArea.textProperty().bind(m_SPCrossoverInfo);
         changeCrossoverButton.disableProperty().bind(m_BPIsPause);
 
+
+
         numberOfGenerationTextField.setDisable(true);
         bestFitnessTextField.setDisable(true);
         timerTextField.setDisable(true);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
+
+        //sizerTableView.editableProperty().addListener();
 
         numberOfGenerationTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
@@ -1205,6 +1434,18 @@ public class Controller implements Initializable///heloooooo
         teacherRowTableColumn.setCellValueFactory(new PropertyValueFactory("Teacher"));
         gradeRowTableColumn.setCellValueFactory(new PropertyValueFactory("Grade"));
         subjectRowTableColumn.setCellValueFactory(new PropertyValueFactory("Subject"));
+
+        flippingProbabilityTableCol.setCellValueFactory(new PropertyValueFactory("Probability"));
+        flippingComponentTableCol.setCellValueFactory(new PropertyValueFactory("Component"));
+        flippingMaxTupplesTableCol.setCellValueFactory(new PropertyValueFactory("MaxTupples"));
+
+        sizerProbabilityTableCol.setCellValueFactory(new PropertyValueFactory("Probability"));
+        sizerTotalTupplesTableCol.setCellValueFactory(new PropertyValueFactory("TotalTupples"));
+
+   //    flippingProbabilityTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        //flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+       // flippingComponentTableCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
     }
 
 
@@ -1250,6 +1491,74 @@ public class Controller implements Initializable///heloooooo
         public void setFitness(String fitness){m_Fitness.set(fitness);}
         public void setGeneration(String generation){m_Generation.set(generation);}
     }
+
+    public class ProductSizer
+    {
+        StringProperty m_Probability;
+        StringProperty m_TotalTupples;
+
+        public ProductSizer(String probability, String totalTupples) {
+            m_Probability = new SimpleStringProperty(probability);
+            m_TotalTupples = new SimpleStringProperty(totalTupples);
+        }
+
+        public String getProbability() {
+            return m_Probability.get();
+        }
+
+        public StringProperty m_ProbabilityProperty() {
+            return m_Probability;
+        }
+
+        public String getTotalTupples() {
+            return m_TotalTupples.get();
+        }
+
+        public StringProperty m_TotalTupplesProperty() {
+            return m_TotalTupples;
+        }
+
+        public void setProbability(String m_Probability) {
+            this.m_Probability.set(m_Probability);
+        }
+
+        public void setTotalTupples(String m_TotalTupples) {
+            this.m_TotalTupples.set(m_TotalTupples);
+        }
+    }
+
+    public class ProductFlipping
+    {
+        StringProperty m_Probability;
+        StringProperty m_Component;
+        StringProperty m_MaxTupples;
+
+        public ProductFlipping(String probability, String component, String tupples)
+        {
+            m_Probability = new SimpleStringProperty(probability);
+            m_Component   = new SimpleStringProperty(component);
+            m_MaxTupples  = new SimpleStringProperty(tupples);
+        }
+
+        public String getProbability() { return m_Probability.get(); }
+
+        public StringProperty m_ProbabilityProperty() { return m_Probability; }
+
+        public String getComponent() { return m_Component.get(); }
+
+        public StringProperty m_ComponentProperty() { return m_Component; }
+
+        public String getMaxTupples() { return m_MaxTupples.get(); }
+
+        public StringProperty m_MaxTupplesProperty() { return m_MaxTupples; }
+
+        public void setProbability(String m_Probability) { this.m_Probability.set(m_Probability); }
+
+        public void setComponent(String m_Component) { this.m_Component.set(m_Component); }
+
+        public void setMaxTupples(String m_MaxTupples) { this.m_MaxTupples.set(m_MaxTupples); }
+    }
+
 
     public class ProductRow
     {

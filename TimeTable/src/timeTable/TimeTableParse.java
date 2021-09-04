@@ -128,7 +128,7 @@ public class TimeTableParse extends Parse
                     }
                     try
                     {
-                        component=configuration.charAt(23);
+                        component=tempStrArr[1].charAt(10);
                     }
                     catch (NumberFormatException e)
                     {

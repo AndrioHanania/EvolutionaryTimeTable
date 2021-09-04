@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.shape.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -30,9 +22,11 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
+<ScrollPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="918.0" prefWidth="1570.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAVAFXUI.Controller">
    <content>
       <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="916.0" prefWidth="1568.0">
          <top>
@@ -241,22 +235,6 @@
                               </AnchorPane>
                           </content>
                         </Tab>
-                        <Tab text="Development graph">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <LineChart fx:id="LineChart" layoutX="87.0" layoutY="104.0" AnchorPane.bottomAnchor="78.0" AnchorPane.leftAnchor="87.0" AnchorPane.rightAnchor="141.0" AnchorPane.topAnchor="104.0">
-                                      <xAxis>
-                                        <CategoryAxis side="BOTTOM" />
-                                      </xAxis>
-                                      <yAxis>
-                                        <NumberAxis side="LEFT" />
-                                      </yAxis>
-                                    </LineChart>
-                                 </children>
-                              </AnchorPane>
-                          </content>
-                        </Tab>
                     </tabs>
                   </TabPane>
                   <HBox prefHeight="100.0" prefWidth="200.0" spacing="25.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
@@ -308,7 +286,7 @@
                                     <TextArea fx:id="selectionTextArea" layoutX="17.0" layoutY="25.0" maxHeight="65.0" maxWidth="232.0" minHeight="65.0" minWidth="232.0" prefHeight="65.0" prefWidth="232.0" AnchorPane.bottomAnchor="370.0" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="25.0" />
                                     <Label layoutX="15.0" layoutY="223.0" text="Top Percent: " />
                                     <TextField fx:id="topPercentTextField" layoutX="102.0" layoutY="218.0" maxHeight="31.0" maxWidth="120.0" />
-                                    <Button fx:id="changeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
+                                    <Button fx:id="ChangeSelectionButton" layoutX="58.0" layoutY="442.0" mnemonicParsing="false" onAction="#OnChangeSelection" text="Change selection" />
                                     <CheckBox fx:id="truncationCheckBox" layoutX="56.0" layoutY="189.0" mnemonicParsing="false" onAction="#OnTruncationSelected" text="Truncation: " AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="175.0" />
                                     <Line endX="135.0" layoutX="134.0" layoutY="256.0" startX="-135.0" />
                                     <CheckBox fx:id="rouletteWheelCheckBox" layoutX="56.0" layoutY="267.0" mnemonicParsing="false" onAction="#OnRouletteWheelSelected" text="RouletteWheel: " AnchorPane.leftAnchor="56.0" />
@@ -376,7 +354,7 @@
                                                 <Insets top="20.0" />
                                              </VBox.margin>
                                           </Line>
-                                          <Button fx:id="changeCrossoverButton" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
+                                          <Button fx:id="changeCrossover" mnemonicParsing="false" onAction="#OnChangeCrossover" text="Change crossover">
                                              <VBox.margin>
                                                 <Insets left="50.0" top="40.0" />
                                              </VBox.margin>
@@ -386,9 +364,32 @@
                                  </children></AnchorPane>
                         </content>
                       </TitledPane>
-                      <TitledPane animated="false" text="untitled 3">
+                      <TitledPane fx:id="mutationPane" animated="false" text="Mutation">
                         <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          <AnchorPane fx:id="mutationSwitch" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="flippingTableView" layoutX="4.0" layoutY="2.0" prefHeight="212.0" prefWidth="261.0">
+                                      <columns>
+                                        <TableColumn fx:id="flippingTableColumn" prefWidth="199.0" text="Flipping">
+                                             <columns>
+                                              <TableColumn fx:id="flippingProbabilityTableCol" prefWidth="87.0" text="probability" />
+                                                <TableColumn fx:id="flippingComponentTableCol" prefWidth="82.0" text="Component" />
+                                                <TableColumn fx:id="flippingMaxTupplesTableCol" prefWidth="89.0" text="Max Tupples" />
+                                             </columns>
+                                          </TableColumn>
+                                      </columns>
+                                    </TableView>
+                                    <TableView fx:id="sizerTableView" layoutX="32.0" layoutY="223.0" prefHeight="283.0" prefWidth="202.0">
+                                       <columns>
+                                          <TableColumn fx:id="sizerTableColumn" prefWidth="221.0" text="Sizer">
+                                             <columns>
+                                                <TableColumn fx:id="sizerProbabilityTableCol" prefWidth="107.0" text="Probability" />
+                                                <TableColumn fx:id="sizerTotalTupplesTableCol" prefWidth="92.0" text="Total Tupples" />
+                                             </columns>
+                                          </TableColumn>
+                                       </columns>
+                                    </TableView>
+                                 </children></AnchorPane>
                         </content>
                       </TitledPane>
                     </panes>

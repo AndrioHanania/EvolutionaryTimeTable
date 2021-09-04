@@ -11,12 +11,13 @@ public class Flipping extends Mutation
     private int m_MaxTupples;
     private char m_Component;
 
+
     //Constructors
     public Flipping(int maxTupples, char component, double probability)
     {
         m_MaxTupples = maxTupples;
         m_Component = component;
-       m_Probability = probability;
+        m_Probability = probability;
     }
 
     //Methods
@@ -24,6 +25,23 @@ public class Flipping extends Mutation
     public String toString() {
         return "Name: Flipping " + " " + super.toString();
     }
+
+    public void setMaxTupples(int m_MaxTupples) {
+        this.m_MaxTupples = m_MaxTupples;
+    }
+
+    public void setComponent(char m_Component) {
+        this.m_Component = m_Component;
+    }
+
+    public char getComponent() {
+        return m_Component;
+    }
+
+    public int getMaxTupples() {
+        return m_MaxTupples;
+    }
+
 
     @Override
     public void execute(Solution solution){
