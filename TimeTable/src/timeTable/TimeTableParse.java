@@ -88,7 +88,8 @@ public class TimeTableParse extends Parse
         switch(eTTCrossover.getName())
         {
             case "AspectOriented":
-                crossover = new AspectOriented(cuttingPoint);
+                String orientedBy = eTTCrossover.getConfiguration().substring(12);
+                crossover = new AspectOriented(cuttingPoint, orientedBy);
                 break;
             case "DayTimeOriented":
                 crossover = new DayTimeOriented(cuttingPoint);

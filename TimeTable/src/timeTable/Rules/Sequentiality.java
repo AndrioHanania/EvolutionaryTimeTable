@@ -6,7 +6,6 @@ import timeTable.Subject;
 import timeTable.TimeTable;
 import timeTable.chromosome.TimeTableChromosome;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Sequentiality extends Rule{
@@ -25,13 +24,7 @@ public class Sequentiality extends Rule{
         m_TotalHours = Integer.parseInt(conf[1]);
     }
 
-    /*
-        תיאור: מקצוע לא נלמד יותר מכמות שעות רצוף. כמות השעות תינתן כפרמטר חיצוני.
-    חישוב רצף השעות כמובן מדבר במסגרת יום מסויים (ולא חוצה ימים).
-    האמור מדבר כמובן על היביט הכיתה. (אם מורה מלמד ספרות 7 שעות רצוף ביום – זה בסדר).
-    פרמטרים: TotalHours - כמות השעות שאין ללמד את המקצוע בצורה רצופה יותר ממנה. מספר חיובי שלם.
 
-        * */
     @Override
     public void Execute(TimeTable timeTable) {
         List<Grade> grades = timeTable.getGrades();
@@ -40,28 +33,21 @@ public class Sequentiality extends Rule{
         List<TimeTableChromosome> timeTableChromosomes = timeTable.getChromosomes();
         int hours = timeTable.getHour();
         boolean[] hoursForSubject = new boolean[hours];
-        boolean isRulePassedPerGrade = true;
-        boolean isRulePassedPerSubject=true;
-        boolean isRulePassedPerDay=true;
-
-
         double scorePerGrade = 100/grades.size();
+        double scorePerSubject = scorePerGrade / subjects.size();
+        double scorePerDay = scorePerSubject / days;
+
         for (Grade grade : grades)
         {
-            isRulePassedPerGrade = true;
-            double scorePerSubject = scorePerGrade / subjects.size();
             for (Subject subject : subjects)
             {
-                isRulePassedPerSubject=true;
-                double scorePerDay = scorePerSubject / days;
                 //changed from int day=1 to int day=0
-                for(int day = 0;day < days;day++)
+                for(int day = 1;day <= days;day++)
                 {
-                    isRulePassedPerDay=true;
-                    for (int i=0;i<hours;i++)
+                    for (int i=1;i<=hours;i++)
                     {
                         //IsSubjectTeachedInHouri
-                        hoursForSubject[i]=false;
+                        hoursForSubject[i-1]=false;
                     }
 
                     //check if the class is studying this subject more then rule defines in a raw
@@ -88,7 +74,6 @@ public class Sequentiality extends Rule{
                             {
                                 //rule faild
                                 m_RuleGrade -= scorePerDay;
-                                isRulePassedPerDay = false;
                                 break;
                             }
                         }
@@ -96,11 +81,7 @@ public class Sequentiality extends Rule{
                         {
                             countHoursInRaw=0;
                         }
-
                     }
-
-                    if(!isRulePassedPerDay){
-                        break;}
                 }
             }
         }

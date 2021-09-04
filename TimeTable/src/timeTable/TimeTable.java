@@ -319,6 +319,16 @@ public class TimeTable extends Solution implements Problem
 
     public double getSoftRulesAvg(){return m_SoftRulesAvg;}
 
+    public int getMaxSizeChromosomes()
+    {
+        int d=m_DaysForStudy;
+        int h=m_HourStudyForDay;
+        int c=m_Grades.size();
+        int s=m_Teachers.size();
+        int t=m_Subjects.size();
+        return d*h*c*s*t;
+    }
+
     //Setters
     public void setHourStudyForDay(int hour){m_HourStudyForDay = hour;}
 

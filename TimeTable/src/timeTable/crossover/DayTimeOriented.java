@@ -16,7 +16,7 @@ public class DayTimeOriented extends Crossover
 
     @Override
     public String toString() {
-        return  "Name: DayTimeOriented " + " " +  super.toString();
+        return  "Name: DayTimeOriented,  " +  super.toString();
     }
 
         @Override

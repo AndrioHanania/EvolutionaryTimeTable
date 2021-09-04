@@ -31,7 +31,7 @@ public abstract class Selection
 
     @Override
     public String toString() {
-        return "Configuration: " + m_Configuration;
+        return " " /*"Configuration: " + m_Configuration*/;
     }
 
 }

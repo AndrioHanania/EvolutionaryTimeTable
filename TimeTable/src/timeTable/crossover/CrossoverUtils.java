@@ -80,11 +80,11 @@ public class CrossoverUtils
         return solutions;
     }
 
-    public static List<Solution> AspectOriented(TimeTable tTableParent1, TimeTable tTableParent2, int numOfCuttingPoints){
+    public static List<Solution> AspectOrientedByTeacher(TimeTable tTableParent1, TimeTable tTableParent2, int numOfCuttingPoints){
         List<Solution> solutions=new ArrayList<>();
         m_CopyFromFirstParent = true;
         m_CuttingPointsLocations = new ArrayList<>(numOfCuttingPoints);
-
+        randomizeCrossingPoints(tTableParent1,tTableParent2, numOfCuttingPoints);
         //unlimited generality for tTableParent1
         TimeTable firstChild = createChild(tTableParent1);
         TimeTable secondChild = createChild(tTableParent1);
@@ -92,48 +92,32 @@ public class CrossoverUtils
         int indexCuttingPoints=0;
         int index=0;
 
-        for (int i=1;i<=tTableParent1.getTeachers().size();i++)
-        {
-            randomizeCrossingPoints(tTableParent1,tTableParent2, numOfCuttingPoints);
-
-            for (int j=1;j<=tTableParent1.getHour();j++)
-            {
-                for (int k=1;k<=tTableParent1.getGrades().size();k++)
-                {
-                    for (int l=1;l<=tTableParent1.getDay();l++)
-                    {
-                        for (int m=1;m<=tTableParent1.getSubjects().size();m++)
-                        {
+        for (int l=1;l<=tTableParent1.getTeachers().size();l++) {
+            for (int i = 1; i <= tTableParent1.getDay(); i++) {
+                for (int j = 1; j <= tTableParent1.getHour(); j++) {
+                    for (int k = 1; k <= tTableParent1.getGrades().size(); k++) {
+                        for (int m = 1; m <= tTableParent1.getSubjects().size(); m++) {
                             index++;
-                            TimeTableChromosome timeTableChromosome = new TimeTableChromosome(i,j,k,l,m,tTableParent1);
-                            if(m_CopyFromFirstParent)
-                            {
-                                if (tTableParent1.getChromosomes().contains(timeTableChromosome))
-                                {
+                            TimeTableChromosome timeTableChromosome = new TimeTableChromosome(i, j, k, l, m, tTableParent1);
+                            if (m_CopyFromFirstParent) {
+                                if (tTableParent1.getChromosomes().contains(timeTableChromosome)) {
                                     firstChild.getChromosomes().add(timeTableChromosome);
                                 }
-                                if (tTableParent2.getChromosomes().contains(timeTableChromosome))
-                                {
+                                if (tTableParent2.getChromosomes().contains(timeTableChromosome)) {
+                                    secondChild.getChromosomes().add(timeTableChromosome);
+                                }
+                            } else {
+                                if (tTableParent2.getChromosomes().contains(timeTableChromosome)) {
+                                    firstChild.getChromosomes().add(timeTableChromosome);
+                                }
+                                if (tTableParent1.getChromosomes().contains(timeTableChromosome)) {
                                     secondChild.getChromosomes().add(timeTableChromosome);
                                 }
                             }
-                            else
-                            {
-                                if (tTableParent2.getChromosomes().contains(timeTableChromosome))
-                                {
-                                    firstChild.getChromosomes().add(timeTableChromosome);
-                                }
-                                if (tTableParent1.getChromosomes().contains(timeTableChromosome))
-                                {
-                                    secondChild.getChromosomes().add(timeTableChromosome);
-                                }
-                            }
-                            if (indexCuttingPoints != m_CuttingPointsLocations.size())
-                            {
-                                if (index>= m_CuttingPointsLocations.get(indexCuttingPoints))
-                                {
+                            if (indexCuttingPoints != m_CuttingPointsLocations.size()) {
+                                if (index >= m_CuttingPointsLocations.get(indexCuttingPoints)) {
                                     indexCuttingPoints++;
-                                    m_CopyFromFirstParent=!m_CopyFromFirstParent;
+                                    m_CopyFromFirstParent = !m_CopyFromFirstParent;
 
                                 }
                             }
@@ -142,6 +126,58 @@ public class CrossoverUtils
                 }
             }
         }
+        solutions.add(firstChild);
+        solutions.add(secondChild);
+        return solutions;
+    }
+
+    public static List<Solution> AspectOrientedByClass(TimeTable tTableParent1, TimeTable tTableParent2, int numOfCuttingPoints){
+        List<Solution> solutions=new ArrayList<>();
+        m_CopyFromFirstParent = true;
+        m_CuttingPointsLocations = new ArrayList<>(numOfCuttingPoints);
+        randomizeCrossingPoints(tTableParent1,tTableParent2, numOfCuttingPoints);
+        //unlimited generality for tTableParent1
+        TimeTable firstChild = createChild(tTableParent1);
+        TimeTable secondChild = createChild(tTableParent1);
+
+        int indexCuttingPoints=0;
+        int index=0;
+
+        for (int k=1;k<=tTableParent1.getGrades().size();k++) {
+            for (int i = 1; i <= tTableParent1.getDay(); i++) {
+                for (int j = 1; j <= tTableParent1.getHour(); j++) {
+                    for (int l = 1; l <= tTableParent1.getTeachers().size(); l++) {
+                        for (int m = 1; m <= tTableParent1.getSubjects().size(); m++) {
+                            index++;
+                            TimeTableChromosome timeTableChromosome = new TimeTableChromosome(i, j, k, l, m, tTableParent1);
+                            if (m_CopyFromFirstParent) {
+                                if (tTableParent1.getChromosomes().contains(timeTableChromosome)) {
+                                    firstChild.getChromosomes().add(timeTableChromosome);
+                                }
+                                if (tTableParent2.getChromosomes().contains(timeTableChromosome)) {
+                                    secondChild.getChromosomes().add(timeTableChromosome);
+                                }
+                            } else {
+                                if (tTableParent2.getChromosomes().contains(timeTableChromosome)) {
+                                    firstChild.getChromosomes().add(timeTableChromosome);
+                                }
+                                if (tTableParent1.getChromosomes().contains(timeTableChromosome)) {
+                                    secondChild.getChromosomes().add(timeTableChromosome);
+                                }
+                            }
+                            if (indexCuttingPoints != m_CuttingPointsLocations.size()) {
+                                if (index >= m_CuttingPointsLocations.get(indexCuttingPoints)) {
+                                    indexCuttingPoints++;
+                                    m_CopyFromFirstParent = !m_CopyFromFirstParent;
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         solutions.add(firstChild);
         solutions.add(secondChild);
         return solutions;
