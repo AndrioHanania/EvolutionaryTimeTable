@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/Jaxb/Jaxb.iml" filepath="$PROJECT_DIR$/Jaxb/Jaxb.iml" />
       <module fileurl="file://$PROJECT_DIR$/TimeTable/TimeTable.iml" filepath="$PROJECT_DIR$/TimeTable/TimeTable.iml" />
       <module fileurl="file://$PROJECT_DIR$/UI/UI.iml" filepath="$PROJECT_DIR$/UI/UI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WebApp/WebApp.iml" filepath="$PROJECT_DIR$/WebApp/WebApp.iml" />
     </modules>
   </component>
 </project>

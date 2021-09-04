@@ -134,7 +134,7 @@
                                           <ColumnConstraints fx:id="teachersGridTuesdayCol" hgrow="SOMETIMES" maxWidth="182.0" minWidth="10.0" prefWidth="164.0" />
                                         <ColumnConstraints fx:id="teachersGridWednesdayCol" hgrow="SOMETIMES" maxWidth="157.0" minWidth="10.0" prefWidth="146.0" />
                                         <ColumnConstraints fx:id="teachersGridThursdayCol" hgrow="SOMETIMES" maxWidth="144.0" minWidth="10.0" prefWidth="130.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="98.0" minWidth="10.0" prefWidth="97.0" />
+                                          <ColumnConstraints fx:id="teachersGridFridayCol" hgrow="SOMETIMES" maxWidth="98.0" minWidth="10.0" prefWidth="97.0" />
                                       </columnConstraints>
                                       <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -158,14 +158,15 @@
                                  <children>
                                     <ChoiceBox id="gradeChoiceBox" fx:id="gradeChoiceBox" layoutX="212.0" layoutY="24.0" prefWidth="150.0" />
                                     <Label layoutX="82.0" layoutY="29.0" text="Chosse grade: " />
-                                    <GridPane fx:id="gradeGridOptimalSolution" layoutX="25.0" layoutY="56.0" prefHeight="527.0" prefWidth="931.0">
+                                    <GridPane fx:id="gradeGridOptimalSolution" layoutX="11.0" layoutY="64.0" prefHeight="519.0" prefWidth="950.0">
                                        <columnConstraints>
-                                          <ColumnConstraints fx:id="teachersGridDayCol1" hgrow="SOMETIMES" maxWidth="158.0" minWidth="10.0" prefWidth="114.0" />
-                                          <ColumnConstraints fx:id="teachersGridSundayCol1" hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="182.0" />
-                                          <ColumnConstraints fx:id="teachersGridMondayyCol1" hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="162.0" />
-                                          <ColumnConstraints fx:id="teachersGridTuesdayCol1" hgrow="SOMETIMES" maxWidth="172.0" minWidth="10.0" prefWidth="172.0" />
-                                          <ColumnConstraints fx:id="teachersGridWednesdayCol1" hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="165.0" />
-                                          <ColumnConstraints fx:id="teachersGridThursdayCol1" hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="137.0" />
+                                          <ColumnConstraints fx:id="teachersGridDayCol1" hgrow="SOMETIMES" maxWidth="158.0" minWidth="10.0" prefWidth="110.0" />
+                                          <ColumnConstraints fx:id="teachersGridSundayCol1" hgrow="SOMETIMES" maxWidth="202.0" minWidth="10.0" prefWidth="150.0" />
+                                          <ColumnConstraints fx:id="teachersGridMondayyCol1" hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="158.0" />
+                                          <ColumnConstraints fx:id="teachersGridTuesdayCol1" hgrow="SOMETIMES" maxWidth="172.0" minWidth="10.0" prefWidth="163.0" />
+                                          <ColumnConstraints fx:id="teachersGridWednesdayCol1" hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="146.0" />
+                                          <ColumnConstraints fx:id="teachersGridThursdayCol1" hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="128.0" />
+                                          <ColumnConstraints fx:id="teachersGridFridayCol" hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="110.0" />
                                        </columnConstraints>
                                        <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />

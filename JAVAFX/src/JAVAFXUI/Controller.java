@@ -237,8 +237,8 @@ public class Controller implements Initializable
                     String hour = key.substring(1);
                     Integer dayInt = Integer.valueOf(day);
                     Integer hourInt = Integer.valueOf(hour);
-                    label.textProperty().bind(Bindings.concat("Teacher: ",t.getTeacher().getName()," ID: ",
-                            t.getTeacher().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().getName()," ID: ",
+                    label.textProperty().bind(Bindings.concat("Teacher: ",t.getTeacher().getName(),System.lineSeparator(), "ID: ",
+                            t.getTeacher().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().getName(),System.lineSeparator(), "ID: ",
                             t.getSubject().getIdNumber()));
                     gradeGridOptimalSolution.add(label,dayInt,hourInt);
                 }
@@ -275,6 +275,7 @@ public class Controller implements Initializable
         Label tuesdayLabel = new Label("Tuesday");
         Label wednesdayLabel = new Label("wednesday");
         Label thursdayLabel = new Label("Thursday");
+        Label fridayLabel = new Label("Friday");
 
         Label eightOclockLabel = new Label("8:00");
         Label nineOclockLabel = new Label("9:00");
@@ -292,6 +293,7 @@ public class Controller implements Initializable
         grid.setConstraints(tuesdayLabel,3,0);
         grid.setConstraints(wednesdayLabel,4,0);
         grid.setConstraints(thursdayLabel,5,0);
+        grid.setConstraints(fridayLabel,6,0);
 
         grid.setConstraints(eightOclockLabel,0,1);
         grid.setConstraints(nineOclockLabel,0,2);
@@ -304,7 +306,7 @@ public class Controller implements Initializable
         grid.setConstraints(fourOclockLabel,0,9);
 
         grid.getChildren().addAll(dayTimeLabel,sundayLabel,mondayLabel,tuesdayLabel
-                ,wednesdayLabel,thursdayLabel,eightOclockLabel,nineOclockLabel,tentOclockLabel,elevenOclockLabel,
+                ,wednesdayLabel,thursdayLabel,fridayLabel, eightOclockLabel,nineOclockLabel,tentOclockLabel,elevenOclockLabel,
                 twelveOclockLabel,oneOclockLabel,twoOclockLabel,threeOclockLabel,fourOclockLabel);
 
 
@@ -930,8 +932,8 @@ public class Controller implements Initializable
                 Integer dayInt = Integer.valueOf(day);
                 Integer hourInt = Integer.valueOf(hour);
                 // subjectNameLabel.setText(t.getSubject().getName());
-                label.textProperty().bind(Bindings.concat("Grade: ",t.getGrade().getName()," ID: ",
-                        t.getGrade().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().getName()," ID: ",
+                label.textProperty().bind(Bindings.concat("Grade: ",t.getGrade().getName(),System.lineSeparator(), "ID: ",
+                        t.getGrade().getIdNumber(),System.lineSeparator(), "Subject: ", t.getSubject().getName(),System.lineSeparator(),"ID: ",
                         t.getSubject().getIdNumber()));
                 // teacherGridOptimalSolution.setConstraints.(subjectNameLabel,day,hour);
                 label.setWrapText(true);
@@ -1048,6 +1050,8 @@ public class Controller implements Initializable
         m_SPSelectionInfo.set("");
         m_SPCrossoverInfo.set("");
         //mutations
+        sizerTableView.getItems().clear();
+        flippingTableView.getItems().clear();
     }
 
 
