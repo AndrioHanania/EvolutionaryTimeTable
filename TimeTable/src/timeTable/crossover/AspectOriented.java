@@ -31,9 +31,9 @@ public class AspectOriented extends Crossover {
     {
         TimeTable TTableParent1 = (TimeTable) parent1;
         TimeTable TTableParent2 = (TimeTable) parent2;
-        if(m_OrientedBy.equals("Teacher"))
+        if(m_OrientedBy.equals("TEACHER"))
             return CrossoverUtils.AspectOrientedByTeacher(TTableParent1,TTableParent2, m_NumOfCuttingPoints);
-        else if (m_OrientedBy.equals("Class"))
+        else if (m_OrientedBy.equals("CLASS"))
             return CrossoverUtils.AspectOrientedByClass(TTableParent1,TTableParent2, m_NumOfCuttingPoints);
         return null;
     }

@@ -20,7 +20,7 @@ public class Tournament extends Selection
         return "Name: Tournament, " + "PTE: " + m_Pte;
     }
 
-    public void setPTE(int pte){m_Pte=pte;}
+    public void setPTE(double pte){m_Pte=pte;}
 
     @Override
     public Population execute(Population currentGeneration)
