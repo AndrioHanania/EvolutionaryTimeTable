@@ -474,11 +474,19 @@ public class Controller implements Initializable
         flippingMaxTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
 
             @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
+                String str = event.getNewValue();
+                try{
+                    int num = Integer.parseInt(str);
+                    ProductFlipping flippingProduct = event.getRowValue();
+                    flippingProduct.setMaxTupples(event.getNewValue());
+                    //changeFlippingInEngine(flip);
+                    flip.setMaxTupples(num);
+                    // is an integer!
 
-                ProductFlipping flippingProduct = event.getRowValue();
-                flippingProduct.setMaxTupples(event.getNewValue());
-                //changeFlippingInEngine(flip);
-                flip.setMaxTupples(Integer.parseInt(flippingProduct.getMaxTupples()));
+                } catch (NumberFormatException e) {
+                    m_SPMessageToUser.set("Max Tupples must be an Integer");
+                    // not an integer!
+                }
             }
         });
     }
@@ -1391,11 +1399,11 @@ public class Controller implements Initializable
         gradesTexArea.textProperty().bind(m_SPGradesInfo);
         rulesTextArea.textProperty().bind(m_SPRulesInfo);
         selectionTextArea.textProperty().bind(m_SPSelectionInfo);
-        changeElitismButton.disableProperty().bind(m_BPIsPause);
-        changeElitismTextField.disableProperty().bind(m_BPIsPause);
-        changeSelectionButton.disableProperty().bind(m_BPIsPause);
+        changeElitismButton.disableProperty().bind(m_BPIsPause.not());
+        changeElitismTextField.disableProperty().bind(m_BPIsPause.not());
+        changeSelectionButton.disableProperty().bind(m_BPIsPause.not());
         crossoverTextArea.textProperty().bind(m_SPCrossoverInfo);
-        changeCrossoverButton.disableProperty().bind(m_BPIsPause);
+        changeCrossoverButton.disableProperty().bind(m_BPIsPause.not());
         elitismLabel.textProperty().bind(m_SPElitism);
 
         numberOfGenerationTextField.setDisable(true);
