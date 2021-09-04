@@ -414,7 +414,7 @@ public class Controller implements Initializable///heloooooo
                 Double val = Double.parseDouble(event.getNewValue());
                 if(val<0 || val>1)
                 {
-                    m_SPMessageToUser.set("probability is not vetween 0 and 1");
+                    m_SPMessageToUser.set("probability must be between 0 and 1");
                 }
                 else
                 {
@@ -428,9 +428,21 @@ public class Controller implements Initializable///heloooooo
         sizerTotalTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductSizer, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<ProductSizer, String> event) {
-                ProductSizer sizerProduct = event.getRowValue();
-                sizerProduct.setTotalTupples(event.getNewValue());
-                sizer.setTotalTupples(Integer.parseInt(sizerProduct.getTotalTupples()));
+                String str = event.getNewValue();
+                try {
+                    int num = Integer.parseInt(str);
+                    ProductSizer sizerProduct = event.getRowValue();
+                    sizerProduct.setTotalTupples(event.getNewValue());
+                    sizer.setTotalTupples(num);
+
+                } catch (NumberFormatException e)
+                {
+                    m_SPMessageToUser.set("Total Tupples must be an Integer");
+                    // not an integer!
+                }
+         //      ProductSizer sizerProduct = event.getRowValue();
+            //    sizerProduct.setTotalTupples(event.getNewValue());
+         //       sizer.setTotalTupples(Integer.parseInt(sizerProduct.getTotalTupples()));
             }
         });
     }
@@ -478,10 +490,19 @@ public class Controller implements Initializable///heloooooo
         flippingMaxTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductFlipping,String>>() {
 
             @Override public void handle(TableColumn.CellEditEvent<ProductFlipping, String> event) {
-                ProductFlipping flippingProduct = event.getRowValue();
-                flippingProduct.setMaxTupples(event.getNewValue());
-                //changeFlippingInEngine(flip);
-                flip.setMaxTupples(Integer.parseInt(flippingProduct.getMaxTupples()));
+                String str = event.getNewValue();
+                try{
+                    int num = Integer.parseInt(str);
+                        ProductFlipping flippingProduct = event.getRowValue();
+                        flippingProduct.setMaxTupples(event.getNewValue());
+                        //changeFlippingInEngine(flip);
+                        flip.setMaxTupples(num);
+                        // is an integer!
+
+                } catch (NumberFormatException e) {
+                    m_SPMessageToUser.set("Max Tupples must be an Integer");
+                    // not an integer!
+                }
             }
         });
     }
@@ -907,7 +928,6 @@ public class Controller implements Initializable///heloooooo
 
     @FXML void OnFileChooser(ActionEvent event)
     {
-
             fileChooserButton.setDisable(true);
             FileChooser fileChooser = new FileChooser();
             File selectedFile = fileChooser.showOpenDialog(null);
@@ -1121,7 +1141,7 @@ public class Controller implements Initializable///heloooooo
             {
                 ui.getEngine().pause();
                 pauseResumeButton.setText("Resume");
-                m_SPMessageToUser.set("Pause");
+                m_SPMessageToUser.set("Paused");
                 m_BPIsPause.set(true);
 
             }
