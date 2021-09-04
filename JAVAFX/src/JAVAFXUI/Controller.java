@@ -408,12 +408,25 @@ public class Controller implements Initializable
             }
         });
 
+
         sizerTotalTupplesTableCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<ProductSizer, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<ProductSizer, String> event) {
-                ProductSizer sizerProduct = event.getRowValue();
-                sizerProduct.setTotalTupples(event.getNewValue());
-                sizer.setTotalTupples(Integer.parseInt(sizerProduct.getTotalTupples()));
+                String str = event.getNewValue();
+                try {
+                    int num = Integer.parseInt(str);
+                    ProductSizer sizerProduct = event.getRowValue();
+                    sizerProduct.setTotalTupples(event.getNewValue());
+                    sizer.setTotalTupples(num);
+
+                } catch (NumberFormatException e)
+                {
+                    m_SPMessageToUser.set("Total Tupples must be an Integer");
+                    // not an integer!
+                }
+                //      ProductSizer sizerProduct = event.getRowValue();
+                //    sizerProduct.setTotalTupples(event.getNewValue());
+                //       sizer.setTotalTupples(Integer.parseInt(sizerProduct.getTotalTupples()));
             }
         });
     }
